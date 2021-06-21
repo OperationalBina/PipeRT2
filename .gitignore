@@ -68,8 +68,8 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Not ignoring Sphinx documentation
-docs/build
+# Sphinx documentation
+docs/_build/
 
 # PyBuilder
 target/
