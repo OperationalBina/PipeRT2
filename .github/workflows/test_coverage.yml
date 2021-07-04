@@ -24,6 +24,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Generate Report
       run: |
+        pip install pytest
         pip install coverage
         coverage run -m pytest
     - name: Upload Coverage to Codecov
