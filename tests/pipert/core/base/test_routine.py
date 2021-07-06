@@ -10,7 +10,9 @@ MAX_TIMEOUT_WAITING = 3
 
 @pytest.fixture()
 def dummy_routine():
-    return DummyRoutine(name="Dummy", message_handler=Dummy(), logger=Dummy())
+    dummy_routine = DummyRoutine()
+    dummy_routine.init(name="Dummy", message_handler=Dummy(), logger=Dummy())
+    return dummy_routine
 
 
 def test_event_trigger(dummy_routine):
