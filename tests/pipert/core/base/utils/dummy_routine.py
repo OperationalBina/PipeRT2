@@ -5,9 +5,8 @@ DUMMY_ROUTINE_EVENT_NAME = "Change"
 
 class DummyRoutine(Routine):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.counter = 0
+    def __init__(self, counter=0):
+        self.counter = counter
         self.inc = True
 
     def main_logic(self, data):

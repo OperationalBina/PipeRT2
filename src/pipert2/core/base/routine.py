@@ -16,7 +16,7 @@ class Routine(ABC):
     events = marking_functions_annotation()
     runners = marking_functions_annotation()
 
-    def __init__(self, name: str, message_handler, logger, *args, **kwargs): # TODO - Add MessageHandler and PipeLogger type hints
+    def init(self, name: str, message_handler, logger, *args, **kwargs): # TODO - Add MessageHandler and PipeLogger type hints
         self.name = name
         self.message_handler = message_handler
         self.logger = logger
