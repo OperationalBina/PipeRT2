@@ -16,14 +16,17 @@ class Routine(ABC):
     events = marking_functions_annotation()
     runners = marking_functions_annotation()
 
-    def __init__(self, name: str, message_handler, logger, **kwargs): # TODO - Add MessageHandler and PipeLogger type hints
+    def __init__(self, name: str, message_handler, logger, *args, **kwargs): # TODO - Add MessageHandler and PipeLogger type hints
         self.name = name
         self.message_handler = message_handler
         self.logger = logger
         self.stop_event = mp.Event()
+        self.stop_event.set()
 
         if "runner" in kwargs and kwargs["runner"] in self.runners.all:
             self.runners.all[kwargs["runner"]](self)
+        else:
+            self.set_runner_as_thread()
 
     @abstractmethod
     def main_logic(self, data):
@@ -104,4 +107,5 @@ class Routine(ABC):
 
         if event_name in self.events.all:
             self.logger.info(f"Running event '{event_name}'")
-            self.events[event_name](self)
+            for callback in self.events.all[event_name]:
+                callback(self)
