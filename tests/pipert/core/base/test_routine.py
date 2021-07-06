@@ -15,8 +15,8 @@ def dummy_routine():
     return dummy_routine
 
 
-def test_event_trigger(dummy_routine):
-    dummy_routine.trigger_event(DUMMY_ROUTINE_EVENT_NAME)
+def test_event_execution(dummy_routine):
+    dummy_routine.execute_event(DUMMY_ROUTINE_EVENT_NAME)
     assert not dummy_routine.inc
 
 

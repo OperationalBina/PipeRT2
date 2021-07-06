@@ -98,14 +98,22 @@ class Routine(ABC):
             self.stop_event.set()
             self.runner.join()
 
-    def trigger_event(self, event_name: str) -> None:
-        """Trigger an event to start
+    def execute_event(self, event_name: str) -> None:
+        """Execute an event to start
 
         Args:
-            event_name (str): The name of the event to trigger
+            event_name (str): The name of the event to execute
         """
 
         if event_name in self.events.all:
             self.logger.info(f"Running event '{event_name}'")
             for callback in self.events.all[event_name]:
                 callback(self)
+
+    def notify_event(self, event_name: str) -> None:
+        """Notify that event has happened
+
+        Args:
+            event_name (str): The name of the event to notify
+        """
+        pass  # TODO - Implement !!
