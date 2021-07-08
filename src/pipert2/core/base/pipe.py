@@ -1,5 +1,7 @@
 from src.pipert2.core.base.flow import Flow
+from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.managers.event_board import EventBoard
+from src.pipert2.core.managers.network import Network
 
 
 # TODO - Add typings
@@ -10,7 +12,7 @@ class Pipe:
     and more.
     """
 
-    def __init__(self, networking, logger):  # TODO - default logger and default networking (Queue)
+    def __init__(self, networking: Network, logger: PipeLogger):  # TODO - default logger and default networking (Queue)
         self.network = networking
         self.logger = logger
         self.flows = {}
@@ -44,7 +46,7 @@ class Pipe:
         """Build the pipe to be ready to start working.
         """
 
-        # TODO - Start the flows processes (and their event listeners).
+        # TODO - Start the flows processes (and inside their event listeners should start).
         pass
 
     def notify_event(self, event_name: str) -> None:
