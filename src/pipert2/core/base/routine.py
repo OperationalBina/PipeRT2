@@ -1,3 +1,5 @@
+from src.pipert2.core.handlers.message_handler import MessageHandler
+from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.utils.annotations import marking_functions_annotation
 
 import threading
@@ -16,7 +18,7 @@ class Routine(ABC):
     events = marking_functions_annotation()
     runners = marking_functions_annotation()
 
-    def init(self, name: str, message_handler, logger, *args, **kwargs): # TODO - Add MessageHandler and PipeLogger type hints
+    def init(self, name: str, message_handler: MessageHandler, logger: PipeLogger, *args, **kwargs):
         self.name = name
         self.message_handler = message_handler
         self.logger = logger
