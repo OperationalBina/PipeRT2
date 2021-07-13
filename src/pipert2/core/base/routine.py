@@ -1,6 +1,7 @@
 from src.pipert2.core.handlers.message_handler import MessageHandler
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.utils.annotations import marking_functions_annotation
+from src.pipert2.utils.dummy_object import Dummy
 
 import threading
 import multiprocessing as mp
@@ -18,17 +19,36 @@ class Routine(ABC):
     events = marking_functions_annotation()
     runners = marking_functions_annotation()
 
-    def init(self, name: str, message_handler: MessageHandler, logger: PipeLogger, *args, **kwargs):
+    def __init__(self, name: str = ""):
         self.name = name
-        self.message_handler = message_handler
-        self.logger = logger
+        self.message_handler = None
+        self._logger: PipeLogger = Dummy()
         self.stop_event = mp.Event()
         self.stop_event.set()
 
+    def initialize(self, message_handler: MessageHandler, *args, **kwargs):
+        self.message_handler = message_handler
+
         if "runner" in kwargs and kwargs["runner"] in self.runners.all:
-            self.runners.all[kwargs["runner"]](self)
+            self._get_runners()[kwargs["runner"]](self)
         else:
             self.set_runner_as_thread()
+
+    @property
+    def logger(self):
+        return self._logger
+
+    @classmethod
+    def get_events(cls):
+        routine_events = cls.events.all[Routine.__name__]
+        for event_name, events_functions in routine_events.items():
+            cls.events.all[cls.__name__][event_name].update(events_functions)
+
+        return cls.events.all[cls.__name__]
+
+    @classmethod
+    def _get_runners(cls):
+        return cls.runners.all[cls.__name__]
 
     @abstractmethod
     def main_logic(self, data):
@@ -107,9 +127,11 @@ class Routine(ABC):
             event_name (str): The name of the event to execute
         """
 
-        if event_name in self.events.all:
+        mapped_events = self.get_events()
+
+        if event_name in mapped_events:
             self.logger.info(f"Running event '{event_name}'")
-            for callback in self.events.all[event_name]:
+            for callback in mapped_events[event_name]:
                 callback(self)
 
     def notify_event(self, event_name: str) -> None:
