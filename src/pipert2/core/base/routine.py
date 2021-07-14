@@ -23,6 +23,7 @@ class Routine(ABC):
     def __init__(self, name: str = ""):
         self.name = name
         self.message_handler = None
+        self.runner_creator = None
         self.event_notifier: Callable = Dummy()
         self._logger: PipeLogger = Dummy()
         self.stop_event = mp.Event()
