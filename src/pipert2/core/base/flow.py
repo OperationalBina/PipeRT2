@@ -12,11 +12,11 @@ class Flow:
         self.routines = {}
         self.name = name
 
-        flow_events_to_listen = set(self.events.all.keys())
+        flow_events_to_listen = set(self.get_events().keys())
 
         for routine in routines:
-            routine.init(logger=logger.get_child(), event_notifier=event_board.get_notifier())
-            flow_events_to_listen.update(routine.events.all.keys())
+            routine.initialize(logger=logger.get_child(), event_notifier=event_board.get_notifier())
+            flow_events_to_listen.update(routine.get_events().keys())
 
         self.logger = logger
         self.event_handler = event_board.get_event_handler(flow_events_to_listen)
@@ -50,3 +50,7 @@ class Flow:
             self.logger.info(f"Running event '{event_name}'")
             for callback in self.events.all[event_name]:
                 callback(self)
+
+    @classmethod
+    def get_events(cls):
+        return cls.events.all[cls.__name__]
