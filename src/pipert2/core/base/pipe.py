@@ -26,10 +26,16 @@ class Pipe:
             auto_wire (bool): Automatically connect the routines to each other by the order of their entry.
             routines: (Routine): List of routines to register to the flow.
         """
+        for routine in routines:
+            routine.initialize(message_handler=self.network.get_message_handler(routine.name),
+                               event_notifier=self.event_board.get_notifier())
 
-        flow = Flow(flow_name)
-        flow.register_routines(self.event_board, self.network, auto_wire, *routines)
+        flow = Flow(flow_name, self.event_board, self.logger.get_child(), *routines)
         self.flows[flow_name] = flow
+
+        if auto_wire:
+            for first_routine, second_routine in zip(routines, routines[1:]):
+                self.network.link(src=first_routine, destination=second_routine)
 
     def link(self, *wires):
         """Connect the routines to each other by their wires configuration.
@@ -64,3 +70,25 @@ class Pipe:
 
         for flow in self.flows.values():
             flow.join()
+
+# pipe = Pipe(networking=RedisNetworking, logger="")
+#
+# r1 = R1(abc=123)
+# r2 = R2()
+# r3 = R3()
+#
+# pipe.create_flow(r1, r2, flow_name="1", auto_wire=False)
+# pipe.create_flow(r3, flow_name="2")
+#
+# pipe.link(Wire(src=r1, destinations=(r2, r3)),
+#           Wire(src=r2,  destinations=(r3, )))
+#
+# pipe.build()
+#
+# pipe.trigger_event("start")
+#
+# time.sleep(20)
+#
+# pipe.trigger_event("kill")
+#
+# pipe.join()
