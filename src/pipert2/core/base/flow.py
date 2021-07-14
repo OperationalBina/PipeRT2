@@ -15,7 +15,7 @@ class Flow:
         flow_events_to_listen = set(self.get_events().keys())
 
         for routine in routines:
-            routine.initialize(logger=logger.get_child(), event_notifier=event_board.get_notifier())
+            routine.set_logger(logger=logger.get_child())
             flow_events_to_listen.update(routine.get_events().keys())
 
         self.logger = logger
@@ -46,9 +46,9 @@ class Flow:
         for routine in self.routines.values():
             routine.execute_event(event_name)
 
-        if event_name in self.events.all:
+        if event_name in self.get_events():
             self.logger.info(f"Running event '{event_name}'")
-            for callback in self.events.all[event_name]:
+            for callback in self.get_events()[event_name]:
                 callback(self)
 
     @classmethod
