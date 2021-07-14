@@ -5,3 +5,4 @@ class Dummy(object):
     """
     def do(self, *args, **kw): return self
     def __getattr__(self, _): return self.do
+    def __call__(self, *args, **kwargs): return self.do

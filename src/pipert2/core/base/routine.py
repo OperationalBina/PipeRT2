@@ -5,6 +5,7 @@ from src.pipert2.utils.dummy_object import Dummy
 
 import threading
 import multiprocessing as mp
+from typing import Callable
 from abc import ABC, abstractmethod
 from functools import partial
 
@@ -22,21 +23,22 @@ class Routine(ABC):
     def __init__(self, name: str = ""):
         self.name = name
         self.message_handler = None
+        self.event_notifier: Callable = Dummy()
         self._logger: PipeLogger = Dummy()
         self.stop_event = mp.Event()
         self.stop_event.set()
 
-    def initialize(self, message_handler: MessageHandler, *args, **kwargs):
+    def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         self.message_handler = message_handler
+        self.event_notifier = event_notifier
 
         if "runner" in kwargs and kwargs["runner"] in self.runners.all:
             self._get_runners()[kwargs["runner"]](self)
         else:
             self.set_runner_as_thread()
 
-    @property
-    def logger(self):
-        return self._logger
+    def set_logger(self, logger: PipeLogger):
+        self._logger = logger
 
     @classmethod
     def get_events(cls):
@@ -84,7 +86,7 @@ class Routine(ABC):
             try:
                 output_data = self.main_logic(message.get_payload())
             except Exception as error:
-                self.logger.exception(f"The routine has crashed: {error}")
+                self._logger.exception(f"The routine has crashed: {error}")
             else:
                 message.update_payload(output_data)
                 self.message_handler.put(message)
@@ -103,7 +105,7 @@ class Routine(ABC):
         """
 
         if self.stop_event.is_set():
-            self.logger.info("Starting")  # TODO - Maybe add an infrastructure logg type instead of info
+            self._logger.info("Starting")  # TODO - Maybe add an infrastructure logg type instead of info
             self.stop_event.clear()
             self.runner = self.runner_creator()
             self.runner.start()
@@ -116,7 +118,7 @@ class Routine(ABC):
         """
 
         if not self.stop_event.is_set():
-            self.logger.info("Stopping")
+            self._logger.info("Stopping")
             self.stop_event.set()
             self.runner.join()
 
@@ -130,7 +132,7 @@ class Routine(ABC):
         mapped_events = self.get_events()
 
         if event_name in mapped_events:
-            self.logger.info(f"Running event '{event_name}'")
+            self._logger.info(f"Running event '{event_name}'")
             for callback in mapped_events[event_name]:
                 callback(self)
 
@@ -140,4 +142,5 @@ class Routine(ABC):
         Args:
             event_name (str): The name of the event to notify
         """
-        pass  # TODO - Implement !!
+
+        self.event_notifier(event_name)
