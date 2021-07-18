@@ -1,4 +1,5 @@
 from collections import defaultdict
+from functools import partial
 import re
 
 
@@ -34,18 +35,17 @@ def marking_functions_annotation():
 
     registry = defaultdict(lambda: defaultdict(set))
 
-    def registrar(params_or_func):
-        if callable(params_or_func):
-            if (not hasattr(registrar, "last_params")) or (registrar.last_params is None):
-                registrar.last_params = "default_key"
-            class_name = re.search(' (.*)\\.', params_or_func.__str__()).group(1)
-            registry[class_name][registrar.last_params].add(params_or_func)
-            registrar.last_params = None
-            return params_or_func
+    def key_registrar(key):
+        if callable(key):
+            return registrar(key="default_key", function=key)
         else:
-            registrar.last_params = params_or_func
-            return registrar
+            return partial(registrar, key=key)
 
-    registrar.all = registry
+    def registrar(function, key):
+        class_name = re.search(' (.*)\\.', function.__str__()).group(1)
+        registry[class_name][key].add(function)
+        return registrar
 
-    return registrar
+    key_registrar.all = registry
+
+    return key_registrar
