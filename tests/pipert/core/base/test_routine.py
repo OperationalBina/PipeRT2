@@ -21,7 +21,7 @@ def test_event_execution(dummy_routine):
 
 
 def test_routine_has_registered_events(dummy_routine):
-    assert DUMMY_ROUTINE_EVENT_NAME in dummy_routine.events.all
+    assert DUMMY_ROUTINE_EVENT_NAME in dummy_routine.get_events()
 
 
 def test_routine_execution(mocker, dummy_routine):
