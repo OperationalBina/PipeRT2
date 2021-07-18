@@ -1,6 +1,6 @@
+import re
 from collections import defaultdict
 from functools import partial
-import re
 
 
 def marking_functions_annotation():
