@@ -6,27 +6,50 @@ from multiprocessing import Process
 
 
 class Flow:
+    """Flow is an entity designed for running a group of routines in a single process.
+    It also responsible for his routines to be notified when an event is happening.
+    """
+
     events = marking_functions_annotation()
 
     def __init__(self, name: str, event_board: EventBoard, logger: PipeLogger, *routines: Routine):
+        """
+        Args:
+            name (str): Name of the flow
+            event_board (EventBoard): The EventBoard of the pipe.
+            logger (PipeLogger): PipeLogger object for logging the flow actions
+            routines (Routine): The routines that will be in the flow
+
+        Attributes:
+            routines (dict[str, Routine]): Dictionary mapping the routines to their name.
+            name (str): Name of the flow
+            logger (PipeLogger): PipeLogger object for logging the flow actions
+            event_handler (EventHandler): EventHandler object for communicating with the
+                event system of the pipe.
+        """
+
         self.routines = {}
         self.name = name
+        self.logger = logger
 
         flow_events_to_listen = set(self.get_events().keys())
 
         for routine in routines:
             routine.set_logger(logger=logger.get_child())
             flow_events_to_listen.update(routine.get_events().keys())
+            self.routines[routine.name] = routine
 
-        self.logger = logger
         self.event_handler = event_board.get_event_handler(flow_events_to_listen)
 
-    def build(self):
+    def build(self) -> None:
+        """Make the flow ready to listen to events and go."""
+
         self.flow_process = Process(target=self.run)
         self.flow_process.start()
 
-    # The process function, starts the event listener
-    def run(self):
+    def run(self) -> None:
+        """The flow process, executing the pipe events that occur"""
+
         event_names = ""
         while event_names != "kill":
             self.event_handler.wait()
@@ -42,7 +65,13 @@ class Flow:
     def stop(self):
         self.logger.info("Stopping")
 
-    def execute_event(self, event_name):
+    def execute_event(self, event_name: str) -> None:
+        """Execute the event callbacks in the flow and its routines.
+
+        Args:
+            event_name (str): The name of the event to be executed.
+        """
+
         for routine in self.routines.values():
             routine.execute_event(event_name)
 
@@ -53,4 +82,10 @@ class Flow:
 
     @classmethod
     def get_events(cls):
+        """Get the events of the flow
+
+            Returns:
+                dict[str, list[Callback]]: The events callbacks mapped by their events.
+        """
+
         return cls.events.all[cls.__name__]
