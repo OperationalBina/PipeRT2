@@ -19,9 +19,15 @@ class Routine(ABC):
 
     events = marking_functions_annotation()
     runners = marking_functions_annotation()
+    routines_created_counter = 0
 
-    def __init__(self, name: str = ""):
-        self.name = name
+    def __init__(self, name: str = None):
+        if name is not None:
+            self.name = name
+        else:
+            self.name = f"{self.__class__.__name__}-{self.routines_created_counter}"
+            self.routines_created_counter += 1
+
         self.message_handler = None
         self.runner_creator = None
         self.event_notifier: Callable = Dummy()
