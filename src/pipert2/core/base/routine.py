@@ -22,6 +22,19 @@ class Routine(ABC):
     routines_created_counter = 0
 
     def __init__(self, name: str = None):
+        """
+        Args:
+            name (str): Name of the routine
+
+        Attributes:
+            name (str): Name of the flow
+            message_handler (MessageHandler): Message handler of the routine to send and receive messages
+            runner_creator (Callback): Callback for running the routine's main logic
+            event_notifier (Callback): Callback for notifying an event has occurred
+            _logger (PipeLogger): The routines logger object
+            stop_event (mp.Event): A multiprocessing event object indicating the routine state (run/stop)
+        """
+
         if name is not None:
             self.name = name
         else:
@@ -36,6 +49,14 @@ class Routine(ABC):
         self.stop_event.set()
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
+        """Initialize the routine to be ready to run
+
+        Args:
+            message_handler (MessageHandler): The routines message
+            event_notifier (Callable): A callable object for notifying an event
+            kwargs: Additional parameters for setting the routine with certain behaviors
+
+        """
         self.message_handler = message_handler
         self.event_notifier = event_notifier
 
@@ -49,6 +70,12 @@ class Routine(ABC):
 
     @classmethod
     def get_events(cls):
+        """Get the events of the routine
+
+        Returns:
+            dict[str, list[Callback]]: The events callbacks mapped by their events
+        """
+
         routine_events = cls.events.all[Routine.__name__]
         for event_name, events_functions in routine_events.items():
             cls.events.all[cls.__name__][event_name].update(events_functions)
@@ -82,7 +109,7 @@ class Routine(ABC):
         raise NotImplementedError
 
     def _extended_run(self) -> None:
-        """Wrapper method for executing the entire routine logic.
+        """Wrapper method for executing the entire routine logic
 
         """
 
@@ -106,7 +133,7 @@ class Routine(ABC):
 
     @events("start")
     def start(self) -> None:
-        """Start running the routine.
+        """Start running the routine
 
         (This method will be called when the 'start' event is triggered)
         """
@@ -119,7 +146,7 @@ class Routine(ABC):
 
     @events("stop")
     def stop(self) -> None:
-        """Stop the routine from running.
+        """Stop the routine from running
 
         (This method will be called when the 'stop' event is triggered)
         """
