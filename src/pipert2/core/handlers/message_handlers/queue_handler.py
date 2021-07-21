@@ -23,7 +23,7 @@ class QueueHandler(MessageHandler):
         self.blocking = blocking
         self.timeout = timeout
 
-    def get(self):
+    def _get(self):
         """Get a message from the input queue.
         If blocking is true, wait the set timeout for a message to arrive,
         otherwise do nothing if the queue is empty.
@@ -41,7 +41,7 @@ class QueueHandler(MessageHandler):
 
         return message
 
-    def put(self, message: Message):
+    def _put(self, message: Message):
         """Put a message into the output queue.
         If blocking is true, try to push the message into the queue if it not full,
         otherwise push the message forcibly into the queue.
