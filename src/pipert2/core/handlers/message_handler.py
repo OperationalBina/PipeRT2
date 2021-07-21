@@ -9,12 +9,11 @@ class MessageHandler(ABC):
     and not with other routines directly.
     """
 
-    def __init__(self, input_obj, output_obj):
-        self.input = input_obj
-        self.output = output_obj
+    def __init__(self):
+        pass
 
     @abstractmethod
-    def get(self):
+    def _get(self) -> Message:
         """Returns the message from the input object.
 
         Returns:
@@ -24,12 +23,30 @@ class MessageHandler(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def put(self, message: Message):
+    def _put(self, message: Message):
         """Puts a given message into the output object.
 
         Args:
             message: The message to be sent.
 
         """
-
         raise NotImplementedError
+
+    def put(self, message: Message):
+        """Encodes a given message and calls the implemented put method.
+
+        Args:
+            message: The message to be sent.
+
+        """
+
+        self._put(Message.encode(message))
+
+    def get(self) -> Message:
+        """Decodes the message received from the implemented get method.
+
+        Returns: A decoded message object.
+
+        """
+
+        return Message.decode(self._get())
