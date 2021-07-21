@@ -14,7 +14,7 @@ class MessageHandler(ABC):
         self.output = output_obj
 
     @abstractmethod
-    def get(self):
+    def get(self) -> Message:
         """Returns the message from the input object.
 
         Returns:
