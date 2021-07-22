@@ -1,4 +1,5 @@
 import pytest
+from pytest_mock import MockerFixture
 
 from src.pipert2.core.base.message import Message
 from src.pipert2.utils.dummy_object import Dummy
@@ -8,7 +9,7 @@ MESSAGE_DATA = {"Feeling": "Good", "It's": "u", "Not no": "yes"}
 
 
 @pytest.fixture()
-def dummy_message(mocker):
+def dummy_message(mocker: MockerFixture):
     msg = Message(data=MESSAGE_DATA, source_address="test_message")
     msg.payload = mocker.Mock()
     msg.payload.data = MESSAGE_DATA
@@ -36,7 +37,7 @@ def test_record_entry(dummy_message: Message):
                for entry_name, history_entry_name in zip(ENTRY_LIST, dummy_message.history.keys()))
 
 
-def test_encode_message(mocker, dummy_message: Message):
+def test_encode_message(mocker: MockerFixture, dummy_message: Message):
     mocker.patch("pickle.dumps")
     payload_mock = dummy_message.payload
 
