@@ -1,7 +1,7 @@
 from ..message_handler import MessageHandler
 from multiprocessing import Queue
 from queue import Full, Empty
-from pipert2.core.base.message import Message
+from src.pipert2.core.base.message import Message
 
 
 class QueueHandler(MessageHandler):
