@@ -47,6 +47,8 @@ def test_get(blocking_queue_handler, non_blocking_queue_handler, input_queue):
     assert blocking_queue_handler.get() == dummy_message
     input_queue.put(dummy_message)
     assert non_blocking_queue_handler.get() == dummy_message
+    assert blocking_queue_handler.get() is None
+    assert non_blocking_queue_handler.get() is None
 
 
 def test_force_push(non_blocking_queue_handler, output_queue, dummy_message):
