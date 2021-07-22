@@ -11,10 +11,10 @@ from functools import partial
 
 
 class Routine(ABC):
-    """A routine is responsible for performing one of the component’s main tasks.
-    It can be run either as a thread or as a process. First it runs a setup function,
-    then it runs its main logic function in a continuous loop (until it is told to terminate),
-    and finally it runs a cleanup function.
+    """A routine is responsible for performing one of the flow’s main tasks.
+    It can run as either a thread or a process. 
+    First it runs a setup function, then it runs its main logic function in a continuous loop, until it is told to terminate.
+    Once terminated it runs a cleanup function.
     """
 
     events = marking_functions_annotation()
