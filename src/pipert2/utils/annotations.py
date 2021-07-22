@@ -1,8 +1,10 @@
 from collections import defaultdict
+import re
 
 
 def marking_functions_annotation():
-    """Create a decorator for marking functions and storing them in a dictionary
+    """Create a decorator for marking functions and storing them in a
+    dictionary by their class and their marking signature
 
     Returns:
         Decorator that stores its functions in the 'all' attribute.
@@ -20,19 +22,24 @@ def marking_functions_annotation():
                 def asian_backing(self):
                     pass
 
+                @classmethod
+                def get_events(cls):
+                    return cls.events.all[cls.__name__]
 
-            print(Bakery.cooking_styles.all)  # {'indian': [<function Bakery.indian_backing at 0x7f8c4f339dc0>],
-                                              #  'asian': [<function Bakery.asian_backing at 0x7f8c4f339e50>]})
+
+            print(Bakery.get_events())  # {'indian': [<function Bakery.indian_backing at 0x7f8c4f339dc0>],
+                                        #  'asian': [<function Bakery.asian_backing at 0x7f8c4f339e50>]})
 
     """
 
-    registry = defaultdict(list)
+    registry = defaultdict(lambda: defaultdict(set))
 
     def registrar(params_or_func):
         if callable(params_or_func):
             if (not hasattr(registrar, "last_params")) or (registrar.last_params is None):
                 registrar.last_params = "default_key"
-            registry[registrar.last_params].append(params_or_func)
+            class_name = re.search(' (.*)\\.', params_or_func.__str__()).group(1)
+            registry[class_name][registrar.last_params].add(params_or_func)
             registrar.last_params = None
             return params_or_func
         else:
@@ -40,4 +47,5 @@ def marking_functions_annotation():
             return registrar
 
     registrar.all = registry
+
     return registrar
