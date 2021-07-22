@@ -48,30 +48,27 @@ class Message:
 
     def __str__(self):
         return f"{{msg id: {self.id}, " \
-               f"payload type: {type(self.payload)}, " \
                f"source address: {self.source_address} }}\n"
 
     def full_description(self):
         return f"msg id: {self.id}, " \
-               f"payload type: {type(self.payload)}, " \
                f"source address: {self.source_address}, " \
                f"history: {self.history} \n"
 
     @staticmethod
-    def encode(msg, generator=None) -> bytes:
+    def encode(msg) -> bytes:
         """Encodes the message object.
         This method compresses the message payload and then serializes the whole
         message object into bytes, using pickle.
 
         Args:
             msg (Message): the message to encode.
-            generator: generator necessary for shared memory usage.
 
         Returns:
             Bytes containing the msg object
         """
 
-        msg.payload.encode(generator)
+        msg.payload.encode()
         return pickle.dumps(msg)
 
     @staticmethod

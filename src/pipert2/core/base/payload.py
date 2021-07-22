@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
 
-
-class Payload(ABC):
-    pass
+class Payload:
+    def __init__(self, data):
+        self.data = data
