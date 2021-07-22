@@ -15,6 +15,7 @@ class Routine(ABC):
     It can run as either a thread or a process. 
     First it runs a setup function, then it runs its main logic function in a continuous loop, until it is told to terminate.
     Once terminated it runs a cleanup function.
+
     """
 
     events = marking_functions_annotation()
@@ -24,7 +25,7 @@ class Routine(ABC):
     def __init__(self, name: str = None):
         """
         Args:
-            name (str): Name of the routine
+            name: Name of the routine
 
         Attributes:
             name (str): Name of the flow
@@ -33,6 +34,7 @@ class Routine(ABC):
             event_notifier (Callback): Callback for notifying an event has occurred
             _logger (PipeLogger): The routines logger object
             stop_event (mp.Event): A multiprocessing event object indicating the routine state (run/stop)
+
         """
 
         if name is not None:
@@ -52,11 +54,12 @@ class Routine(ABC):
         """Initialize the routine to be ready to run
 
         Args:
-            message_handler (MessageHandler): The routines message
-            event_notifier (Callable): A callable object for notifying an event
+            message_handler: The routines message
+            event_notifier: A callable object for notifying an event
             kwargs: Additional parameters for setting the routine with certain behaviors
 
         """
+
         self.message_handler = message_handler
         self.event_notifier = event_notifier
 
@@ -74,6 +77,7 @@ class Routine(ABC):
 
         Returns:
             dict[str, list[Callback]]: The events callbacks mapped by their events
+
         """
 
         routine_events = cls.events.all[Routine.__name__]
@@ -92,19 +96,24 @@ class Routine(ABC):
 
         Args:
             data: The data for the routine to process
+
         """
 
         raise NotImplementedError
 
     @abstractmethod
     def setup(self) -> None:
-        """An initial setup before running"""
+        """An initial setup before running
+
+        """
 
         raise NotImplementedError
 
     @abstractmethod
     def cleanup(self) -> None:
-        """The final method that end the routine execution"""
+        """The final method that ends the routine execution
+
+        """
 
         raise NotImplementedError
 
@@ -136,6 +145,7 @@ class Routine(ABC):
         """Start running the routine
 
         (This method will be called when the 'start' event is triggered)
+
         """
 
         if self.stop_event.is_set():
@@ -149,6 +159,7 @@ class Routine(ABC):
         """Stop the routine from running
 
         (This method will be called when the 'stop' event is triggered)
+
         """
 
         if not self.stop_event.is_set():
@@ -160,7 +171,8 @@ class Routine(ABC):
         """Execute an event to start
 
         Args:
-            event_name (str): The name of the event to execute
+            event_name: The name of the event to execute
+
         """
 
         mapped_events = self.get_events()
@@ -171,10 +183,11 @@ class Routine(ABC):
                 callback(self)
 
     def notify_event(self, event_name: str) -> None:
-        """Notify that event has happened
+        """Notify that an event has happened
 
         Args:
-            event_name (str): The name of the event to notify
+            event_name: The name of the event to notify
+
         """
 
         self.event_notifier(event_name)
