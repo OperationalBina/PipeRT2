@@ -1,7 +1,8 @@
 import pytest
-import pickle
 
 from src.pipert2.core.base.message import Message
+from src.pipert2.utils.dummy_object import Dummy
+
 
 MESSAGE_DATA = {"Feeling": "Good", "It's": "u", "Not no": "yes"}
 
@@ -31,25 +32,26 @@ def test_record_entry(dummy_message: Message):
     for entry in ENTRY_LIST:
         dummy_message.record_entry(entry)
 
-    print(dummy_message.history.keys())
-
     assert all(entry_name == history_entry_name
-               for entry_name in ENTRY_LIST for history_entry_name in dummy_message.history.keys())
+               for entry_name, history_entry_name in zip(ENTRY_LIST, dummy_message.history.keys()))
 
 
 def test_encode_message(mocker, dummy_message: Message):
-    payload_mock = mocker.Mock()
-    dummy_message.payload = payload_mock
+    mocker.patch("pickle.dumps")
+    payload_mock = dummy_message.payload
 
-    encoded_message = Message.encode(dummy_message)
+    Message.encode(dummy_message)
 
     payload_mock.encode.assert_called()
-    assert encoded_message == pickle.dumps(dummy_message)
 
 
-def test_decode_message(dummy_message: Message):
-    encoded_message = Message.encode(dummy_message)
+def test_decode_message():
+    message = Message(MESSAGE_DATA, "R1")
+    message.payload = Dummy()
+    message.payload.data = MESSAGE_DATA
+
+    encoded_message = Message.encode(message)
 
     decoded_message:Message = Message.decode(encoded_message, lazy=False)
 
-    assert decoded_message.__str__() == encoded_message.__str__()
+    assert decoded_message.__str__() == message.__str__()
