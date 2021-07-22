@@ -32,6 +32,7 @@ class QueueHandler(MessageHandler):
             Return the message that came from the queue or None if the queue was empty.
 
         """
+
         message = None
 
         try:
@@ -51,9 +52,9 @@ class QueueHandler(MessageHandler):
 
         """
 
-        self._try_putting_to_queue(message) if self.blocking else self._push_to_queue(message)
+        self._safe_push_to_queue(message) if self.blocking else self._force_push_to_queue(message)
 
-    def _push_to_queue(self, message: Message):
+    def _force_push_to_queue(self, message: Message):
         """Forcibly push a message into the queue.
 
         Args:
@@ -70,7 +71,7 @@ class QueueHandler(MessageHandler):
             except Full:
                 print("The queue is full!")  # TODO: Replace with log
 
-    def _try_putting_to_queue(self, message: Message):
+    def _safe_push_to_queue(self, message: Message):
         """Try pushing a message into the queue.
         If the queue is full, do nothing.
 
