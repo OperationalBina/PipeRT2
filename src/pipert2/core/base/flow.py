@@ -1,5 +1,8 @@
+from typing import List
+
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.base.routine import Routine
+from src.pipert2.core.handlers.event_handler import EventHandler
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.annotations import marking_functions_annotation
 from multiprocessing import Process
@@ -12,7 +15,7 @@ class Flow:
 
     events = marking_functions_annotation()
 
-    def __init__(self, name: str, event_board: EventBoard, logger: PipeLogger, *routines: Routine):
+    def __init__(self, name: str, event_board: EventBoard, logger: PipeLogger, routines: List[Routine]):
         """
         Args:
             name (str): Name of the flow
@@ -26,6 +29,7 @@ class Flow:
             logger (PipeLogger): PipeLogger object for logging the flow actions
             event_handler (EventHandler): EventHandler object for communicating with the
                 event system of the pipe.
+
         """
 
         self.routines = {}
@@ -39,23 +43,27 @@ class Flow:
             flow_events_to_listen.update(routine.get_events().keys())
             self.routines[routine.name] = routine
 
-        self.event_handler = event_board.get_event_handler(flow_events_to_listen)
+        self.event_handler: EventHandler = event_board.get_event_handler(flow_events_to_listen)
 
     def build(self) -> None:
-        """Make the flow ready to listen to events and go."""
+        """Make the flow ready to listen to events and go.
+        """
 
         self.flow_process = Process(target=self.run)
         self.flow_process.start()
 
     def run(self) -> None:
-        """The flow process, executing the pipe events that occur"""
+        """The flow process, executing the pipe events that occur
+        """
 
-        event_names = ""
-        while event_names != "kill":
+        event_names = []
+        while "kill" not in event_names:
             self.event_handler.wait()
             event_names = self.event_handler.get_names()
             for event in event_names:  # Maybe do this in threads to not get stuck on listening to events.
                 self.execute_event(event)
+
+        self.execute_event("stop")
 
     @events("start")
     def start(self):
@@ -70,6 +78,7 @@ class Flow:
 
         Args:
             event_name (str): The name of the event to be executed.
+
         """
 
         for routine in self.routines.values():
@@ -85,7 +94,8 @@ class Flow:
         """Get the events of the flow
 
             Returns:
-                dict[str, list[Callback]]: The events callbacks mapped by their events.
+                dict[str, set[Callback]]: The events callbacks mapped by their events.
+
         """
 
         return cls.events.all[cls.__name__]
