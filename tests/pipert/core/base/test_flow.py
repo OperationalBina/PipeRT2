@@ -1,9 +1,10 @@
+from src.pipert2.core.base.flow import Flow
+
+from pytest_mock import MockerFixture
 from unittest.mock import call
 
 import pytest
-from pytest_mock import MockerFixture
 
-from src.pipert2.core.base.flow import Flow
 
 ROUTINE_NAME = "R1"
 KILL_EVENT = "kill"
