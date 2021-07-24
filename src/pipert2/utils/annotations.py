@@ -35,14 +35,17 @@ def marking_functions_annotation():
 
     registry = defaultdict(lambda: defaultdict(set))
 
-    def key_registrar(key):
-        if callable(key):
-            return registrar(key="default_key", function=key)
+    def key_registrar(key_or_function):
+        if callable(key_or_function):
+            # No key was given to the function, setting a defualt key
+            return registrar(key="default_key", function=key_or_function)
         else:
-            return partial(registrar, key=key)
+            return partial(registrar, key=key_or_function)
 
     def registrar(function, key):
+        # Get the class name from the function __str__ attribute using regular expression
         class_name = re.search(' (.*)\\.', function.__str__()).group(1)
+
         registry[class_name][key].add(function)
         return registrar
 
