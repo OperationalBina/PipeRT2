@@ -6,9 +6,29 @@ import pickle
 
 
 class Message:
+    """The Message is a wrapper for information that passes through the pipe.
+    The information cannot pass alone and it passes inside the Message object during its entire stay.
+    The Message is not exposed to the user and is used as a tool in the system that helps to route the information
+    and remember its transit history and later more.
+
+    """
+
     counter = 0
 
     def __init__(self, data: collections.Mapping, source_address: str):
+        """
+        Args:
+            data: Data that the message will hold.
+            source_address: Where the message was created. # TODO - Maybe remove this arg
+
+        Attributes:
+            payload (Payload): The payload that managing the data.
+            source_address (str): Where the Message was created
+            history (collections.OrderedDict): Transition history of the Message between the routines
+            id (str): Unique id for the Message object.
+
+        """
+
         self.payload: Payload = Payload(data)
 
         self.source_address = source_address
@@ -22,6 +42,7 @@ class Message:
 
         Args:
             data (collections.Mapping): dictionary containing the data
+
         """
 
         self.payload.data = data
@@ -31,6 +52,7 @@ class Message:
 
         Returns:
             Dictionary with the message data
+
         """
 
         if self.payload.encoded:
@@ -42,6 +64,7 @@ class Message:
 
         Args:
             routine_name: the name of the routine that the message entered.
+
         """
 
         self.history[routine_name] = time.time()
@@ -66,6 +89,7 @@ class Message:
 
         Returns:
             Bytes containing the msg object
+
         """
 
         msg.payload.encode()
@@ -73,8 +97,7 @@ class Message:
 
     @staticmethod
     def decode(encoded_msg: bytes, lazy=False):
-        """
-        Decodes the message object.
+        """Decodes the message object.
         This method deserializes the pickled message, and decodes the message
         payload if 'lazy' is False.
 
@@ -85,6 +108,7 @@ class Message:
 
         Returns:
             Message object of the given message bytes
+
         """
 
         msg = pickle.loads(encoded_msg)
