@@ -11,6 +11,7 @@ from multiprocessing import Process
 class Flow:
     """Flow is an entity designed for running a group of routines in a single process.
     It also responsible for his routines to be notified when an event is happening.
+
     """
 
     events = marking_functions_annotation()
@@ -47,6 +48,7 @@ class Flow:
 
     def build(self) -> None:
         """Make the flow ready to listen to events and go.
+
         """
 
         self.flow_process = Process(target=self.run)
@@ -54,6 +56,7 @@ class Flow:
 
     def run(self) -> None:
         """The flow process, executing the pipe events that occur
+
         """
 
         event_names = []
