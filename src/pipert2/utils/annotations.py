@@ -3,7 +3,7 @@ from collections import defaultdict
 from functools import partial
 
 
-def marking_functions_annotation():
+def class_functions_dictionary():
     """Create a decorator for marking functions and storing them in a
     dictionary by their class and their marking signature
 
