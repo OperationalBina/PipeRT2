@@ -7,9 +7,9 @@ from src.pipert2.core.base.payload import Payload
 
 class Message:
     """The Message is a wrapper for information that passes through the pipe.
-    The information cannot pass alone and it passes inside the Message object during its entire stay.
-    The Message is not exposed to the user and is used as a tool in the system that helps to route the information
-    and remember its transit history and later more.
+    The information cannot pass alone, it passes inside the Message object during its entire stay.
+    The Message is not exposed to the user and is used as a tool in the system. The Message helps route the 
+    information and remember its transit history (Further features in development).
 
     """
 
