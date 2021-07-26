@@ -86,10 +86,10 @@ class Message:
         message object into bytes, using pickle.
 
         Args:
-            msg (Message): the message to encode.
+            msg (Message): The message to encode.
 
         Returns:
-            Bytes containing the msg object
+            Bytes containing the msg object.
 
         """
 
