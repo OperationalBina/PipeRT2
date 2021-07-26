@@ -1,8 +1,8 @@
-from src.pipert2.core.base.payload import Payload
-
 import collections
 import time
 import pickle
+
+from src.pipert2.core.base.payload import Payload
 
 
 class Message:
@@ -19,7 +19,7 @@ class Message:
         """
         Args:
             data: Data that the message will hold.
-            source_address: Where the message was created. # TODO - Maybe remove this arg
+            source_address: Where the message was created.
 
         Attributes:
             payload (Payload): The payload that managing the data.
@@ -57,6 +57,7 @@ class Message:
 
         if self.payload.encoded:
             self.payload.decode()
+
         return self.payload.data
 
     def record_entry(self, routine_name) -> None:
@@ -93,6 +94,7 @@ class Message:
         """
 
         msg.payload.encode()
+
         return pickle.dumps(msg)
 
     @staticmethod
@@ -114,4 +116,5 @@ class Message:
         msg = pickle.loads(encoded_msg)
         if not lazy:
             msg.payload.decode()
+
         return msg
