@@ -37,7 +37,7 @@ class Message:
         Message.counter += 1
 
     def update_data(self, data: collections.Mapping):
-        """Update the data the message containing
+        """Update the data the message contains.
 
         Args:
             data (collections.Mapping): dictionary containing the data.
