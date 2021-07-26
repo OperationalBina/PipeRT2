@@ -61,10 +61,10 @@ class Message:
         return self.payload.data
 
     def record_entry(self, routine_name) -> None:
-        """Records the timestamp of the message's entry into a component.
+        """Records the timestamp of the message's entry into a routine.
 
         Args:
-            routine_name: the name of the routine that the message entered.
+            routine_name: The name of the routine that the message entered.
 
         """
 
