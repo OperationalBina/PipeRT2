@@ -1,5 +1,6 @@
 from src.pipert2.core.base.flow import Flow
 from src.pipert2.core.base.logger import PipeLogger
+from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.core.managers.network import Network
 
@@ -18,7 +19,7 @@ class Pipe:
         self.flows = {}
         self.event_board = EventBoard()
 
-    def create_flow(self, flow_name: str, auto_wire: bool = True, *routines):
+    def create_flow(self, flow_name: str, auto_wire: bool = True, *routines: Routine):
         """Create a new flow in the pipe.
 
         Args:
