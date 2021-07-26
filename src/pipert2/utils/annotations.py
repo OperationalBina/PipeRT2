@@ -13,7 +13,7 @@ def class_functions_dictionary():
     Example usage:
         .. code-block:: python
             class Bakery:
-                cooking_styles = marking_functions_annotation()
+                cooking_styles = class_functions_dictionary()
 
                 @cooking_styles("indian")
                 def indian_backing(self):
@@ -47,7 +47,7 @@ def class_functions_dictionary():
         class_name = re.search(' (.*)\\.', function.__str__()).group(1)
 
         registry[class_name][key].add(function)
-        return registrar
+        return function
 
     key_registrar.all = registry
 
