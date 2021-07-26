@@ -13,6 +13,7 @@ def timeout_wrapper(func: Callable, expected_value: Any, timeout_duration: int =
 
         Returns:
             bool: True if the func returned the expected value during the time, False otherwise
+
     """
 
     timeout = time.time() + timeout_duration
