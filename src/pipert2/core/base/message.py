@@ -41,7 +41,7 @@ class Message:
         """Update the data the message containing
 
         Args:
-            data (collections.Mapping): dictionary containing the data
+            data (collections.Mapping): dictionary containing the data.
 
         """
 
