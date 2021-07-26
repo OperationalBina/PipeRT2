@@ -22,8 +22,8 @@ class Message:
             source_address: Where the message was created.
 
         Attributes:
-            payload (Payload): The payload that managing the data.
-            source_address (str): Where the Message was created
+            payload (Payload): The payload that manages the data.
+            source_address (str): Where the Message was first conceived.
             history (collections.OrderedDict): Transition history of the Message between the routines
             id (str): Unique id for the Message object.
 
