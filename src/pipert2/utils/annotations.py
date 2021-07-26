@@ -1,8 +1,11 @@
+import re
 from collections import defaultdict
+from functools import partial
 
 
-def marking_functions_annotation():
-    """Create a decorator for marking functions and storing them in a dictionary
+def class_functions_dictionary():
+    """Create a decorator for marking functions and storing them in a
+    dictionary by their class and their marking signature
 
     Returns:
         Decorator that stores its functions in the 'all' attribute.
@@ -20,24 +23,32 @@ def marking_functions_annotation():
                 def asian_backing(self):
                     pass
 
+                @classmethod
+                def get_events(cls):
+                    return cls.events.all[cls.__name__]
 
-            print(Bakery.cooking_styles.all)  # {'indian': [<function Bakery.indian_backing at 0x7f8c4f339dc0>],
-                                              #  'asian': [<function Bakery.asian_backing at 0x7f8c4f339e50>]})
+
+            print(Bakery.get_events())  # {'indian': [<function Bakery.indian_backing at 0x7f8c4f339dc0>],
+                                        #  'asian': [<function Bakery.asian_backing at 0x7f8c4f339e50>]})
 
     """
 
-    registry = defaultdict(list)
+    registry = defaultdict(lambda: defaultdict(set))
 
-    def registrar(params_or_func):
-        if callable(params_or_func):
-            if (not hasattr(registrar, "last_params")) or (registrar.last_params is None):
-                registrar.last_params = "default_key"
-            registry[registrar.last_params].append(params_or_func)
-            registrar.last_params = None
-            return params_or_func
+    def key_registrar(key_or_function):
+        if callable(key_or_function):
+            # No key was given to the function, setting a defualt key
+            return registrar(key="default_key", function=key_or_function)
         else:
-            registrar.last_params = params_or_func
-            return registrar
+            return partial(registrar, key=key_or_function)
 
-    registrar.all = registry
-    return registrar
+    def registrar(function, key):
+        # Get the class name from the function __str__ attribute using regular expression
+        class_name = re.search(' (.*)\\.', function.__str__()).group(1)
+
+        registry[class_name][key].add(function)
+        return registrar
+
+    key_registrar.all = registry
+
+    return key_registrar
