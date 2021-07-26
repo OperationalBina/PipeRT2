@@ -2,4 +2,11 @@ from abc import ABC, abstractmethod
 
 
 class PipeLogger(ABC):
-    pass
+
+    @abstractmethod
+    def exception(self, param):
+        pass
+
+    @abstractmethod
+    def info(self, param):
+        pass
