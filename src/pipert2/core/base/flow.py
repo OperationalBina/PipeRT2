@@ -4,7 +4,7 @@ from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.handlers.event_handler import EventHandler
 from src.pipert2.core.managers.event_board import EventBoard
-from src.pipert2.utils.annotations import marking_functions_annotation
+from src.pipert2.utils.annotations import class_functions_dictionary
 from multiprocessing import Process
 
 
@@ -14,7 +14,7 @@ class Flow:
 
     """
 
-    events = marking_functions_annotation()
+    events = class_functions_dictionary()
 
     def __init__(self, name: str, event_board: EventBoard, logger: PipeLogger, routines: List[Routine]):
         """
