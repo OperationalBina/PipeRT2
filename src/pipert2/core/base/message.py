@@ -51,7 +51,7 @@ class Message:
         """Get the data from the message.
 
         Returns:
-            Dictionary with the message data
+            Dictionary with the message data.
 
         """
 
