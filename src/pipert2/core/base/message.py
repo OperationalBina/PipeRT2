@@ -1,7 +1,6 @@
 import collections
 import time
 import pickle
-
 from src.pipert2.core.base.payload import Payload
 
 
