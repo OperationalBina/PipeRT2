@@ -104,12 +104,12 @@ class Message:
         payload if 'lazy' is False.
 
         Args:
-            encoded_msg (Bytes): the message bytes to decode.
-            lazy: if this is True, then the payload will only be decoded once it's
+            encoded_msg (Bytes): The message bytes to decode.
+            lazy: If this is True, then the payload will only be decoded once it's
             accessed.
 
         Returns:
-            Message object of the given message bytes
+            Message object of the given message bytes.
 
         """
 
