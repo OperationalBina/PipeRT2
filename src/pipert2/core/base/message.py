@@ -48,7 +48,7 @@ class Message:
         self.payload.data = data
 
     def get_data(self) -> collections.Mapping:
-        """Get the data in the message
+        """Get the data from the message.
 
         Returns:
             Dictionary with the message data
