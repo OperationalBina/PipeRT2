@@ -3,11 +3,10 @@ import multiprocessing as mp
 from typing import Callable
 from functools import partial
 from abc import ABC, abstractmethod
-
-from src.pipert2.core.handlers.message_handler import MessageHandler
 from src.pipert2.core.base.logger import PipeLogger
-from src.pipert2.utils.annotations import class_functions_dictionary
+from src.pipert2.core.handlers.message_handler import MessageHandler
 from src.pipert2.utils.dummy_object import Dummy
+from src.pipert2.utils.annotations import class_functions_dictionary
 
 
 class Routine(ABC):
