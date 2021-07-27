@@ -10,7 +10,7 @@ from multiprocessing import Process
 
 class Flow:
     """Flow is an entity designed for running a group of routines in a single process.
-    It also responsible for his routines to be notified when an event is happening.
+    It is also responsible to notify his routines when an event is triggered.
 
     """
 
@@ -19,15 +19,15 @@ class Flow:
     def __init__(self, name: str, event_board: EventBoard, logger: PipeLogger, routines: List[Routine]):
         """
         Args:
-            name (str): Name of the flow
+            name (str): Name of the flow.
             event_board (EventBoard): The EventBoard of the pipe.
-            logger (PipeLogger): PipeLogger object for logging the flow actions
-            routines (Routine): The routines that will be in the flow
+            logger (PipeLogger): PipeLogger object for logging the flow actions.
+            routines (Routine): The routines that will be in the flow.
 
         Attributes:
             routines (dict[str, Routine]): Dictionary mapping the routines to their name.
-            name (str): Name of the flow
-            logger (PipeLogger): PipeLogger object for logging the flow actions
+            name (str): Name of the flow.
+            logger (PipeLogger): PipeLogger object for logging the flow actions.
             event_handler (EventHandler): EventHandler object for communicating with the
                 event system of the pipe.
 
@@ -47,7 +47,7 @@ class Flow:
         self.event_handler: EventHandler = event_board.get_event_handler(flow_events_to_listen)
 
     def build(self) -> None:
-        """Make the flow ready to listen to events and go.
+        """Start the flow process.
 
         """
 
@@ -55,7 +55,7 @@ class Flow:
         self.flow_process.start()
 
     def run(self) -> None:
-        """The flow process, executing the pipe events that occur
+        """The flow process, executing the pipe events that occur.
 
         """
 
@@ -94,7 +94,7 @@ class Flow:
 
     @classmethod
     def get_events(cls):
-        """Get the events of the flow
+        """Get the events of the flow.
 
             Returns:
                 dict[str, set[Callback]]: The events callbacks mapped by their events.
