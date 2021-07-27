@@ -63,8 +63,8 @@ class Flow:
         while "kill" not in event_names:
             self.event_handler.wait()
             event_names = self.event_handler.get_names()
-            for event in event_names:  # Maybe do this in threads to not get stuck on listening to events.
-                self.execute_event(event)
+            for event_name in event_names:  # Maybe do this in threads to not get stuck on listening to events.
+                self.execute_event(event_name)
 
         self.execute_event("stop")
 
