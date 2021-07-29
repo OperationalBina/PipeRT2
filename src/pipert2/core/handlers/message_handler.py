@@ -7,29 +7,32 @@ class MessageHandler(ABC):
     and relaying them onward if needed.
     The message handler communicates only with the network object
     and not with other routines directly.
+
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, routine_name):
+        self.routine_name = routine_name
 
     @abstractmethod
-    def _get(self) -> Message:
+    def _get(self) -> bytes:
         """Returns the message from the input object.
 
         Returns:
             A message object.
+
         """
 
         raise NotImplementedError
 
     @abstractmethod
-    def _put(self, message: Message):
+    def _put(self, message: bytes):
         """Puts a given message into the output object.
 
         Args:
             message: The message to be sent.
 
         """
+
         raise NotImplementedError
 
     def put(self, message: Message):
@@ -49,4 +52,7 @@ class MessageHandler(ABC):
 
         """
 
-        return Message.decode(self._get())
+        message = Message.decode(self._get())
+        message.record_entry(self.routine_name)
+
+        return message
