@@ -10,8 +10,8 @@ class MessageHandler(ABC):
 
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, routine_name):
+        self.routine_name = routine_name
 
     @abstractmethod
     def _get(self) -> bytes:
@@ -35,7 +35,7 @@ class MessageHandler(ABC):
 
         raise NotImplementedError
 
-    def put(self, message: bytes):
+    def put(self, message: Message):
         """Encodes a given message and calls the implemented put method.
 
         Args:
@@ -45,11 +45,14 @@ class MessageHandler(ABC):
 
         self._put(Message.encode(message))
 
-    def get(self) -> bytes:
+    def get(self) -> Message:
         """Decodes the message received from the implemented get method.
 
         Returns: A decoded message object.
 
         """
 
-        return Message.decode(self._get())
+        message = Message.decode(self._get())
+        message.record_entry(self.routine_name)
+
+        return message
