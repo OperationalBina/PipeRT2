@@ -51,8 +51,11 @@ class MessageHandler(ABC):
         Returns: A decoded message object.
 
         """
-
-        message = Message.decode(self._get())
-        message.record_entry(self.routine_name)
+        try:
+            message = Message.decode(self._get())
+        except TypeError:
+            message = None
+        else:
+            message.record_entry(self.routine_name)
 
         return message
