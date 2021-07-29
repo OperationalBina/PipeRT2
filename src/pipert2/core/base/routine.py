@@ -1,18 +1,19 @@
-from src.pipert2.core.handlers.message_handler import MessageHandler
-from src.pipert2.core.base.logger import PipeLogger
-from src.pipert2.utils.annotations import class_functions_dictionary
-from src.pipert2.utils.dummy_object import Dummy
-
 import threading
 import multiprocessing as mp
 from typing import Callable
 from abc import ABC, abstractmethod
 from functools import partial
+from src.pipert2.core.handlers.message_handler import MessageHandler
+from src.pipert2.core.base.logger import PipeLogger
+from src.pipert2.utils.annotations import class_functions_dictionary
+from src.pipert2.utils.dummy_object import Dummy
+from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
+from src.pipert2.utils.method_data import Method
 
 
-class Routine(ABC):
+class Routine(ABC, EventExecutorInterface):
     """A routine is responsible for performing one of the flow’s main tasks.
-    It can run as either a thread or a process. 
+    It can run as either a thread or a process.
     First it runs a setup function, then it runs its main logic function in a continuous loop, until it is told to terminate.
     Once terminated it runs a cleanup function.
 
@@ -167,22 +168,17 @@ class Routine(ABC):
             self.stop_event.set()
             self.runner.join()
 
-    def execute_event(self, event_name: str) -> None:
+    def execute_event(self, event: Method) -> None:
         """Execute an event to start
 
         Args:
-            event_name: The name of the event to execute
+            event: The event to execute
 
         """
 
-        mapped_events = self.get_events()
+        EventExecutorInterface.execute_event(self, event)  # TODO - Can be removed but i think it should stay
 
-        if event_name in mapped_events:
-            self._logger.info(f"Running event '{event_name}'")
-            for callback in mapped_events[event_name]:
-                callback(self)
-
-    def notify_event(self, event_name: str) -> None:
+    def notify_event(self, event_name: str, **event_params) -> None:
         """Notify that an event has happened
 
         Args:
@@ -190,4 +186,4 @@ class Routine(ABC):
 
         """
 
-        self.event_notifier(event_name)
+        self.event_notifier(event_name, **event_params)
