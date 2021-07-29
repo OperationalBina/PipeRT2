@@ -23,14 +23,14 @@ def output_queue():
 
 @pytest.fixture()
 def blocking_queue_handler(input_queue, output_queue):
-    blocking_queue_handler = QueueHandler(input_queue, output_queue, blocking=True, timeout=1)
+    blocking_queue_handler = QueueHandler("dummy", input_queue, output_queue, blocking=True, timeout=1)
 
     return blocking_queue_handler
 
 
 @pytest.fixture()
 def non_blocking_queue_handler(input_queue, output_queue):
-    non_blocking_queue_handler = QueueHandler(input_queue, output_queue, blocking=False)
+    non_blocking_queue_handler = QueueHandler("dummy", input_queue, output_queue, blocking=False)
 
     return non_blocking_queue_handler
 
