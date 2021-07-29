@@ -1,14 +1,14 @@
 import threading
 import multiprocessing as mp
 from typing import Callable
-from abc import ABC, abstractmethod
 from functools import partial
-from src.pipert2.core.handlers.message_handler import MessageHandler
+from abc import ABC, abstractmethod
 from src.pipert2.core.base.logger import PipeLogger
-from src.pipert2.utils.annotations import class_functions_dictionary
-from src.pipert2.utils.dummy_object import Dummy
-from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
+from src.pipert2.core.handlers.message_handler import MessageHandler
 from src.pipert2.utils.method_data import Method
+from src.pipert2.utils.dummy_object import Dummy
+from src.pipert2.utils.annotations import class_functions_dictionary
+from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
 class Routine(ABC, EventExecutorInterface):
