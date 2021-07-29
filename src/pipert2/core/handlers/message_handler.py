@@ -10,7 +10,7 @@ class MessageHandler(ABC):
 
     """
 
-    def __init__(self, routine_name):
+    def __init__(self, routine_name: str):
         self.routine_name = routine_name
 
     @abstractmethod

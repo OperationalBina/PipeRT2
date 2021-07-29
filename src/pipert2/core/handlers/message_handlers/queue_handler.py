@@ -1,7 +1,6 @@
 from ..message_handler import MessageHandler
 from multiprocessing import Queue
 from queue import Full, Empty
-from src.pipert2.core.base.message import Message
 
 
 class QueueHandler(MessageHandler):
@@ -16,14 +15,14 @@ class QueueHandler(MessageHandler):
 
     """
 
-    def __init__(self, input_queue: Queue, output_queue: Queue, blocking=True, timeout=1):
-        super().__init__()
+    def __init__(self, routine_name: str, input_queue: Queue, output_queue: Queue, blocking=True, timeout=1):
+        super().__init__(routine_name)
         self.input_queue = input_queue
         self.output_queue = output_queue
         self.blocking = blocking
         self.timeout = timeout
 
-    def _get(self):
+    def _get(self) -> bytes:
         """Get a message from the input queue.
         If blocking is true, wait the set timeout for a message to arrive,
         otherwise do nothing if the queue is empty.
@@ -42,7 +41,7 @@ class QueueHandler(MessageHandler):
 
         return message
 
-    def _put(self, message: Message):
+    def _put(self, message: bytes):
         """Put a message into the output queue.
         If blocking is true, try to push the message into the queue if it not full,
         otherwise push the message forcibly into the queue.
@@ -54,7 +53,7 @@ class QueueHandler(MessageHandler):
 
         self._safe_push_to_queue(message) if self.blocking else self._force_push_to_queue(message)
 
-    def _force_push_to_queue(self, message: Message):
+    def _force_push_to_queue(self, message: bytes):
         """Forcibly push a message into the queue.
 
         Args:
@@ -71,7 +70,7 @@ class QueueHandler(MessageHandler):
             except Full:
                 print("The queue is full!")  # TODO: Replace with log
 
-    def _safe_push_to_queue(self, message: Message):
+    def _safe_push_to_queue(self, message: bytes):
         """Try pushing a message into the queue.
         If the queue is full, do nothing.
 
