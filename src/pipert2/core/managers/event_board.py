@@ -73,3 +73,6 @@ class EventBoard:
             output_event_queue.put(Method(event_name, kwargs))
 
         return partial(notify_event, output_event_queue=self.new_events_queue)
+
+    def notify_event(self, event_name, **event_parameters):
+        self.new_events_queue.put(Method(event_name, event_parameters))
