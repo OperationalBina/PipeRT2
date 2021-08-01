@@ -7,6 +7,8 @@ from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.annotations import class_functions_dictionary
 from multiprocessing import Process
 
+from src.pipert2.utils.dummy_object import Dummy
+
 
 class Flow:
     """Flow is an entity designed for running a group of routines in a single process.
@@ -36,6 +38,7 @@ class Flow:
         self.routines = {}
         self.name = name
         self.logger = logger
+        self.flow_process = Dummy()
 
         flow_events_to_listen = set(self.get_events().keys())
 
@@ -68,6 +71,9 @@ class Flow:
 
         self.execute_event("stop")
 
+        for routine in self.routines.values():
+            routine.join()
+
     @events("start")
     def start(self):
         self.logger.info("Starting")
@@ -91,6 +97,13 @@ class Flow:
             self.logger.info(f"Running event '{event_name}'")
             for callback in self.get_events()[event_name]:
                 callback(self)
+
+    def join(self) -> None:
+        """Block until the flow process terminates
+
+        """
+
+        self.flow_process.join()
 
     @classmethod
     def get_events(cls):
