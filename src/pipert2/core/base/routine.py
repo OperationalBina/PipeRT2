@@ -5,6 +5,7 @@ from functools import partial
 from abc import ABCMeta, abstractmethod
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.handlers.message_handler import MessageHandler
+from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from src.pipert2.utils.method_data import Method
 from src.pipert2.utils.dummy_object import Dummy
 from src.pipert2.utils.annotations import class_functions_dictionary
@@ -141,7 +142,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     def set_runner_as_thread(self):
         self.runner_creator = partial(threading.Thread, target=self._extended_run)
 
-    @events("start")
+    @events(START_EVENT_NAME)
     def start(self) -> None:
         """Start running the routine
 
@@ -155,7 +156,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.runner = self.runner_creator()
             self.runner.start()
 
-    @events("stop")
+    @events(STOP_EVENT_NAME)
     def stop(self) -> None:
         """Stop the routine from running
 

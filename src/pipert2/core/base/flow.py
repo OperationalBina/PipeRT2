@@ -5,6 +5,7 @@ from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.handlers.event_handler import EventHandler
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.annotations import class_functions_dictionary
+from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 from src.pipert2.utils.method_data import Method
 
@@ -61,18 +62,17 @@ class Flow(EventExecutorInterface):
         """
 
         event: Method = self.event_handler.wait()
-        while event.name != "kill":
-            # Maybe do this in threads to not get stuck on listening to events.
+        while event.name != KILL_EVENT_NAME:
             self.execute_event(event)
             event = self.event_handler.wait()
 
-        self.execute_event(Method("stop"))
+        self.execute_event(Method(STOP_EVENT_NAME))
 
-    @events("start")
+    @events(START_EVENT_NAME)
     def start(self):
         self.logger.info("Starting")
 
-    @events("stop")
+    @events(STOP_EVENT_NAME)
     def stop(self):
         self.logger.info("Stopping")
 
