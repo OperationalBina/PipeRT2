@@ -1,13 +1,12 @@
-from src.pipert2.core.handlers.message_handler import MessageHandler
-from src.pipert2.core.base.logger import PipeLogger
-from src.pipert2.utils.annotations import marking_functions_annotation
-from src.pipert2.utils.dummy_object import Dummy
-
 import threading
 import multiprocessing as mp
 from typing import Callable
-from abc import ABC, abstractmethod
 from functools import partial
+from abc import ABC, abstractmethod
+from src.pipert2.core.base.logger import PipeLogger
+from src.pipert2.core.handlers.message_handler import MessageHandler
+from src.pipert2.utils.dummy_object import Dummy
+from src.pipert2.utils.annotations import class_functions_dictionary
 
 
 class Routine(ABC):
@@ -18,8 +17,8 @@ class Routine(ABC):
 
     """
 
-    events = marking_functions_annotation()
-    runners = marking_functions_annotation()
+    events = class_functions_dictionary()
+    runners = class_functions_dictionary()
     routines_created_counter = 0
 
     def __init__(self, name: str = None):

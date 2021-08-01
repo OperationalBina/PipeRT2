@@ -10,3 +10,7 @@ class PipeLogger(ABC):
     @abstractmethod
     def info(self, param):
         pass
+
+    @abstractmethod
+    def get_child(self):
+        pass
