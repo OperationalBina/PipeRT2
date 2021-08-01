@@ -2,7 +2,7 @@ import threading
 import multiprocessing as mp
 from typing import Callable
 from functools import partial
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.handlers.message_handler import MessageHandler
 from src.pipert2.utils.method_data import Method
@@ -11,7 +11,7 @@ from src.pipert2.utils.annotations import class_functions_dictionary
 from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
-class Routine(ABC, EventExecutorInterface):
+class Routine(EventExecutorInterface, metaclass=ABCMeta):
     """A routine is responsible for performing one of the flow’s main tasks.
     It can run as either a thread or a process.
     First it runs a setup function, then it runs its main logic function in a continuous loop, until it is told to terminate.
