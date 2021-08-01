@@ -2,16 +2,11 @@ import pytest
 from pytest_mock import MockerFixture
 from unittest.mock import call
 from src.pipert2.core.base.flow import Flow
-from src.pipert2.utils.consts.event_names import START_EVENT_NAME, KILL_EVENT_NAME, STOP_EVENT_NAME
+from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from src.pipert2.utils.method_data import Method
+from tests.pipert.core.utils.events_utils import START_EVENT, EVENT1, STOP_EVENT, KILL_EVENT
 
 ROUTINE_NAME = "R1"
-EVENT1_NAME = "event1"
-
-START_EVENT = Method(START_EVENT_NAME)
-EVENT1 = Method(EVENT1_NAME)
-STOP_EVENT = Method(STOP_EVENT_NAME)
-KILL_EVENT = Method(KILL_EVENT_NAME)
 
 
 @pytest.fixture()

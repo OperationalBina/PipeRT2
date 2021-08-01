@@ -1,8 +1,8 @@
 import pytest
 from functools import partial
 from src.pipert2.utils.dummy_object import Dummy
-from utils.dummy_routine import DummyRoutine, DUMMY_ROUTINE_EVENT
-from utils.functions_test_utils import timeout_wrapper
+from tests.pipert.core.utils.dummy_routine import DummyRoutine, DUMMY_ROUTINE_EVENT
+from tests.pipert.core.utils.functions_test_utils import timeout_wrapper
 
 MAX_TIMEOUT_WAITING = 3
 
