@@ -18,14 +18,19 @@ def test_event_notifier(dummy_event_board: EventBoard):
     assert dummy_event_board.new_events_queue.get() == EVENT1
 
 
+def test_notify_event(dummy_event_board: EventBoard):
+    dummy_event_board.notify_event(EVENT1.name)
+
+    assert dummy_event_board.new_events_queue.get() == EVENT1
+
+
 def test_event_loop(dummy_event_board: EventBoard):
     event_handler = dummy_event_board.get_event_handler([EVENT1.name])
-    event_notifier = dummy_event_board.get_event_notifier()
 
     dummy_event_board.build()
 
     for event in EVENTS:
-        event_notifier(event.name)
+        dummy_event_board.notify_event(event.name)
         executed_event = event_handler.wait()
         assert executed_event == event
 
