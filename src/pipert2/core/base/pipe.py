@@ -39,7 +39,7 @@ class Pipe:
 
         if auto_wire:
             for first_routine, second_routine in zip(routines, routines[1:]):
-                self.network.link(src=first_routine, destination=second_routine)
+                self.network.link(src=first_routine, destinations=second_routine)
 
     def link(self, *wires):
         """Connect the routines to each other by their wires configuration.
@@ -50,8 +50,7 @@ class Pipe:
         """
 
         for wire in wires:
-            self.network
-            # TODO - should we do it outside the wires or just create the 'connect' method in the wire class ???
+            self.network.link(src=wire.source, destinations=wire.destinations)
 
     def build(self):
         """Build the pipe to be ready to start working.
@@ -76,27 +75,6 @@ class Pipe:
 
         """
 
+        # TODO - Maybe before joining send a kill event ?
         for flow in self.flows.values():
             flow.join()
-
-# pipe = Pipe(networking=RedisNetworking, logger="")
-#
-# r1 = R1(abc=123)
-# r2 = R2()
-# r3 = R3()
-#
-# pipe.create_flow(flow_name="1", auto_wire=False,  r1, r2)
-# pipe.create_flow(r3, flow_name="2")
-#
-# pipe.link(Wire(source=r1, destinations=(r2, r3)),
-#           Wire(source=r2, destinations=(r3, )))
-#
-# pipe.build()
-#
-# pipe.notify_event("start")
-#
-# time.sleep(20)
-#
-# pipe.notify_event("kill")
-#
-# pipe.join()
