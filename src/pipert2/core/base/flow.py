@@ -1,14 +1,16 @@
+from multiprocessing import Process
 from typing import List
-
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.handlers.event_handler import EventHandler
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.annotations import class_functions_dictionary
-from multiprocessing import Process
+from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
+from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
+from src.pipert2.utils.method_data import Method
 
 
-class Flow:
+class Flow(EventExecutorInterface):
     """Flow is an entity designed for running a group of routines in a single process.
     It is also responsible to notify his routines when an event is triggered.
 
@@ -35,7 +37,7 @@ class Flow:
 
         self.routines = {}
         self.name = name
-        self.logger = logger
+        self._logger = logger
 
         flow_events_to_listen = set(self.get_events().keys())
 
@@ -59,45 +61,40 @@ class Flow:
 
         """
 
-        event_names = []
-        while "kill" not in event_names:
-            self.event_handler.wait()
-            event_names = self.event_handler.get_names()
-            for event_name in event_names:  # Maybe do this in threads to not get stuck on listening to events.
-                self.execute_event(event_name)
+        event: Method = self.event_handler.wait()
+        while event.name != KILL_EVENT_NAME:
+            self.execute_event(event)
+            event = self.event_handler.wait()
 
-        self.execute_event("stop")
+        self.execute_event(Method(STOP_EVENT_NAME))
 
-    @events("start")
+    @events(START_EVENT_NAME)
     def start(self):
-        self.logger.info("Starting")
+        self._logger.info("Starting")
 
-    @events("stop")
+    @events(STOP_EVENT_NAME)
     def stop(self):
-        self.logger.info("Stopping")
+        self._logger.info("Stopping")
 
-    def execute_event(self, event_name: str) -> None:
+    def execute_event(self, event: Method) -> None:
         """Execute the event callbacks in the flow and its routines.
 
         Args:
-            event_name (str): The name of the event to be executed.
+            event: The event to be executed.
 
         """
 
         for routine in self.routines.values():
-            routine.execute_event(event_name)
+            routine.execute_event(event)
 
-        if event_name in self.get_events():
-            self.logger.info(f"Running event '{event_name}'")
-            for callback in self.get_events()[event_name]:
-                callback(self)
+        EventExecutorInterface.execute_event(self, event)
 
     @classmethod
     def get_events(cls):
         """Get the events of the flow.
 
-            Returns:
-                dict[str, set[Callback]]: The events callbacks mapped by their events.
+        Returns:
+            dict[str, set[Callback]]: The events callbacks mapped by their events.
 
         """
 
