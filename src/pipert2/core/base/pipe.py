@@ -20,7 +20,7 @@ class Pipe:
         self.flows = {}
         self.event_board = EventBoard()
 
-    def create_flow(self, flow_name: str, auto_wire: bool = True, *routines: Routine):
+    def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine):
         """Create a new flow in the pipe.
 
         Args:
@@ -32,7 +32,7 @@ class Pipe:
 
         for routine in routines:
             routine.initialize(message_handler=self.network.get_message_handler(routine.name),
-                               event_notifier=self.event_board.get_notifier())
+                               event_notifier=self.event_board.get_event_notifier())
 
         flow = Flow(flow_name, self.event_board, self.logger.get_child(), *routines)
         self.flows[flow_name] = flow
