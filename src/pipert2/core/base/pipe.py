@@ -15,6 +15,19 @@ class Pipe:
     """
 
     def __init__(self, networking: Network, logger: PipeLogger):  # TODO - default logger and default networking (Queue)
+        """
+        Args:
+            networking: Network object responsible for the routine's communication.
+            logger: PipeLogger object for logging the pipe actions.
+
+        Attributes:
+            networking: Network object responsible for the routine's communication.
+            logger: PipeLogger object for logging the pipe actions.
+            flows (dict[str, Flow]): Dictionary mapping the pipe flows to their name.
+            event_board (EventBoard): EventBoard object responsible for the pipe events.
+
+        """
+
         self.network = networking
         self.logger = logger
         self.flows = {}
