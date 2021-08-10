@@ -34,7 +34,7 @@ class Pipe:
             routine.initialize(message_handler=self.network.get_message_handler(routine.name),
                                event_notifier=self.event_board.get_event_notifier())
 
-        flow = Flow(flow_name, self.event_board, self.logger.get_child(), *routines)
+        flow = Flow(flow_name, self.event_board, self.logger.get_child(), routines=list(routines))
         self.flows[flow_name] = flow
 
         if auto_wire:
