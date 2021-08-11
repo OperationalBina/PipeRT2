@@ -4,13 +4,25 @@ from abc import ABC, abstractmethod
 class PipeLogger(ABC):
 
     @abstractmethod
-    def exception(self, param):
-        pass
+    def info(self, message):
+        raise NotImplementedError
 
     @abstractmethod
-    def info(self, param):
-        pass
+    def error(self, message):
+        raise NotImplementedError
 
     @abstractmethod
-    def get_child(self):
-        pass
+    def debug(self, message):
+        raise NotImplementedError
+
+    @abstractmethod
+    def warning(self, message):
+        raise NotImplementedError
+
+    @abstractmethod
+    def exception(self, message):
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_logger_child(self, child_name):
+        raise NotImplementedError
