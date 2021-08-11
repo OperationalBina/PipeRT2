@@ -8,7 +8,6 @@ from src.pipert2.utils.annotations import class_functions_dictionary
 from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 from src.pipert2.utils.method_data import Method
-
 from src.pipert2.utils.dummy_object import Dummy
 
 
