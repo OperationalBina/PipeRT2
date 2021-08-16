@@ -14,7 +14,7 @@ class Message:
 
     counter = 0
 
-    def __init__(self, data: collections.Mapping, source_address: str):
+    def __init__(self, data: dict, source_address: str):
         """
         Args:
             data: Data that the message will hold.
@@ -36,17 +36,17 @@ class Message:
 
         Message.counter += 1
 
-    def update_data(self, data: collections.Mapping):
+    def update_data(self, data: dict):
         """Update the data the message contains.
 
         Args:
-            data (collections.Mapping): dictionary containing the data.
+            data (dict): dictionary containing the data.
 
         """
 
         self.payload.data = data
 
-    def get_data(self) -> collections.Mapping:
+    def get_data(self) -> dict:
         """Get the data from the message.
 
         Returns:
