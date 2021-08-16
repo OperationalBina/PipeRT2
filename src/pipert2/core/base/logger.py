@@ -11,7 +11,8 @@ class PipeLogger(ABC):
     def info(self, message: str):
         """Log a message with severity of 'INFO'.
 
-        :param message: Message to log.
+        Args:
+            message: Message to log.
 
         """
 
@@ -21,7 +22,8 @@ class PipeLogger(ABC):
     def error(self, message: str):
         """Log a message with severity of 'ERROR'.
 
-        :param message: Message to log.
+        Args:
+            message: Message to log.
 
         """
 
@@ -31,7 +33,8 @@ class PipeLogger(ABC):
     def debug(self, message: str):
         """Log a message with severity of 'DEBUG'.
 
-        :param message: Message to log.
+        Args:
+            message: Message to log.
 
         """
 
@@ -41,7 +44,8 @@ class PipeLogger(ABC):
     def warning(self, message: str):
         """Log a message with severity of 'WARNING'.
 
-        :param message: Message to log.
+        Args:
+            message: Message to log.
 
         """
 
@@ -51,17 +55,19 @@ class PipeLogger(ABC):
     def exception(self, message: str):
         """Log a message with severity of 'ERROR' with exception information.
 
-        :param message: Message to log.
+        Args:
+            message: Message to log.
 
         """
 
         raise NotImplementedError
 
     @abstractmethod
-    def get_logger_child(self, child_name: str):
+    def get_logger_child(self, child_name: str) -> 'PipeLogger':
         """Get a logger which is a descendant to this one.
 
-        :param child_name: The name of the descendant logger.
+        Args:
+            child_name: The name of the descendant logger.
 
         """
 
