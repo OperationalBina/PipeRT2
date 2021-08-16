@@ -7,6 +7,18 @@ class PipeLogger(ABC):
 
     """
 
+    def __init__(self, name: str):
+        """
+        Args:
+            name: Name of the logger.
+
+        Attributes:
+            name: Name of the logger.
+
+        """
+
+        self.name = name
+
     @abstractmethod
     def info(self, message: str):
         """Log a message with severity of 'INFO'.
