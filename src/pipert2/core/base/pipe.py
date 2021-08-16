@@ -4,6 +4,7 @@ from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.base.wire import Wire
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.core.managers.network import Network
+from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME
 
 
 class Pipe:
@@ -83,11 +84,13 @@ class Pipe:
 
         self.event_board.notify_event(event_name, **event_parameters)
 
-    def join(self):
+    def join(self, to_kill=False):
         """Block the execution until all of the flows have been killed
 
         """
 
-        # TODO - Maybe before joining send a kill event ?
+        if to_kill:
+            self.notify_event(KILL_EVENT_NAME)
+
         for flow in self.flows.values():
             flow.join()
