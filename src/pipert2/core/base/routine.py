@@ -51,6 +51,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self._logger: PipeLogger = Dummy()
         self.stop_event = mp.Event()
         self.stop_event.set()
+        self.runner = Dummy()
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -188,3 +189,11 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """
 
         self.event_notifier(event_name, **event_params)
+
+    def join(self):
+        """Block until all routine thread terminates
+
+        """
+
+        if self.stop_event.is_set():
+            self.runner.join()

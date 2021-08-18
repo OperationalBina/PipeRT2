@@ -8,6 +8,7 @@ from src.pipert2.utils.annotations import class_functions_dictionary
 from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 from src.pipert2.utils.method_data import Method
+from src.pipert2.utils.dummy_object import Dummy
 
 
 class Flow(EventExecutorInterface):
@@ -38,6 +39,7 @@ class Flow(EventExecutorInterface):
         self.routines = {}
         self.name = name
         self._logger = logger
+        self.flow_process = Dummy()
 
         flow_events_to_listen = set(self.get_events().keys())
 
@@ -68,6 +70,9 @@ class Flow(EventExecutorInterface):
 
         self.execute_event(Method(STOP_EVENT_NAME))
 
+        for routine in self.routines.values():
+            routine.join()
+
     @events(START_EVENT_NAME)
     def start(self):
         self._logger.info("Starting")
@@ -88,6 +93,13 @@ class Flow(EventExecutorInterface):
             routine.execute_event(event)
 
         EventExecutorInterface.execute_event(self, event)
+
+    def join(self) -> None:
+        """Block until the flow process terminates
+
+        """
+
+        self.flow_process.join()
 
     @classmethod
     def get_events(cls):
