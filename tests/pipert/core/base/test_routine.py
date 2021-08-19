@@ -1,8 +1,8 @@
 import pytest
 from functools import partial
 from src.pipert2.utils.dummy_object import Dummy
-from utils.dummy_routine import DummyRoutine, DUMMY_ROUTINE_EVENT_NAME
-from utils.functions_test_utils import timeout_wrapper
+from tests.pipert.core.utils.dummy_routine import DummyRoutine, DUMMY_ROUTINE_EVENT
+from tests.pipert.core.utils.functions_test_utils import timeout_wrapper
 
 MAX_TIMEOUT_WAITING = 3
 
@@ -15,12 +15,12 @@ def dummy_routine():
 
 
 def test_event_execution(dummy_routine):
-    dummy_routine.execute_event(DUMMY_ROUTINE_EVENT_NAME)
+    dummy_routine.execute_event(DUMMY_ROUTINE_EVENT)
     assert not dummy_routine.inc
 
 
 def test_routine_has_registered_events(dummy_routine):
-    assert DUMMY_ROUTINE_EVENT_NAME in dummy_routine.get_events()
+    assert DUMMY_ROUTINE_EVENT.name in dummy_routine.get_events()
 
 
 def test_routine_execution(mocker, dummy_routine):

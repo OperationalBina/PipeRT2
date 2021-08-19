@@ -2,16 +2,19 @@ import threading
 import multiprocessing as mp
 from typing import Callable
 from functools import partial
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.handlers.message_handler import MessageHandler
+from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
+from src.pipert2.utils.method_data import Method
 from src.pipert2.utils.dummy_object import Dummy
 from src.pipert2.utils.annotations import class_functions_dictionary
+from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
-class Routine(ABC):
+class Routine(EventExecutorInterface, metaclass=ABCMeta):
     """A routine is responsible for performing one of the flow’s main tasks.
-    It can run as either a thread or a process. 
+    It can run as either a thread or a process.
     First it runs a setup function, then it runs its main logic function in a continuous loop, until it is told to terminate.
     Once terminated it runs a cleanup function.
 
@@ -48,6 +51,7 @@ class Routine(ABC):
         self._logger: PipeLogger = Dummy()
         self.stop_event = mp.Event()
         self.stop_event.set()
+        self.runner = Dummy()
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -139,7 +143,7 @@ class Routine(ABC):
     def set_runner_as_thread(self):
         self.runner_creator = partial(threading.Thread, target=self._extended_run)
 
-    @events("start")
+    @events(START_EVENT_NAME)
     def start(self) -> None:
         """Start running the routine
 
@@ -153,7 +157,7 @@ class Routine(ABC):
             self.runner = self.runner_creator()
             self.runner.start()
 
-    @events("stop")
+    @events(STOP_EVENT_NAME)
     def stop(self) -> None:
         """Stop the routine from running
 
@@ -166,22 +170,17 @@ class Routine(ABC):
             self.stop_event.set()
             self.runner.join()
 
-    def execute_event(self, event_name: str) -> None:
+    def execute_event(self, event: Method) -> None:
         """Execute an event to start
 
         Args:
-            event_name: The name of the event to execute
+            event: The event to execute
 
         """
 
-        mapped_events = self.get_events()
+        EventExecutorInterface.execute_event(self, event)  # TODO - Can be removed but i think it should stay
 
-        if event_name in mapped_events:
-            self._logger.info(f"Running event '{event_name}'")
-            for callback in mapped_events[event_name]:
-                callback(self)
-
-    def notify_event(self, event_name: str) -> None:
+    def notify_event(self, event_name: str, **event_params) -> None:
         """Notify that an event has happened
 
         Args:
@@ -189,4 +188,12 @@ class Routine(ABC):
 
         """
 
-        self.event_notifier(event_name)
+        self.event_notifier(event_name, **event_params)
+
+    def join(self):
+        """Block until all routine thread terminates
+
+        """
+
+        if self.stop_event.is_set():
+            self.runner.join()
