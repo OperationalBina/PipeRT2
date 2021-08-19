@@ -1,5 +1,5 @@
 import pytest
-from mock import patch, Mock
+from mock import Mock
 from src.pipert2.core.base.payload import Payload
 
 DATA = {

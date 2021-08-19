@@ -1,4 +1,5 @@
 import pytest
+from mock import Mock
 from pytest_mock import MockerFixture
 from src.pipert2.core.base.message import Message
 from src.pipert2.utils.dummy_object import Dummy
@@ -40,7 +41,7 @@ def test_encode_message(mocker: MockerFixture, dummy_message: Message):
     mocker.patch("pickle.dumps")
     payload_mock = dummy_message.payload
 
-    Message.encode(dummy_message)
+    Message.encode(dummy_message, Mock())
 
     payload_mock.encode.assert_called()
 
@@ -50,8 +51,8 @@ def test_decode_message():
     message.payload = Dummy()
     message.payload.data = MESSAGE_DATA
 
-    encoded_message = Message.encode(message)
+    encoded_message = Message.encode(message, Mock())
 
-    decoded_message:Message = Message.decode(encoded_message, lazy=False)
+    decoded_message:Message = Message.decode(encoded_message, decoder=Mock(), lazy=False)
 
     assert decoded_message.__str__() == message.__str__()
