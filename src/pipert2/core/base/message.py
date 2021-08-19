@@ -2,7 +2,6 @@ import collections
 import time
 import pickle
 from typing import Callable
-
 from src.pipert2.core.base.payload import Payload
 
 
@@ -57,7 +56,7 @@ class Message:
         """
 
         if self.payload.encoded:
-            self.payload.decode()
+            raise Exception("The message is encoded, unable to get the data !")
 
         return self.payload.data
 
@@ -81,14 +80,14 @@ class Message:
                f"history: {self.history} \n"
 
     @staticmethod
-    def encode(msg, encoder) -> bytes:
+    def encode(msg, encoder: Callable) -> bytes:
         """Encodes the message object.
         This method compresses the message payload and then serializes the whole
         message object into bytes, using pickle.
 
         Args:
             msg (Message): The message to encode.
-            encoder ():
+            encoder: Function to encode the message payload with.
 
         Returns:
             Bytes containing the msg object.
@@ -107,7 +106,7 @@ class Message:
 
         Args:
             encoded_msg (Bytes): The message bytes to decode.
-            decoder:
+            decoder: Function to decode the message payload with.
             lazy: If this is True, then the payload will only be decoded once it's
             accessed.
 
