@@ -1,4 +1,3 @@
-from collections import Iterable
 from typing import Tuple
 
 from src.pipert2.core.base.routine import Routine

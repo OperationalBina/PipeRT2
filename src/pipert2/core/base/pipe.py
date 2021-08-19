@@ -4,6 +4,7 @@ from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.base.wire import Wire
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.core.managers.network import Network
+from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME
 
 
 class Pipe:
@@ -15,12 +16,25 @@ class Pipe:
     """
 
     def __init__(self, networking: Network, logger: PipeLogger):  # TODO - default logger and default networking (Queue)
+        """
+        Args:
+            networking: Network object responsible for the routine's communication.
+            logger: PipeLogger object for logging the pipe actions.
+
+        Attributes:
+            networking: Network object responsible for the routine's communication.
+            logger: PipeLogger object for logging the pipe actions.
+            flows (dict[str, Flow]): Dictionary mapping the pipe flows to their name.
+            event_board (EventBoard): EventBoard object responsible for the pipe events.
+
+        """
+
         self.network = networking
         self.logger = logger
         self.flows = {}
         self.event_board = EventBoard()
 
-    def create_flow(self, flow_name: str, auto_wire: bool = True, *routines: Routine):
+    def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine):
         """Create a new flow in the pipe.
 
         Args:
@@ -32,9 +46,9 @@ class Pipe:
 
         for routine in routines:
             routine.initialize(message_handler=self.network.get_message_handler(routine.name),
-                               event_notifier=self.event_board.get_notifier())
+                               event_notifier=self.event_board.get_event_notifier())
 
-        flow = Flow(flow_name, self.event_board, self.logger.get_child(), *routines)
+        flow = Flow(flow_name, self.event_board, self.logger.get_child(), routines=list(routines))
         self.flows[flow_name] = flow
 
         if auto_wire:
@@ -70,11 +84,13 @@ class Pipe:
 
         self.event_board.notify_event(event_name, **event_parameters)
 
-    def join(self):
+    def join(self, to_kill=False):
         """Block the execution until all of the flows have been killed
 
         """
 
-        # TODO - Maybe before joining send a kill event ?
+        if to_kill:
+            self.notify_event(KILL_EVENT_NAME)
+
         for flow in self.flows.values():
             flow.join()
