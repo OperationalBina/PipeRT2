@@ -1,6 +1,8 @@
 import collections
 import time
 import pickle
+from typing import Callable
+
 from src.pipert2.core.base.payload import Payload
 
 
@@ -79,31 +81,33 @@ class Message:
                f"history: {self.history} \n"
 
     @staticmethod
-    def encode(msg) -> bytes:
+    def encode(msg, encoder) -> bytes:
         """Encodes the message object.
         This method compresses the message payload and then serializes the whole
         message object into bytes, using pickle.
 
         Args:
             msg (Message): The message to encode.
+            encoder ():
 
         Returns:
             Bytes containing the msg object.
 
         """
 
-        msg.payload.encode()
+        msg.payload.encode(encoder)
 
         return pickle.dumps(msg)
 
     @staticmethod
-    def decode(encoded_msg: bytes, lazy=False):
+    def decode(encoded_msg: bytes, decoder: Callable, lazy=False):
         """Decodes the message object.
         This method deserializes the pickled message, and decodes the message
         payload if 'lazy' is False.
 
         Args:
             encoded_msg (Bytes): The message bytes to decode.
+            decoder:
             lazy: If this is True, then the payload will only be decoded once it's
             accessed.
 
@@ -114,6 +118,6 @@ class Message:
 
         msg = pickle.loads(encoded_msg)
         if not lazy:
-            msg.payload.decode()
+            msg.payload.decode(decoder)
 
         return msg
