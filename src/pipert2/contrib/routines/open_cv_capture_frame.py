@@ -46,7 +46,12 @@ class OpenCVCaptureFrame(Routine):
         return None
 
     def main_logic(self, data):
-        return {"frame": self.grab_frame()}
+        frame = self.grab_frame()
+
+        if frame is not None:
+            return {"frame": frame}
+
+        return None
 
     def setup(self):
         self.begin_capture()
