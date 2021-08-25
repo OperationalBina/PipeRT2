@@ -18,7 +18,7 @@ def test_write_and_read_from_memory(dummy_shared_memory_manager):
 
 
 def test_max_count(dummy_shared_memory_manager):
-    test_data = b"AAA"
+    test_data = b"BBB"
     test_data_2 = b"aaa"
     first_memory = dummy_shared_memory_manager.write_to_mem(test_data)
 
