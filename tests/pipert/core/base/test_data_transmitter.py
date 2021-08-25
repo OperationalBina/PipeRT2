@@ -7,8 +7,8 @@ from src.pipert2.core.base.basic_transmitter import BasicTransmitter
 @pytest.fixture
 def dummy_shared_memory_transmitter():
     if sys.version_info.minor <= 7:
-        from src.pipert2.core.base.posix_ipc_transmitter import PosixIpcTransmitter
-        dummy_shared_memory_transmitter = PosixIpcTransmitter()
+        from src.pipert2.core.base.shared_memory_transmitter import SharedMemoryTransmitter
+        dummy_shared_memory_transmitter = SharedMemoryTransmitter()
     else:
         dummy_shared_memory_transmitter = DataTransmitter()  # TODO: Change to multiprocessing
 
