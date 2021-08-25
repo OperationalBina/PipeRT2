@@ -1,10 +1,13 @@
+import sys
 from pipert2.utils.singleton import Singleton
-from pipert2.utils.shared_memory.shared_memory_generator import SharedMemoryGenerator, get_shared_memory_object
+if sys.version_info.minor <= 7:
+    from pipert2.utils.shared_memory.shared_memory_generator import SharedMemoryGenerator, get_shared_memory_object
 
 
 class SharedMemoryManager(metaclass=Singleton):
-    def __init__(self):
-        self.shared_memory_generator = SharedMemoryGenerator()
+    def __init__(self, max_segment_count=50, segment_size=5000000):
+        self.shared_memory_generator = SharedMemoryGenerator(max_segment_count=max_segment_count,
+                                                             segment_size=segment_size)
         self.shared_memory_generator.create_memories()
 
     def write_to_mem(self, data: bytes) -> str:
@@ -25,3 +28,6 @@ class SharedMemoryManager(metaclass=Singleton):
         memory.release_semaphore()
 
         return data
+
+    def cleanup_memory(self):
+        self.shared_memory_generator.cleanup()

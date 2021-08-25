@@ -33,17 +33,17 @@ class SharedMemoryGenerator:
     """
     Generates a set 'max_count' amount of shared memories to be used.
     """
-    def __init__(self, max_count=50, size=5000000):
-        self.memory_id_gen = MemoryIdIterator(os.getpid(), max_count)
-        self.max_count = max_count
+    def __init__(self, max_segment_count, segment_size):
+        self.memory_id_gen = MemoryIdIterator(os.getpid(), max_segment_count)
+        self.max_segment_count = max_segment_count
         self.shared_memories = {}
-        self.size = size
+        self.segment_size = segment_size
 
     def create_memories(self):
-        for _ in range(self.max_count):
+        for _ in range(self.max_segment_count):
             next_name = self.memory_id_gen.get_next()
             memory = posix_ipc.SharedMemory(next_name, posix_ipc.O_CREAT,
-                                            size=self.size)
+                                            size=self.segment_size)
             semaphore = posix_ipc.Semaphore(next_name, posix_ipc.O_CREAT)
             mapfile = mmap.mmap(memory.fd, memory.size)
             memory.close_fd()
@@ -59,7 +59,7 @@ class SharedMemoryGenerator:
         """
         Cleans all of the allocated shared memories to free up the ram.
         """
-        for _ in range(self.max_count):
+        for _ in range(self.max_segment_count):
             name_to_unlink = self.memory_id_gen.get_next()
             if name_to_unlink in self.shared_memories:
                 self._destroy_memory(name_to_unlink)
