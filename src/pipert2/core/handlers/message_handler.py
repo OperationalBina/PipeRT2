@@ -45,8 +45,9 @@ class MessageHandler(ABC):
 
         """
 
-        transmitted_data = self.transmit(message.payload.data)
-        message.update_data(transmitted_data)
+        if type(self.transmit) == callable:
+            transmitted_data = self.transmit(message.payload.data)
+            message.update_data(transmitted_data)
 
         self._put(Message.encode(message))
 
@@ -60,8 +61,9 @@ class MessageHandler(ABC):
         try:
             message = Message.decode(self._get())
 
-            received_data = self.receive(message.payload.data)
-            message.update_data(received_data)
+            if type(self.receive) == callable:
+                received_data = self.receive(message.payload.data)
+                message.update_data(received_data)
         except TypeError:
             message = None
         else:
