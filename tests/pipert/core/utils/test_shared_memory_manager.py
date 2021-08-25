@@ -27,6 +27,8 @@ def test_max_count(dummy_shared_memory_manager):
 
     assert test_data == dummy_shared_memory_manager.read_from_mem(first_memory, len(test_data))
     dummy_shared_memory_manager.write_to_mem(test_data_2)
+    import time
+    time.sleep(0.5)
     assert test_data != dummy_shared_memory_manager.read_from_mem(first_memory, len(test_data))
 
 
