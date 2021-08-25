@@ -5,6 +5,8 @@ from src.pipert2.core.base.wire import Wire
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.core.managers.network import Network
 from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME
+from src.pipert2.core.base.data_transmitter import DataTransmitter
+from src.pipert2.core.base.basic_transmitter import BasicTransmitter
 
 
 class Pipe:
@@ -34,10 +36,12 @@ class Pipe:
         self.flows = {}
         self.event_board = EventBoard()
 
-    def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine):
+    def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
+                    data_transmitter: DataTransmitter = BasicTransmitter()):
         """Create a new flow in the pipe.
 
         Args:
+            data_transmitter:
             flow_name (str): The name of the flow to be created
             auto_wire (bool): Automatically connect the routines to each other by the order of their entry.
             routines: (Routine): List of routines to register to the flow.
@@ -53,7 +57,8 @@ class Pipe:
 
         if auto_wire:
             for first_routine, second_routine in zip(routines, routines[1:]):
-                self.network.link(src=first_routine, destinations=second_routine)
+                self.network.link(src=first_routine, destinations=second_routine, transmit=data_transmitter.transmit(),
+                                  receive=data_transmitter.receive())
 
     def link(self, *wires):
         """Connect the routines to each other by their wires configuration.
@@ -64,7 +69,8 @@ class Pipe:
         """
 
         for wire in wires:
-            self.network.link(src=wire.source, destinations=wire.destinations)
+            self.network.link(src=wire.source, destinations=wire.destinations, transmit=wire.transmit,
+                              receive=wire.receive)
 
     def build(self):
         """Build the pipe to be ready to start working.
