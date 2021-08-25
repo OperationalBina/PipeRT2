@@ -11,9 +11,10 @@ def dummy_shared_memory_manager():
     return dummy_shared_memory_manager
 
 
-def test_cleanup(dummy_shared_memory_manager):
-    dummy_shared_memory_manager.cleanup_memory()
-    assert dummy_shared_memory_manager.shared_memory_generator.shared_memories == {}
+def test_write_and_read_from_memory(dummy_shared_memory_manager):
+    test_data = b"AAA"
+    memory_name = dummy_shared_memory_manager.write_to_mem(test_data)
+    assert dummy_shared_memory_manager.read_from_mem(memory_name, len(test_data)) == test_data
 
 
 def test_max_count(dummy_shared_memory_manager):
@@ -27,11 +28,8 @@ def test_max_count(dummy_shared_memory_manager):
     assert test_data == dummy_shared_memory_manager.read_from_mem(first_memory, len(test_data))
     dummy_shared_memory_manager.write_to_mem(test_data_2)
     assert test_data != dummy_shared_memory_manager.read_from_mem(first_memory, len(test_data))
-    dummy_shared_memory_manager.cleanup_memory()
 
 
-def test_write_and_read_from_memory(dummy_shared_memory_manager):
-    test_data = b"AAA"
-    memory_name = dummy_shared_memory_manager.write_to_mem(test_data)
-    assert dummy_shared_memory_manager.read_from_mem(memory_name, len(test_data)) == test_data
+def test_cleanup(dummy_shared_memory_manager):
     dummy_shared_memory_manager.cleanup_memory()
+    assert dummy_shared_memory_manager.shared_memory_generator.shared_memories == {}
