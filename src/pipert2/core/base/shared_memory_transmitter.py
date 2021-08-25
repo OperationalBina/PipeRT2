@@ -1,5 +1,5 @@
 from src.pipert2.core.base.data_transmitter import DataTransmitter
-from pipert2.utils.shared_memory_manager import SharedMemoryManager
+from src.pipert2.utils.shared_memory_manager import SharedMemoryManager
 
 
 class SharedMemoryTransmitter(DataTransmitter):

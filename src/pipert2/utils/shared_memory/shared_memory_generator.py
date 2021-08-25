@@ -1,8 +1,8 @@
 import os
 import mmap
 import posix_ipc
-from pipert2.utils.shared_memory.shared_memory import SharedMemory
-from pipert2.utils.shared_memory.memory_id_iterator import MemoryIdIterator
+from src.pipert2.utils.shared_memory.shared_memory import SharedMemory
+from src.pipert2.utils.shared_memory.memory_id_iterator import MemoryIdIterator
 
 
 def get_shared_memory_object(name: str) -> [SharedMemory, None]:
