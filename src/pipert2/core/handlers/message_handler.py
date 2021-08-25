@@ -12,6 +12,8 @@ class MessageHandler(ABC):
 
     def __init__(self, routine_name: str):
         self.routine_name = routine_name
+        self.transmit = None
+        self.receive = None
 
     @abstractmethod
     def _get(self) -> bytes:
@@ -43,6 +45,9 @@ class MessageHandler(ABC):
 
         """
 
+        transmitted_data = self.transmit(message.payload.data)
+        message.update_data(transmitted_data)
+
         self._put(Message.encode(message))
 
     def get(self) -> Message:
@@ -51,8 +56,12 @@ class MessageHandler(ABC):
         Returns: A decoded message object.
 
         """
+
         try:
             message = Message.decode(self._get())
+
+            received_data = self.receive(message.payload.data)
+            message.update_data(received_data)
         except TypeError:
             message = None
         else:
