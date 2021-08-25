@@ -28,10 +28,10 @@ def test_max_count(dummy_shared_memory_manager):
 
     for memory in memories:
         assert test_data_2 == dummy_shared_memory_manager.read_from_mem(memory, len(test_data))
-        print(dummy_shared_memory_manager.read_from_mem(memory, len(test_data)))
 
     assert test_data == dummy_shared_memory_manager.read_from_mem(first_memory, len(test_data))
-    dummy_shared_memory_manager.write_to_mem(test_data_2)
+    second_cycle = dummy_shared_memory_manager.write_to_mem(test_data_2)
+    assert second_cycle == first_memory
     assert test_data != dummy_shared_memory_manager.read_from_mem(first_memory, len(test_data))
 
 
