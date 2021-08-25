@@ -5,8 +5,14 @@ class DataTransmitter(ABC):
 
     @abstractmethod
     def transmit(self):
-        raise NotImplementedError
+        def func(data: dict):
+            raise NotImplementedError
+
+        return func
 
     @abstractmethod
     def receive(self):
-        raise NotImplementedError
+        def func(data: dict):
+            raise NotImplementedError
+
+        return func
