@@ -2,12 +2,12 @@ import pytest
 from src.pipert2.utils.shared_memory_manager import SharedMemoryManager
 
 
-MAX_SEGMENT_COUNT = 5
+MAX_SEGMENT_COUNT = 50
 
 
 @pytest.fixture
 def dummy_shared_memory_manager():
-    dummy_shared_memory_manager = SharedMemoryManager(max_segment_count=MAX_SEGMENT_COUNT, segment_size=500)
+    dummy_shared_memory_manager = SharedMemoryManager()
     return dummy_shared_memory_manager
 
 
@@ -35,6 +35,6 @@ def test_max_count(dummy_shared_memory_manager):
     assert test_data != dummy_shared_memory_manager.read_from_mem(first_memory, len(test_data))
 
 
-# def test_cleanup(dummy_shared_memory_manager):
-#     dummy_shared_memory_manager.cleanup_memory()
-#     assert dummy_shared_memory_manager.shared_memory_generator.shared_memories == {}
+def test_cleanup(dummy_shared_memory_manager):
+    dummy_shared_memory_manager.cleanup_memory()
+    assert dummy_shared_memory_manager.shared_memory_generator.shared_memories == {}
