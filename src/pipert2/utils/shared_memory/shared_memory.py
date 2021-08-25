@@ -1,6 +1,6 @@
 import sys
-if sys.version_info.minor <= 7:
-    import posix_ipc
+# if sys.version_info.minor <= 7:
+import posix_ipc
 import mmap
 
 
