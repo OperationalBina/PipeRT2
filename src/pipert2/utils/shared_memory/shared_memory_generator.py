@@ -1,6 +1,8 @@
 import os
 import mmap
-import posix_ipc
+import sys
+if sys.version_info.minor <= 7:
+    import posix_ipc
 from src.pipert2.utils.shared_memory.shared_memory import SharedMemory
 from src.pipert2.utils.shared_memory.memory_id_iterator import MemoryIdIterator
 
