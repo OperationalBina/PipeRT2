@@ -41,27 +41,5 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     install_requires=["posix-ipc"],
-    python_requires=">=3.6, !=3.8.*, !=3.9.*",
-)
-
-setuptools.setup(
-    name="PipeRT",
-    version=get_version("src/pipert2/__init__.py"),
-    author="digitalTevel",
-    author_email="digitalTevel@gmail.com",
-    description="Real-time pipeline 4 analytics",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/OperationalBina/PipeRT2",
-    project_urls={
-        "Bug Tracker": "https://github.com/OperationalBina/PipeRT2/issues",
-    },
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],
-    package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src"),
-    python_requires=">=3.8",
+    python_requires=">=3.6",
 )
