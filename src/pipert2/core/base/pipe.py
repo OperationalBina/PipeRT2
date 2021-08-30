@@ -58,12 +58,11 @@ class Pipe:
         self.flows[flow_name] = flow
 
         if auto_wire:
-            transmit = data_transmitter.transmit() if data_transmitter else self.default_data_transmitter.transmit()
-            receive = data_transmitter.receive() if data_transmitter else self.default_data_transmitter.receive()
+            data_transmitter = self.default_data_transmitter if data_transmitter is None else data_transmitter
 
             for first_routine, second_routine in zip(routines, routines[1:]):
-                self.network.link(source=first_routine, destinations=second_routine, transmit=transmit,
-                                  receive=receive)
+                self.network.link(source=first_routine, destinations=(second_routine,),
+                                  data_transmitter=data_transmitter)
 
     def link(self, *wires):
         """Connect the routines to each other by their wires configuration.
@@ -76,8 +75,7 @@ class Pipe:
         for wire in wires:
             data_transmitter = wire.data_transmitter if wire.data_transmitter else self.default_data_transmitter
 
-            self.network.link(source=wire.source, destinations=wire.destinations, transmit=data_transmitter.transmit(),
-                              receive=data_transmitter.receive())
+            self.network.link(source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
 
     def build(self):
         """Build the pipe to be ready to start working.
