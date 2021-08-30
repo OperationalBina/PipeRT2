@@ -1,11 +1,12 @@
-from typing import List
+from typing import Tuple
 from abc import ABC, abstractmethod
 from collections import defaultdict
+from pipert2.core.base.routine import Routine
 from pipert2.core.handlers.message_handler import MessageHandler
 
 
 class Network(ABC):
-    """The network is responsible for managing all of the communicaiton in the pipe.
+    """The network is responsible for managing all of the communication in the pipe.
     It generates the message handlers used by the routines, and can change who the routines send their messages to.
 
     """
@@ -14,22 +15,26 @@ class Network(ABC):
         self.message_handlers = defaultdict(str)
 
     @abstractmethod
-    def _generate_message_handler(self) -> MessageHandler:
+    def get_message_handler(self, routine_name: str) -> MessageHandler:
         """Generate a new message handler, save it, and return it to the routine.
+
+        Args:
+            routine_name: The name of the routine for the message handler.
 
         Returns:
             The new message handler for the routine.
+
         """
 
         raise NotImplementedError
 
     @abstractmethod
-    def _change_communication(self, src: str, dest: List[str]):
+    def link(self, source: Routine, destinations: Tuple[Routine]):
         """Rewire the destinations of a given message handler.
 
         Args:
-            src: The name of the routine holding the source message handler.
-            dest: A list of all of the destination routines.
+            source: The source routine to be linked.
+            destinations: A list of all of the destination routines.
 
         """
 
