@@ -27,6 +27,7 @@ jobs:
         pip install pytest
         pip install pytest-mock
         pip install posix-ipc
+        pip install numpy
         pip install mock
         pip install coverage
         coverage run -m pytest
