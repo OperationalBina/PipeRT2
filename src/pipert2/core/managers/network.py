@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod
-from pipert2.core.handlers.message_handler import MessageHandler
 from typing import List
+from abc import ABC, abstractmethod
 from collections import defaultdict
+from pipert2.core.handlers.message_handler import MessageHandler
 
 
 class Network(ABC):
