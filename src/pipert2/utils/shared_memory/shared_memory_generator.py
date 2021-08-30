@@ -1,13 +1,12 @@
 import os
 import mmap
-import sys
-# if sys.version_info.minor <= 7:
 import posix_ipc
+from typing import Optional
 from src.pipert2.utils.shared_memory.shared_memory import SharedMemory
 from src.pipert2.utils.shared_memory.memory_id_iterator import MemoryIdIterator
 
 
-def get_shared_memory_object(name: str) -> [SharedMemory, None]:
+def get_shared_memory_object(name: str) -> Optional[SharedMemory]:
     """Get a SharedMemory object that correlates to the name given.
 
     Args:

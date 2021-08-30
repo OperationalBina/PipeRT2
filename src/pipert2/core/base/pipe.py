@@ -17,7 +17,7 @@ class Pipe:
 
     """
 
-    def __init__(self, networking: Network, logger: PipeLogger):  # TODO - default logger and default networking (Queue)
+    def __init__(self, networking: Network, logger: PipeLogger, data_transmitter: DataTransmitter = BasicTransmitter()):  # TODO - default logger and default networking (Queue)
         """
         Args:
             networking: Network object responsible for the routine's communication.
@@ -35,14 +35,16 @@ class Pipe:
         self.logger = logger
         self.flows = {}
         self.event_board = EventBoard()
+        self.default_data_transmitter = data_transmitter
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
-                    data_transmitter: DataTransmitter = BasicTransmitter()):
+                    data_transmitter: DataTransmitter = None):
         """Create a new flow in the pipe.
 
         Args:
-            data_transmitter:
-            flow_name (str): The name of the flow to be created
+            data_transmitter (DataTransmitter): A data transmitter object that indicates how data will be transferred
+                                                inside the flow.
+            flow_name (str): The name of the flow to be created.
             auto_wire (bool): Automatically connect the routines to each other by the order of their entry.
             routines: (Routine): List of routines to register to the flow.
 
@@ -55,10 +57,13 @@ class Pipe:
         flow = Flow(flow_name, self.event_board, self.logger.get_child(), routines=list(routines))
         self.flows[flow_name] = flow
 
+        transmit = data_transmitter.transmit() if data_transmitter else self.default_data_transmitter.transmit()
+        receive = data_transmitter.receive() if data_transmitter else self.default_data_transmitter.receive()
+
         if auto_wire:
             for first_routine, second_routine in zip(routines, routines[1:]):
-                self.network.link(src=first_routine, destinations=second_routine, transmit=data_transmitter.transmit(),
-                                  receive=data_transmitter.receive())
+                self.network.link(src=first_routine, destinations=second_routine, transmit=transmit,
+                                  receive=receive)
 
     def link(self, *wires):
         """Connect the routines to each other by their wires configuration.
@@ -69,8 +74,11 @@ class Pipe:
         """
 
         for wire in wires:
-            self.network.link(src=wire.source, destinations=wire.destinations, transmit=wire.transmit,
-                              receive=wire.receive)
+            transmit = wire.transmit if wire.transmit else self.default_data_transmitter.transmit()
+            receive = wire.receive if wire.receive else self.default_data_transmitter.receive()
+
+            self.network.link(src=wire.source, destinations=wire.destinations, transmit=transmit,
+                              receive=receive)
 
     def build(self):
         """Build the pipe to be ready to start working.

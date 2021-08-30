@@ -1,6 +1,6 @@
 class MemoryIdIterator:
     """Iterates over a set amount of id's. The id's are in the following format:
-    "{component_name}_{serial_memory_number}".
+    "{process_id}_{serial_memory_number}".
 
     """
 

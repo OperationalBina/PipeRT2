@@ -7,8 +7,8 @@ from src.pipert2.core.base.basic_transmitter import BasicTransmitter
 
 class Wire:
     def __init__(self, source: Routine, destinations: Tuple[Routine, ...],
-                 data_transmitter: DataTransmitter = BasicTransmitter()):
+                 data_transmitter: DataTransmitter = None):
         self.source = source
         self.destinations = destinations
-        self.transmit = data_transmitter.transmit()
-        self.receive = data_transmitter.receive()
+        self.transmit = data_transmitter.transmit() if data_transmitter else None
+        self.receive = data_transmitter.receive() if data_transmitter else None

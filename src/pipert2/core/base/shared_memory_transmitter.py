@@ -1,3 +1,4 @@
+import numpy as np
 from src.pipert2.core.base.data_transmitter import DataTransmitter
 from src.pipert2.utils.shared_memory_manager import SharedMemoryManager
 
@@ -6,6 +7,15 @@ class SharedMemoryTransmitter(DataTransmitter):
     """A shared memory implementation of a data transmitter.
 
     """
+    def __init__(self, data_size_threshold: int = 5000):
+        """
+
+        Args:
+            data_size_threshold: The minimum size for a value to be saved in the shared memory.
+
+        """
+
+        self.data_size_threshold = data_size_threshold
 
     def transmit(self) -> callable:
         """Shared memory transmit implementation.
@@ -14,12 +24,11 @@ class SharedMemoryTransmitter(DataTransmitter):
             A function that parses the payload data and saves necessary values in shared memory.
         """
 
-        def func(data: dict, size_threshold: int = 5000) -> dict:
+        def func(data: dict) -> dict:
             """Parse a given dict and if necessary save a value in shared memory.
 
             Args:
                 data: A dictionary to be parsed.
-                size_threshold: The minimum size for a value to be saved in the shared memory.
 
             Returns:
                 A dictionary containing the same values as before, other than values saved in shared memory.
@@ -37,9 +46,14 @@ class SharedMemoryTransmitter(DataTransmitter):
                 except TypeError:
                     return_dict[key] = value
                 else:
-                    if len(new_val) >= size_threshold:
+                    if len(new_val) >= self.data_size_threshold:
                         address = SharedMemoryManager().write_to_mem(new_val)
-                        return_dict[key] = {"address": address, "size": len(new_val)}
+
+                        if type(value) == np.ndarray:
+                            return_dict[key] = {"address": address, "size": len(new_val), "shape": value.shape,
+                                                "dtype": value.dtype}
+                        else:
+                            return_dict[key] = {"address": address, "size": len(new_val)}
                     else:
                         return_dict[key] = value
 
@@ -70,10 +84,18 @@ class SharedMemoryTransmitter(DataTransmitter):
 
             for key, value in data.items():
                 if type(value) == dict:
-                    mem_name = value.get("address", "")
-                    bytes_to_read = value.get("size", 0)
-                    returned_value = SharedMemoryManager().read_from_mem(mem_name=mem_name,
-                                                                         bytes_to_read=bytes_to_read)
+                    mem_name = value.get("address", None)
+                    bytes_to_read = value.get("size", None)
+
+                    if mem_name and bytes_to_read:
+                        returned_value = SharedMemoryManager().read_from_mem(mem_name=mem_name,
+                                                                             bytes_to_read=bytes_to_read)
+                    else:
+                        returned_value = None
+
+                    if "shape" in value:
+                        returned_value = np.frombuffer(returned_value, dtype=value["dtype"])
+                        returned_value = returned_value.reshape(value["shape"])
 
                     if returned_value:
                         return_dict[key] = returned_value
