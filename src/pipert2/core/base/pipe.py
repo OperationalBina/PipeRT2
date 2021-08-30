@@ -57,10 +57,10 @@ class Pipe:
         flow = Flow(flow_name, self.event_board, self.logger.get_child(), routines=list(routines))
         self.flows[flow_name] = flow
 
-        transmit = data_transmitter.transmit() if data_transmitter else self.default_data_transmitter.transmit()
-        receive = data_transmitter.receive() if data_transmitter else self.default_data_transmitter.receive()
-
         if auto_wire:
+            transmit = data_transmitter.transmit() if data_transmitter else self.default_data_transmitter.transmit()
+            receive = data_transmitter.receive() if data_transmitter else self.default_data_transmitter.receive()
+
             for first_routine, second_routine in zip(routines, routines[1:]):
                 self.network.link(src=first_routine, destinations=second_routine, transmit=transmit,
                                   receive=receive)
@@ -74,11 +74,10 @@ class Pipe:
         """
 
         for wire in wires:
-            transmit = wire.transmit if wire.transmit else self.default_data_transmitter.transmit()
-            receive = wire.receive if wire.receive else self.default_data_transmitter.receive()
+            data_transmitter = wire.data_transmitter if wire.data_transmitter else self.default_data_transmitter
 
-            self.network.link(src=wire.source, destinations=wire.destinations, transmit=transmit,
-                              receive=receive)
+            self.network.link(src=wire.source, destinations=wire.destinations, transmit=data_transmitter.transmit(),
+                              receive=data_transmitter.receive())
 
     def build(self):
         """Build the pipe to be ready to start working.

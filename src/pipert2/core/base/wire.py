@@ -10,5 +10,4 @@ class Wire:
                  data_transmitter: DataTransmitter = None):
         self.source = source
         self.destinations = destinations
-        self.transmit = data_transmitter.transmit() if data_transmitter else None
-        self.receive = data_transmitter.receive() if data_transmitter else None
+        self.data_transmitter = data_transmitter

@@ -87,15 +87,15 @@ class SharedMemoryTransmitter(DataTransmitter):
                     mem_name = value.get("address", None)
                     bytes_to_read = value.get("size", None)
 
-                    if mem_name and bytes_to_read:
+                    if (mem_name is None) and (bytes_to_read is None):
+                        returned_value = None
+                    else:
                         returned_value = SharedMemoryManager().read_from_mem(mem_name=mem_name,
                                                                              bytes_to_read=bytes_to_read)
-                    else:
-                        returned_value = None
 
-                    if "shape" in value:
-                        returned_value = np.frombuffer(returned_value, dtype=value["dtype"])
-                        returned_value = returned_value.reshape(value["shape"])
+                        if "shape" in value:
+                            returned_value = np.frombuffer(returned_value, dtype=value["dtype"])
+                            returned_value = returned_value.reshape(value["shape"])
 
                     if returned_value:
                         return_dict[key] = returned_value
