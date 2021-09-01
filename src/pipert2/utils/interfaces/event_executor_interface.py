@@ -17,4 +17,3 @@ class EventExecutorInterface(ABC):  # TODO - Maybe add a logger abstract class f
     @abstractmethod
     def get_events(cls):
         raise NotImplementedError
-

@@ -1,5 +1,7 @@
 from multiprocessing import Process
 from typing import List
+from src.pipert2.utils.consts.event_format import EVENT_SEPARATOR, EVENT_INDEX, FLOW_INDEX, ROUTINE_CONTAINED_LENGTH, \
+    ROUTINE_INDEX
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.handlers.event_handler import EventHandler
@@ -44,11 +46,14 @@ class Flow(EventExecutorInterface):
         flow_events_to_listen = set(self.get_events().keys())
 
         for routine in routines:
-            routine.set_logger(logger=logger.get_logger_child(routine.name))
+            routine.set_logger(logger=logger.getChild(routine.name))
             flow_events_to_listen.update(routine.get_events().keys())
             self.routines[routine.name] = routine
 
         self.event_handler: EventHandler = event_board.get_event_handler(flow_events_to_listen)
+
+    def get_name(self) -> str:
+        return self.name
 
     def build(self) -> None:
         """Start the flow process.
@@ -89,10 +94,20 @@ class Flow(EventExecutorInterface):
 
         """
 
-        for routine in self.routines.values():
-            routine.execute_event(event)
+        event_commands = event.name.split(EVENT_SEPARATOR)
+        can_execute = self.get_name() == event_commands[FLOW_INDEX] if len(event_commands) > 1 else True
 
-        EventExecutorInterface.execute_event(self, event)
+        if can_execute:
+            execution_event = Method(name=event_commands[EVENT_INDEX], params=event.params)
+
+            if len(event_commands) == ROUTINE_CONTAINED_LENGTH:
+                routine_name = event_commands[ROUTINE_INDEX]
+                self.routines.get(routine_name).execute_event(execution_event)
+            else:
+                for routine in self.routines.values():
+                    routine.execute_event(execution_event)
+
+            EventExecutorInterface.execute_event(self, event)
 
     def join(self) -> None:
         """Block until the flow process terminates
