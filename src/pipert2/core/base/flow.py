@@ -52,9 +52,6 @@ class Flow(EventExecutorInterface):
 
         self.event_handler: EventHandler = event_board.get_event_handler(flow_events_to_listen)
 
-    def get_name(self) -> str:
-        return self.name
-
     def build(self) -> None:
         """Start the flow process.
 
@@ -95,7 +92,7 @@ class Flow(EventExecutorInterface):
         """
 
         event_commands = event.name.split(EVENT_SEPARATOR)
-        can_execute = self.get_name() == event_commands[FLOW_INDEX] if len(event_commands) > 1 else True
+        can_execute = self.name == event_commands[FLOW_INDEX] if len(event_commands) > 1 else True
 
         if can_execute:
             execution_event = Method(name=event_commands[EVENT_INDEX], params=event.params)
