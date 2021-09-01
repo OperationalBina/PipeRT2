@@ -8,7 +8,7 @@ from src.pipert2.core.base.wire import Wire
 def dummy_pipe():
     with patch('src.pipert2.core.base.pipe.Flow'):
         with patch('src.pipert2.core.base.pipe.EventBoard'):
-            pipe = Pipe(networking=Mock(), logger=Mock())
+            pipe = Pipe(network=Mock(), logger=Mock())
             yield pipe
 
 
@@ -44,9 +44,8 @@ def test_create_flow_auto_wire_true(dummy_pipe: Pipe):
     network_mock: Mock = dummy_pipe.network
 
     for first_routine_mock, second_routine_mock in zip(routine_mocks, routine_mocks[1:]):
-        network_mock.link.assert_any_call(src=first_routine_mock, destinations=second_routine_mock,
-                                          transmit=data_transmitter_mock.transmit(),
-                                          receive=data_transmitter_mock.receive())
+        network_mock.link.assert_any_call(source=first_routine_mock, destinations=(second_routine_mock,),
+                                          data_transmitter=data_transmitter_mock)
 
 
 def test_link(dummy_pipe: Pipe):
@@ -63,9 +62,8 @@ def test_link(dummy_pipe: Pipe):
     network_mock: Mock = dummy_pipe.network
 
     for first_routine_mock, second_routine_mock in zip(routine_mocks, routine_mocks[1:]):
-        network_mock.link.assert_any_call(src=first_routine_mock, destinations=(second_routine_mock,),
-                                          transmit=data_transmitter_mock.transmit(),
-                                          receive=data_transmitter_mock.receive())
+        network_mock.link.assert_any_call(source=first_routine_mock, destinations=(second_routine_mock,),
+                                          data_transmitter=data_transmitter_mock)
 
 
 def test_build(dummy_pipe_with_flows):

@@ -19,14 +19,18 @@ def output_queue():
 
 @pytest.fixture()
 def blocking_queue_handler(input_queue, output_queue):
-    blocking_queue_handler = QueueHandler("dummy", input_queue, output_queue, blocking=True, timeout=1)
+    blocking_queue_handler = QueueHandler("dummy", blocking=True, timeout=1)
+    blocking_queue_handler.input_queue = input_queue
+    blocking_queue_handler.output_queue = output_queue
 
     return blocking_queue_handler
 
 
 @pytest.fixture()
 def non_blocking_queue_handler(input_queue, output_queue):
-    non_blocking_queue_handler = QueueHandler("dummy", input_queue, output_queue, blocking=False)
+    non_blocking_queue_handler = QueueHandler("dummy", blocking=False)
+    non_blocking_queue_handler.input_queue = input_queue
+    non_blocking_queue_handler.output_queue = output_queue
 
     return non_blocking_queue_handler
 
@@ -45,8 +49,8 @@ def test_get(blocking_queue_handler, non_blocking_queue_handler, input_queue):
     assert blocking_queue_handler.get() == message
     input_queue.put(Message.encode(message))
     assert non_blocking_queue_handler.get() == message
-    assert blocking_queue_handler.get() is None
-    assert non_blocking_queue_handler.get() is None
+    assert blocking_queue_handler.get().payload.data == {}
+    assert non_blocking_queue_handler.get().payload.data == {}
 
 
 def test_force_push(non_blocking_queue_handler, output_queue):
