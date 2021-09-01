@@ -7,7 +7,21 @@ from src.pipert2.core.handlers.message_handlers.queue_handler import QueueHandle
 
 
 class QueueNetwork(Network):
+    """The queue network generates queue handlers to manage communication using multiprocessing queues within the pipe.
+
+    """
+
     def get_message_handler(self, routine_name: str) -> QueueHandler:
+        """Generate/Retrieve a queue handler.
+
+        Args:
+            routine_name: The name of the routine to retrieve the queue handler for.
+
+        Returns:
+            A QueueHandler object relevant to the routine.
+
+        """
+
         if routine_name in self.message_handlers:
             message_handler = self.message_handlers[routine_name]
         else:
@@ -17,6 +31,15 @@ class QueueNetwork(Network):
         return message_handler
 
     def link(self, source: Routine, destinations: Tuple[Routine], data_transmitter: DataTransmitter):
+        """Links between two QueueHandlers of the given routines.
+
+        Args:
+            source: The source routine that generates data.
+            destinations: Destination routines that receive the data.
+            data_transmitter: The data transmitter that indicates how to transfer the data.
+
+        """
+
         for destination_routine in destinations:
             queue = Queue(maxsize=1)
             destination_routine.message_handler.input_queue = queue
