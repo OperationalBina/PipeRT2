@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 from src.pipert2.core.base.message import Message
 
 
@@ -16,8 +17,8 @@ class MessageHandler(ABC):
         self.receive = None
 
     @abstractmethod
-    def _get(self) -> bytes:
-        """Returns the message from the input object.
+    def _get(self) -> Optional[bytes]:
+        """Returns the message from the input object. If the input object is not initialized return None.
 
         Returns:
             A message object.
@@ -54,18 +55,22 @@ class MessageHandler(ABC):
     def get(self) -> Message:
         """Decodes the message received from the implemented get method.
 
-        Returns: A decoded message object.
+        Returns:
+            A decoded message object.
 
         """
 
         try:
             message = Message.decode(self._get())
 
-            if type(self.receive) == callable:
-                received_data = self.receive(message.payload.data)
-                message.update_data(received_data)
+            if message is None:
+                message = Message({}, self.routine_name)
+            else:
+                if type(self.receive) == callable:
+                    received_data = self.receive(message.payload.data)
+                    message.update_data(received_data)
         except TypeError:
-            message = None
+            message = Message({}, self.routine_name)
         else:
             message.record_entry(self.routine_name)
 
