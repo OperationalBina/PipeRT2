@@ -92,7 +92,11 @@ class Flow(EventExecutorInterface):
         """
 
         event_commands = event.name.split(EVENT_SEPARATOR)
-        can_execute = self.name == event_commands[FLOW_INDEX] if len(event_commands) > 1 else True
+
+        if len(event_commands) > 1:
+            can_execute = self.name == event_commands[FLOW_INDEX]
+        else:
+            can_execute = True
 
         if can_execute:
             execution_event = Method(name=event_commands[EVENT_INDEX], params=event.params)
