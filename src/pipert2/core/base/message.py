@@ -112,8 +112,12 @@ class Message:
 
         """
 
-        msg = pickle.loads(encoded_msg)
-        if not lazy:
-            msg.payload.decode()
+        try:
+            msg = pickle.loads(encoded_msg)
+        except TypeError:
+            msg = None
+        else:
+            if not lazy:
+                msg.payload.decode()
 
         return msg
