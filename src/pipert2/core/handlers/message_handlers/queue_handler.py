@@ -1,6 +1,5 @@
-from ..message_handler import MessageHandler
-from multiprocessing import Queue
 from queue import Full, Empty
+from src.pipert2.core.handlers.message_handler import MessageHandler
 
 
 class QueueHandler(MessageHandler):
@@ -8,17 +7,15 @@ class QueueHandler(MessageHandler):
     queues.
 
     Args:
-        input_queue: The that will be used in order to get messages.
-        output_queue: The that will be used in order to push messages.
         blocking: If the queues will behave as blocking behavior detailed in each function or not.
         timeout: How long the queues will wait in seconds if blocking is true.
 
     """
 
-    def __init__(self, routine_name: str, input_queue: Queue, output_queue: Queue, blocking=True, timeout=1):
+    def __init__(self, routine_name: str, blocking=False, timeout=1):
         super().__init__(routine_name)
-        self.input_queue = input_queue
-        self.output_queue = output_queue
+        self.input_queue = None
+        self.output_queue = None
         self.blocking = blocking
         self.timeout = timeout
 
@@ -34,10 +31,11 @@ class QueueHandler(MessageHandler):
 
         message = None
 
-        try:
-            message = self.input_queue.get(block=self.blocking, timeout=self.timeout)
-        except Empty:
-            print("The queue is empty")  # TODO: Replace with log
+        if self.input_queue is not None:
+            try:
+                message = self.input_queue.get(block=self.blocking, timeout=self.timeout)
+            except Empty:
+                print("The queue is empty")  # TODO: Replace with log
 
         return message
 
@@ -50,6 +48,9 @@ class QueueHandler(MessageHandler):
             message: The given message to push.
 
         """
+
+        if self.output_queue is None:
+            raise Exception(f"{self.routine_name}'s output_queue was not initialized when put was called!")
 
         self._safe_push_to_queue(message) if self.blocking else self._force_push_to_queue(message)
 
