@@ -41,7 +41,7 @@ class QueueNetwork(Network):
         """
 
         for destination_routine in destinations:
-            queue = Queue(maxsize=1)
+            queue = Queue(maxsize=1)  # TODO: Add the possibility to configure the maxsize of queues.
             destination_routine.message_handler.input_queue = queue
             source.message_handler.output_queue = queue
 

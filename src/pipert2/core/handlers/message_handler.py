@@ -60,18 +60,14 @@ class MessageHandler(ABC):
 
         """
 
-        try:
-            message = Message.decode(self._get())
+        message = Message.decode(self._get())
 
-            if message is None:
-                message = Message({}, self.routine_name)
-            else:
-                if type(self.receive) == callable:
-                    received_data = self.receive(message.payload.data)
-                    message.update_data(received_data)
-        except TypeError:
+        if message is None:
             message = Message({}, self.routine_name)
-        else:
-            message.record_entry(self.routine_name)
+        elif type(self.receive) == callable:
+            received_data = self.receive(message.payload.data)
+            message.update_data(received_data)
+
+        message.record_entry(self.routine_name)
 
         return message

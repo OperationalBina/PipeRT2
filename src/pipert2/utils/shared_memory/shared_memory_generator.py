@@ -21,15 +21,16 @@ def get_shared_memory_object(name: str) -> Optional[SharedMemory]:
         memory = posix_ipc.SharedMemory(name)
         semaphore = posix_ipc.Semaphore(name)
     except posix_ipc.ExistentialError:
-        return None
+        shared_memory = None
     except Exception:
-        return None
+        shared_memory = None
+    else:
+        mapfile = mmap.mmap(memory.fd, memory.size)
+        memory.close_fd()
+        semaphore.release()
+        shared_memory = SharedMemory(memory, semaphore, mapfile)
 
-    mapfile = mmap.mmap(memory.fd, memory.size)
-    memory.close_fd()
-    semaphore.release()
-
-    return SharedMemory(memory, semaphore, mapfile)
+    return shared_memory
 
 
 class SharedMemoryGenerator:

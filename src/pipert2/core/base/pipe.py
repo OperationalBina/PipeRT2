@@ -22,10 +22,12 @@ class Pipe:
         Args:
             network: Network object responsible for the routine's communication.
             logger: PipeLogger object for logging the pipe actions.
+            data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
 
         Attributes:
             network: Network object responsible for the routine's communication.
             logger: PipeLogger object for logging the pipe actions.
+            data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             flows (dict[str, Flow]): Dictionary mapping the pipe flows to their name.
             event_board (EventBoard): EventBoard object responsible for the pipe events.
 
@@ -42,11 +44,11 @@ class Pipe:
         """Create a new flow in the pipe.
 
         Args:
-            data_transmitter (DataTransmitter): A data transmitter object that indicates how data will be transferred
-                                                inside the flow.
             flow_name (str): The name of the flow to be created.
             auto_wire (bool): Automatically connect the routines to each other by the order of their entry.
             routines: (Routine): List of routines to register to the flow.
+            data_transmitter (DataTransmitter): A data transmitter object that indicates how data will be transferred
+                                                inside the flow.
 
         """
 
