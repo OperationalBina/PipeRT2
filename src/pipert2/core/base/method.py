@@ -4,7 +4,17 @@ from src.pipert2.utils.consts.event_format import EVENT_SEPARATOR, EVENT_INDEX, 
 
 
 class Method:
+    """The method class uses for describing event command and his parameters.
+    Using methods we notify on events through the pipeline components.
+    """
+
     def __init__(self, name: str, params: dict = {}):
+        """
+        Args:
+            name (str): The method name in format - { event-flow_name-routine_name }.
+            params (dict): Dictionary of method parameters, default is empty dictionary.
+        """
+
         self.name = name
         self.params = params
 
@@ -19,7 +29,7 @@ class Method:
             False if flows aren't match.
         """
 
-        if self._is_extended_command():
+        if self._is_contain_specific_flow():
             flow_name = self.name.split(EVENT_SEPARATOR)[FLOW_INDEX]
             is_flow_valid = flow_to_validate == flow_name
         else:
@@ -47,11 +57,13 @@ class Method:
         """
 
         if len(self.name.split(EVENT_SEPARATOR)) == EVENT_CONTAIN_ROUTINE_LENGTH:
-            return self.name.split(EVENT_SEPARATOR)[ROUTINE_INDEX]
+            routine_name = self.name.split(EVENT_SEPARATOR)[ROUTINE_INDEX]
+        else:
+            routine_name = None
 
-        return None
+        return routine_name
 
-    def _is_extended_command(self) -> bool:
+    def _is_contain_specific_flow(self) -> bool:
         event_commands = len(self.name.split(EVENT_SEPARATOR))
 
         return event_commands > 1
