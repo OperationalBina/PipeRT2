@@ -37,7 +37,7 @@ class Method:
 
         return is_flow_valid
 
-    def create_base_method(self):
+    def create_base_method(self) -> 'Method':
         """Create base method if flow mentioned specific flow/routine.
 
         Returns:
@@ -56,7 +56,7 @@ class Method:
             Routine name if mentioned, None if didn't.
         """
 
-        if len(self.name.split(EVENT_SEPARATOR)) == EVENT_CONTAIN_ROUTINE_LENGTH:
+        if self._is_contain_specific_routine():
             routine_name = self.name.split(EVENT_SEPARATOR)[ROUTINE_INDEX]
         else:
             routine_name = None
@@ -67,6 +67,11 @@ class Method:
         event_commands = len(self.name.split(EVENT_SEPARATOR))
 
         return event_commands > 1
+
+    def _is_contain_specific_routine(self) -> bool:
+        method_commands = self.name.split(EVENT_SEPARATOR)
+
+        return len(method_commands) == EVENT_CONTAIN_ROUTINE_LENGTH
 
     def __eq__(self, other) -> bool:
         return other.name == self.name and other.params == self.params
