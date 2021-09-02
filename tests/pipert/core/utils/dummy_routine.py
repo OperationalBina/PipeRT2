@@ -1,5 +1,5 @@
 from src.pipert2.core.base.routine import Routine
-from src.pipert2.utils.method_data import Method
+from src.pipert2.core.base.method import Method
 
 DUMMY_ROUTINE_EVENT = Method("Change")
 

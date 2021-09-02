@@ -1,7 +1,5 @@
 from multiprocessing import Process
 from typing import List
-from src.pipert2.utils.consts.event_format import EVENT_SEPARATOR, EVENT_INDEX, FLOW_INDEX, ROUTINE_CONTAINED_LENGTH, \
-    ROUTINE_INDEX
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.handlers.event_handler import EventHandler
@@ -9,7 +7,7 @@ from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.annotations import class_functions_dictionary
 from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
-from src.pipert2.utils.method_data import Method
+from src.pipert2.core.base.method import Method
 from src.pipert2.utils.dummy_object import Dummy
 
 
@@ -91,22 +89,16 @@ class Flow(EventExecutorInterface):
 
         """
 
-        event_commands = event.name.split(EVENT_SEPARATOR)
+        if event.is_valid_by_flow(self.name):
+            base_execution_event = event.create_base_method()
+            routine_name = event.get_routine_name()
 
-        if len(event_commands) > 1:
-            can_execute = self.name == event_commands[FLOW_INDEX]
-        else:
-            can_execute = True
-
-        if can_execute:
-            execution_event = Method(name=event_commands[EVENT_INDEX], params=event.params)
-
-            if len(event_commands) == ROUTINE_CONTAINED_LENGTH:
-                routine_name = event_commands[ROUTINE_INDEX]
-                self.routines.get(routine_name).execute_event(execution_event)
+            if routine_name:
+                if routine_name in self.routines.keys():
+                    self.routines.get(routine_name).execute_event(base_execution_event)
             else:
                 for routine in self.routines.values():
-                    routine.execute_event(execution_event)
+                    routine.execute_event(base_execution_event)
 
             EventExecutorInterface.execute_event(self, event)
 
