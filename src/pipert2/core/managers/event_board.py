@@ -3,9 +3,10 @@ from multiprocessing import Pipe, SimpleQueue
 from threading import Thread
 from functools import partial
 from typing import Callable
+
+from src.pipert2.utils.method_data import Method
 from src.pipert2.core.handlers.event_handler import EventHandler
 from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME
-from src.pipert2.core.base.method import Method
 
 DEFAULT_EVENT_HANDLER_EVENTS = [START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME]
 
@@ -46,14 +47,14 @@ class EventBoard:
         """
 
         event: Method = self.new_events_queue.get()
-        while event.name != KILL_EVENT_NAME:
-            for pipe in self.events_pipes[event.name]:
+        while event.event_name != KILL_EVENT_NAME:
+            for pipe in self.events_pipes[event.event_name]:
                 pipe.send(event)
 
             event = self.new_events_queue.get()
 
         # Send the kill event to the other pipes
-        for pipe in self.events_pipes[event.name]:
+        for pipe in self.events_pipes[event.event_name]:
             pipe.send(event)
 
     def build(self):
@@ -69,10 +70,11 @@ class EventBoard:
 
         """
 
-        def notify_event(event_name, output_event_queue, **kwargs):
-            output_event_queue.put(Method(event_name, kwargs))
+        def notify_event(event_name, output_event_queue, flow_name=None, routine_name=None, **kwargs):
+            output_event_queue.put(Method(event_name, flow_name=flow_name, routine_name=routine_name, params=kwargs))
 
         return partial(notify_event, output_event_queue=self.new_events_queue)
 
-    def notify_event(self, event_name, **event_parameters):
-        self.new_events_queue.put(Method(event_name, event_parameters))
+    def notify_event(self, event_name, flow_name=None, routine_name=None, **event_parameters):
+        self.new_events_queue.put(Method(event_name=event_name, flow_name=flow_name,
+                                         routine_name=routine_name, params=event_parameters))
