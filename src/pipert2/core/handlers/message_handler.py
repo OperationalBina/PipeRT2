@@ -45,7 +45,7 @@ class MessageHandler(ABC):
 
         """
 
-        if type(self.transmit) == callable:
+        if callable(self.transmit):
             transmitted_data = self.transmit(message.payload.data)
             message.update_data(transmitted_data)
 
@@ -61,7 +61,7 @@ class MessageHandler(ABC):
         try:
             message = Message.decode(self._get())
 
-            if type(self.receive) == callable:
+            if callable(self.receive):
                 received_data = self.receive(message.payload.data)
                 message.update_data(received_data)
         except TypeError:
