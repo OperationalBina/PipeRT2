@@ -94,7 +94,12 @@ class Message:
 
         msg.payload.encode()
 
-        return pickle.dumps(msg)
+        try:
+            pickled_message = pickle.dumps(msg)
+        except TypeError:  # TODO - Maybe add logs to exception
+            pickled_message = msg
+
+        return pickled_message
 
     @staticmethod
     def decode(encoded_msg: bytes, lazy=False):
@@ -112,7 +117,11 @@ class Message:
 
         """
 
-        msg = pickle.loads(encoded_msg)
+        try:
+            msg = pickle.loads(encoded_msg)
+        except TypeError:  # TODO - Maybe add logs to exception
+            msg = encoded_msg
+
         if not lazy:
             msg.payload.decode()
 
