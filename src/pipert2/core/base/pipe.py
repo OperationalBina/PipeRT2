@@ -1,9 +1,9 @@
 from src.pipert2.core.base.flow import Flow
-from src.pipert2.core.base.logger import PipeLogger
-from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.base.wire import Wire
-from src.pipert2.core.managers.event_board import EventBoard
+from src.pipert2.core.base.routine import Routine
+from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.managers.network import Network
+from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from src.pipert2.core.base.data_transmitter import DataTransmitter
 from src.pipert2.core.base.basic_transmitter import BasicTransmitter
@@ -17,21 +17,21 @@ class Pipe:
 
     """
 
-    def __init__(self, networking: Network, logger: PipeLogger, data_transmitter: DataTransmitter = BasicTransmitter()):  # TODO - default logger and default networking (Queue)
+    def __init__(self, network: Network, logger: PipeLogger, data_transmitter: DataTransmitter = BasicTransmitter()):  # TODO - default logger and default networking (Queue)
         """
         Args:
-            networking: Network object responsible for the routine's communication.
+            network: Network object responsible for the routine's communication.
             logger: PipeLogger object for logging the pipe actions.
 
         Attributes:
-            networking: Network object responsible for the routine's communication.
+            network: Network object responsible for the routine's communication.
             logger: PipeLogger object for logging the pipe actions.
             flows (dict[str, Flow]): Dictionary mapping the pipe flows to their name.
             event_board (EventBoard): EventBoard object responsible for the pipe events.
 
         """
 
-        self.network = networking
+        self.network = network
         self.logger = logger
         self.flows = {}
         self.event_board = EventBoard()
@@ -62,7 +62,7 @@ class Pipe:
             receive = data_transmitter.receive() if data_transmitter else self.default_data_transmitter.receive()
 
             for first_routine, second_routine in zip(routines, routines[1:]):
-                self.network.link(src=first_routine, destinations=second_routine, transmit=transmit,
+                self.network.link(source=first_routine, destinations=second_routine, transmit=transmit,
                                   receive=receive)
 
     def link(self, *wires):
@@ -76,7 +76,7 @@ class Pipe:
         for wire in wires:
             data_transmitter = wire.data_transmitter if wire.data_transmitter else self.default_data_transmitter
 
-            self.network.link(src=wire.source, destinations=wire.destinations, transmit=data_transmitter.transmit(),
+            self.network.link(source=wire.source, destinations=wire.destinations, transmit=data_transmitter.transmit(),
                               receive=data_transmitter.receive())
 
     def build(self):
