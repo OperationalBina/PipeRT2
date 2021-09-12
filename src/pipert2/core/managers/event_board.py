@@ -3,7 +3,6 @@ from multiprocessing import Pipe, SimpleQueue
 from threading import Thread
 from functools import partial
 from typing import Callable
-
 from src.pipert2.utils.method_data import Method
 from src.pipert2.core.handlers.event_handler import EventHandler
 from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME
@@ -70,11 +69,24 @@ class EventBoard:
 
         """
 
-        def notify_event(event_name, output_event_queue, flow_name=None, routine_name=None, **kwargs):
-            output_event_queue.put(Method(event_name, flow_name=flow_name, routine_name=routine_name, params=kwargs))
+        def notify_event(event_name, output_event_queue, flow_name=None, routine_names=None, **params):
+
+            if flow_name:
+                specific_flows_to_routines = {flow_name: routine_names}
+            else:
+                specific_flows_to_routines = None
+
+            output_event_queue.put(Method(event_name, flow_to_routines=specific_flows_to_routines, params=params))
 
         return partial(notify_event, output_event_queue=self.new_events_queue)
 
-    def notify_event(self, event_name, flow_name=None, routine_name=None, **event_parameters):
-        self.new_events_queue.put(Method(event_name=event_name, flow_name=flow_name,
-                                         routine_name=routine_name, params=event_parameters))
+    def notify_event(self, event_name, flow_name=None, routine_names=None, **params):
+
+        if flow_name:
+            specific_flows_to_routines = {flow_name: routine_names}
+        else:
+            specific_flows_to_routines = None
+
+        self.new_events_queue.put(Method(event_name=event_name,
+                                         flow_to_routines=specific_flows_to_routines,
+                                         params=params))

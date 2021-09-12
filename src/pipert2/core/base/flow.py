@@ -89,13 +89,12 @@ class Flow(EventExecutorInterface):
 
         """
 
-        is_specific_flow_exist = True if event.flow_name else False
-        is_event_valid = (is_specific_flow_exist and event.flow_name == self.name) or True
-
-        if is_event_valid:
-            if event.routine_name:
-                if event.routine_name in self.routines.keys():
-                    self.routines.get(event.routine_name).execute_event(event)
+        if event.is_flow_valid(self.name):
+            if event.is_contain_routines(self.name):
+                routines = event.flow_to_routines.get(self.name)
+                for routine in routines:
+                    if routine in self.routines.keys():
+                        self.routines.get(routine).execute_event(event)
             else:
                 for routine in self.routines.values():
                     routine.execute_event(event)

@@ -62,7 +62,8 @@ def test_execute_event(dummy_flow_with_two_routines: Flow):
 
 
 def test_execute_all_routine_in_specific_flow(dummy_flow_with_two_routines: Flow):
-    TEST_METHOD = Method(event_name=START_EVENT_NAME, flow_name="Flow1")
+    TEST_METHOD = Method(event_name=START_EVENT_NAME,
+                         flow_to_routines={"Flow1": None})
 
     dummy_flow_with_two_routines.execute_event(TEST_METHOD)
     first_routine_mocker = dummy_flow_with_two_routines.routines[FIRST_ROUTINE_NAME]
@@ -73,7 +74,8 @@ def test_execute_all_routine_in_specific_flow(dummy_flow_with_two_routines: Flow
 
 
 def test_execute_specific_routine(dummy_flow_with_two_routines: Flow):
-    TEST_METHOD = Method(event_name=START_EVENT_NAME, flow_name="Flow1", routine_name=SECOND_ROUTINE_NAME)
+    TEST_METHOD = Method(event_name=START_EVENT_NAME,
+                         flow_to_routines={"Flow1": [SECOND_ROUTINE_NAME]})
 
     dummy_flow_with_two_routines.execute_event(TEST_METHOD)
     first_routine_mocker = dummy_flow_with_two_routines.routines[FIRST_ROUTINE_NAME]
@@ -81,3 +83,15 @@ def test_execute_specific_routine(dummy_flow_with_two_routines: Flow):
 
     assert not first_routine_mocker.execute_event.called
     second_routine_mocker.execute_event.assert_called_with(TEST_METHOD)
+
+
+def test_not_execute_flows_routines(dummy_flow_with_two_routines: Flow):
+    TEST_METHOD = Method(event_name=START_EVENT_NAME,
+                         flow_to_routines={"Flow7": [SECOND_ROUTINE_NAME]})
+
+    dummy_flow_with_two_routines.execute_event(TEST_METHOD)
+    first_routine_mocker = dummy_flow_with_two_routines.routines[FIRST_ROUTINE_NAME]
+    second_routine_mocker = dummy_flow_with_two_routines.routines[SECOND_ROUTINE_NAME]
+
+    assert not first_routine_mocker.execute_event.called
+    assert not second_routine_mocker.execute_event.called
