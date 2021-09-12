@@ -34,8 +34,9 @@ def test_create_flow_auto_wire_false(dummy_pipe: Pipe):
 
 def test_create_flow_auto_wire_true(dummy_pipe: Pipe):
     FLOW_NAME = "f1"
+    data_transmitter_mock = Mock()
     routine_mocks = [Mock(), Mock(), Mock()]
-    dummy_pipe.create_flow(FLOW_NAME, True, *routine_mocks)
+    dummy_pipe.create_flow(FLOW_NAME, True, *routine_mocks, data_transmitter=data_transmitter_mock)
 
     for routine_mock in routine_mocks:
         routine_mock.initialize.assert_called_once()
@@ -43,23 +44,28 @@ def test_create_flow_auto_wire_true(dummy_pipe: Pipe):
     network_mock: Mock = dummy_pipe.network
 
     for first_routine_mock, second_routine_mock in zip(routine_mocks, routine_mocks[1:]):
-        network_mock.link.assert_any_call(source=first_routine_mock, destinations=(second_routine_mock,))
+        network_mock.link.assert_any_call(source=first_routine_mock, destinations=(second_routine_mock,),
+                                          transmit=data_transmitter_mock.transmit(),
+                                          receive=data_transmitter_mock.receive())
 
 
 def test_link(dummy_pipe: Pipe):
-    dummy_pipe.link()
     routine_mocks = [Mock(), Mock(), Mock()]
+    data_transmitter_mock = Mock()
     wires = []
 
     for first_routine_mock, second_routine_mock in zip(routine_mocks, routine_mocks[1:]):
-        wires.append(Wire(source=first_routine_mock, destinations=(second_routine_mock,)))
+        wires.append(Wire(source=first_routine_mock, destinations=(second_routine_mock,),
+                          data_transmitter=data_transmitter_mock))
 
     dummy_pipe.link(*wires)
 
     network_mock: Mock = dummy_pipe.network
 
     for first_routine_mock, second_routine_mock in zip(routine_mocks, routine_mocks[1:]):
-        network_mock.link.assert_any_call(source=first_routine_mock, destinations=(second_routine_mock,))
+        network_mock.link.assert_any_call(source=first_routine_mock, destinations=(second_routine_mock,),
+                                          transmit=data_transmitter_mock.transmit(),
+                                          receive=data_transmitter_mock.receive())
 
 
 def test_build(dummy_pipe_with_flows):
