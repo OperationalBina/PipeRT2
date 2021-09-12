@@ -29,7 +29,6 @@ jobs:
         cd docs
         export PATH="$PATH:/home/runner/.local/bin"
         export SPHINXBUILD="python3 -m sphinx"
-#        sphinx-apidoc -o docs/source src/pipert2
         make html
 
     - name: Deploy to GitHub pages
