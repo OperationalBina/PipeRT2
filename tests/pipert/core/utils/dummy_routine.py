@@ -23,6 +23,6 @@ class DummyRoutine(Routine):
     def cleanup(self) -> None:
         pass
 
-    @Routine.events(DUMMY_ROUTINE_EVENT.name)
+    @Routine.events(DUMMY_ROUTINE_EVENT.event_name)
     def change_logic(self):
         self.inc = not self.inc
