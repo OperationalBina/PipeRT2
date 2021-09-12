@@ -30,7 +30,7 @@ class Network(ABC):
 
     @abstractmethod
     def link(self, source: Routine, destinations: Tuple[Routine]):
-        """Rewire the destinations of a given message handler.
+        """Rewire the destinations of a given routine.
 
         Args:
             source: The source routine to be linked.
