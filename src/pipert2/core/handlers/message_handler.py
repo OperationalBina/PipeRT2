@@ -46,7 +46,7 @@ class MessageHandler(ABC):
 
         """
 
-        if type(self.transmit) == callable:
+        if callable(self.transmit):
             transmitted_data = self.transmit(message.payload.data)
             message.update_data(transmitted_data)
 
@@ -64,7 +64,7 @@ class MessageHandler(ABC):
 
         if message is None:
             message = Message({}, self.routine_name)
-        elif type(self.receive) == callable:
+        elif callable(self.receive):
             received_data = self.receive(message.payload.data)
             message.update_data(received_data)
 
