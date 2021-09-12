@@ -92,6 +92,7 @@ def test_execute_all_routine_in_specific_flow(dummy_flow_with_two_routines: Flow
 
 def test_execute_specific_routine(dummy_flow_with_two_routines: Flow,
                                   dummy_method_with_specific_flow_and_routines: Method):
+
     dummy_flow_with_two_routines.execute_event(dummy_method_with_specific_flow_and_routines)
     first_routine_mocker = dummy_flow_with_two_routines.routines[FIRST_ROUTINE_NAME]
     second_routine_mocker = dummy_flow_with_two_routines.routines[SECOND_ROUTINE_NAME]
