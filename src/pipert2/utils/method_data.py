@@ -11,18 +11,18 @@ else:
 @dataclass
 class Method:
     event_name: str
-    flow_to_routines: Dict[str, Optional[list]] = None
+    routines_by_flow: Dict[str, Optional[list]] = None
     params: dict = field(default_factory=lambda: {})
 
     def is_flow_valid(self, flow_name_to_validate: str):
-        if self.flow_to_routines:
-            return flow_name_to_validate in self.flow_to_routines.keys()
+        if self.routines_by_flow:
+            return flow_name_to_validate in self.routines_by_flow.keys()
         else:
             return True
 
     def is_contain_routines(self, flow_name_to_validate: str):
-        if self.flow_to_routines:
-            return flow_name_to_validate in self.flow_to_routines.keys() and\
-                   self.flow_to_routines.get(flow_name_to_validate)
+        if self.routines_by_flow:
+            return flow_name_to_validate in self.routines_by_flow.keys() and \
+                   self.routines_by_flow.get(flow_name_to_validate)
         else:
             return False

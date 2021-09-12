@@ -91,7 +91,7 @@ class Flow(EventExecutorInterface):
 
         if event.is_flow_valid(self.name):
             if event.is_contain_routines(self.name):
-                routines = event.flow_to_routines.get(self.name)
+                routines = event.routines_by_flow.get(self.name)
                 for routine in routines:
                     if routine in self.routines.keys():
                         self.routines.get(routine).execute_event(event)

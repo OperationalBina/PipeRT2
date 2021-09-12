@@ -76,7 +76,7 @@ class EventBoard:
             else:
                 specific_flows_to_routines = None
 
-            output_event_queue.put(Method(event_name, flow_to_routines=specific_flows_to_routines, params=params))
+            output_event_queue.put(Method(event_name, routines_by_flow=specific_flows_to_routines, params=params))
 
         return partial(notify_event, output_event_queue=self.new_events_queue)
 
@@ -88,5 +88,5 @@ class EventBoard:
             specific_flows_to_routines = None
 
         self.new_events_queue.put(Method(event_name=event_name,
-                                         flow_to_routines=specific_flows_to_routines,
+                                         routines_by_flow=specific_flows_to_routines,
                                          params=params))
