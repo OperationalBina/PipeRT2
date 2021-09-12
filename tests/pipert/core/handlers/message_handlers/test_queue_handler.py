@@ -113,8 +113,8 @@ def test_get_no_receive_method(blocking_queue_handler, non_blocking_queue_handle
     assert blocking_queue_handler.get() == message
     input_queue.put(Message.encode(message))
     assert non_blocking_queue_handler.get() == message
-    assert blocking_queue_handler.get() is None
-    assert non_blocking_queue_handler.get() is None
+    assert blocking_queue_handler.get().payload.data == {}
+    assert non_blocking_queue_handler.get().payload.data == {}
 
 
 class StrMessage(Message):
