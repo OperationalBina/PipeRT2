@@ -1,4 +1,5 @@
 import sys
+from collections import defaultdict
 
 from typing import Dict, Optional
 
@@ -11,18 +12,18 @@ else:
 @dataclass
 class Method:
     event_name: str
-    routines_by_flow: Dict[str, Optional[list]] = None
+    routines_by_flow: Dict[str, Optional[list]] = field(default_factory=lambda: defaultdict(list))
     params: dict = field(default_factory=lambda: {})
 
     def is_flow_valid(self, flow_name_to_validate: str):
-        if self.routines_by_flow:
-            return flow_name_to_validate in self.routines_by_flow.keys()
+        if any(self.routines_by_flow):
+            return flow_name_to_validate in self.routines_by_flow
         else:
             return True
 
-    def is_contain_routines(self, flow_name_to_validate: str):
-        if self.routines_by_flow:
-            return flow_name_to_validate in self.routines_by_flow.keys() and \
+    def do_run_specific_routines(self, flow_name_to_validate: str):
+        if any(self.routines_by_flow):
+            return flow_name_to_validate in self.routines_by_flow and \
                    self.routines_by_flow.get(flow_name_to_validate)
         else:
             return False

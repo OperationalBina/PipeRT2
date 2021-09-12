@@ -11,7 +11,7 @@ def method_without_specific_flows():
 
 @pytest.fixture()
 def method_with_specific_flow():
-    return Method(event_name=START_EVENT_NAME, routines_by_flow={'flow1': None})
+    return Method(event_name=START_EVENT_NAME, routines_by_flow={'flow1': []})
 
 
 @pytest.fixture()
@@ -32,12 +32,12 @@ def test_is_flow_valid_with_same_flow_in_method(method_with_specific_flow: Metho
 
 
 def test_is_contain_routines_without_specific_flows(method_without_specific_flows: Method):
-    assert not method_without_specific_flows.is_contain_routines("flow1")
+    assert not method_without_specific_flows.do_run_specific_routines("flow1")
 
 
 def test_is_contain_routines_with_specific_flow_without_routines(method_without_specific_flows: Method):
-    assert not method_without_specific_flows.is_contain_routines("flow1")
+    assert not method_without_specific_flows.do_run_specific_routines("flow1")
 
 
 def test_is_contain_routines_with_specific_flow_with_routines(method_with_specific_flow_and_routines: Method):
-    assert method_with_specific_flow_and_routines.is_contain_routines("flow1")
+    assert method_with_specific_flow_and_routines.do_run_specific_routines("flow1")

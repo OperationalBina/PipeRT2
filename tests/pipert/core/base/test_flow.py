@@ -39,7 +39,7 @@ def dummy_flow_with_two_routines(mocker: MockerFixture):
 def dummy_method_without_specific_flow(mocker: MockerFixture):
     TEST_METHOD = mocker.MagicMock()
     TEST_METHOD.is_flow_valid.return_value = True
-    TEST_METHOD.is_contain_routines.return_value = False
+    TEST_METHOD.do_run_specific_routines.return_value = False
 
     return TEST_METHOD
 
@@ -48,7 +48,7 @@ def dummy_method_without_specific_flow(mocker: MockerFixture):
 def dummy_method_with_specific_flow_and_routines(mocker: MockerFixture):
     TEST_METHOD = mocker.MagicMock()
     TEST_METHOD.is_flow_valid.return_value = True
-    TEST_METHOD.is_contain_routines.return_value = True
+    TEST_METHOD.do_run_specific_routines.return_value = True
     TEST_METHOD.routines_by_flow = {"Flow1": [SECOND_ROUTINE_NAME]}
 
     return TEST_METHOD
