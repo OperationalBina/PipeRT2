@@ -8,11 +8,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6]
+        python-version: [3.6, 3.7, 3.8, 3.9]
     env:
       OS: 'ubuntu-latest'
       PYTHON: ${{ matrix.python-version }}
@@ -27,6 +27,7 @@ jobs:
         pip install pytest
         pip install pytest-mock
         pip install posix-ipc
+        pip install numpy
         pip install mock
         pip install coverage
         coverage run -m pytest
