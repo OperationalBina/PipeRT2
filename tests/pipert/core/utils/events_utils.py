@@ -1,6 +1,3 @@
-import pytest
-from pytest_mock import MockerFixture
-
 from src.pipert2.utils.consts.event_names import START_EVENT_NAME, KILL_EVENT_NAME, STOP_EVENT_NAME
 from src.pipert2.utils.method_data import Method
 
