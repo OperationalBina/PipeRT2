@@ -115,12 +115,11 @@ class Message:
         Returns:
             Message object of the given message bytes.
 
+        Raises:
+            TypeError: if encoded_msg is None or not bytes.
         """
 
-        try:
-            msg = pickle.loads(encoded_msg)
-        except TypeError:  # TODO - Maybe add logs to exception
-            msg = encoded_msg
+        msg = pickle.loads(encoded_msg)
 
         if not lazy:
             msg.payload.decode()
