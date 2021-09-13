@@ -65,9 +65,7 @@ class MessageHandler(ABC):
 
         message = Message.decode(self._get())
 
-        if message is None:
-            message = Message({}, self.routine_name)
-        elif callable(self.receive):
+        if callable(self.receive):
             received_data = self.receive(message.payload.data)
             message.update_data(received_data)
 
