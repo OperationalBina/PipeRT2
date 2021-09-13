@@ -17,18 +17,12 @@ def get_shared_memory_object(name: str) -> Optional[SharedMemory]:
 
     """
 
-    try:
-        memory = posix_ipc.SharedMemory(name)
-        semaphore = posix_ipc.Semaphore(name)
-    except posix_ipc.ExistentialError:
-        shared_memory = None
-    except Exception:
-        shared_memory = None
-    else:
-        mapfile = mmap.mmap(memory.fd, memory.size)
-        memory.close_fd()
-        semaphore.release()
-        shared_memory = SharedMemory(memory, semaphore, mapfile)
+    memory = posix_ipc.SharedMemory(name)
+    semaphore = posix_ipc.Semaphore(name)
+    mapfile = mmap.mmap(memory.fd, memory.size)
+    memory.close_fd()
+    semaphore.release()
+    shared_memory = SharedMemory(memory, semaphore, mapfile)
 
     return shared_memory
 
