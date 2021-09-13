@@ -44,8 +44,8 @@ class PublishQueue(object):
 
         Args:
             value: The value to push to every registered queue.
-            block: Whether or not to block the queue when putting a message.
-            timeout: How long to wait if block is true.
+            block: Whether or not to block each queue when putting a message.
+            timeout: How long to wait for each queue if block is true.
 
         """
 
