@@ -31,7 +31,7 @@ class PublishQueue(object):
 
     @ensure_parent
     def register(self):
-        q = Queue()
+        q = Queue(maxsize=1)
         self._queues.append(q)
 
         return q
