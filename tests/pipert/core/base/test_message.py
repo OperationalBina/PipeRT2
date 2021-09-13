@@ -45,6 +45,16 @@ def test_encode_message(mocker: MockerFixture, dummy_message: Message):
     payload_mock.encode.assert_called()
 
 
+def test_encode_message_when_unable_pickling(mocker: MockerFixture, dummy_message: Message):
+    mocker.patch("pickle.dumps", side_effect=TypeError)
+    payload_mock = dummy_message.payload
+
+    encoded_msg = Message.encode(dummy_message)
+
+    payload_mock.encode.assert_called()
+    assert encoded_msg == dummy_message
+
+
 def test_decode_message():
     message = Message(MESSAGE_DATA, "R1")
     message.payload = Dummy()
