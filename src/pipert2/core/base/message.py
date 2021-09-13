@@ -1,7 +1,6 @@
 import collections
 import time
 import pickle
-from typing import Callable
 from src.pipert2.core.base.payload import Payload
 
 
@@ -15,7 +14,7 @@ class Message:
 
     counter = 0
 
-    def __init__(self, data: dict, source_address: str):
+    def __init__(self, data: collections.Mapping, source_address: str):
         """
         Args:
             data: Data that the message will hold.
@@ -37,17 +36,17 @@ class Message:
 
         Message.counter += 1
 
-    def update_data(self, data: dict):
+    def update_data(self, data: collections.Mapping):
         """Update the data the message contains.
 
         Args:
-            data (dict): dictionary containing the data.
+            data (collections.Mapping): dictionary containing the data.
 
         """
 
         self.payload.data = data
 
-    def get_data(self) -> dict:
+    def get_data(self) -> collections.Mapping:
         """Get the data from the message.
 
         Returns:
@@ -56,7 +55,7 @@ class Message:
         """
 
         if self.payload.encoded:
-            raise Exception("The message is encoded, unable to get the data !")
+            self.payload.decode()
 
         return self.payload.data
 
@@ -80,33 +79,31 @@ class Message:
                f"history: {self.history} \n"
 
     @staticmethod
-    def encode(msg, encoder: Callable) -> bytes:
+    def encode(msg) -> bytes:
         """Encodes the message object.
         This method compresses the message payload and then serializes the whole
         message object into bytes, using pickle.
 
         Args:
             msg (Message): The message to encode.
-            encoder: Function to encode the message payload with.
 
         Returns:
             Bytes containing the msg object.
 
         """
 
-        msg.payload.encode(encoder)
+        msg.payload.encode()
 
         return pickle.dumps(msg)
 
     @staticmethod
-    def decode(encoded_msg: bytes, decoder: Callable, lazy=False):
+    def decode(encoded_msg: bytes, lazy=False):
         """Decodes the message object.
         This method deserializes the pickled message, and decodes the message
         payload if 'lazy' is False.
 
         Args:
             encoded_msg (Bytes): The message bytes to decode.
-            decoder: Function to decode the message payload with.
             lazy: If this is True, then the payload will only be decoded once it's
             accessed.
 
@@ -117,6 +114,6 @@ class Message:
 
         msg = pickle.loads(encoded_msg)
         if not lazy:
-            msg.payload.decode(decoder)
+            msg.payload.decode()
 
         return msg
