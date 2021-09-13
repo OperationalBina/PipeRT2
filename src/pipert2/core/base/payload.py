@@ -1,3 +1,6 @@
+from typing import Callable
+
+
 class Payload:
     """The payload object is what actually stores the data.
     It is responsible for encoding and decoding the data itself.
@@ -31,22 +34,22 @@ class Payload:
 
         self._data = new_data
 
-    def decode(self, decoder) -> None:
+    def decode(self, decoder: Callable) -> None:
         """Decode the payload's data
 
         """
 
         if self.encoded:
-            self._data = decoder.decode(self._data)
+            self._data = decoder(self._data)
 
             self.encoded = False
 
-    def encode(self, encoder) -> None:
+    def encode(self, encoder: Callable) -> None:
         """Encode the payload's data
 
         """
 
         if not self.encoded:
-            self._data = encoder.encode(self._data)
+            self._data = encoder(self._data)
 
             self.encoded = True
