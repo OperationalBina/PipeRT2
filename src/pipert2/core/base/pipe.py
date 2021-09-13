@@ -1,6 +1,6 @@
 from src.pipert2.core.base.flow import Flow
 from src.pipert2.core.base.wire import Wire
-from src.pipert2.core.base.routine import Routine
+from src.pipert2.core.base.routines.routine import Routine
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.managers.network import Network
 from src.pipert2.core.managers.event_board import EventBoard

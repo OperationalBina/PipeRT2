@@ -1,16 +1,18 @@
 import pytest
 from functools import partial
+from pytest_mock import MockerFixture
 from src.pipert2.utils.dummy_object import Dummy
-from tests.pipert.core.utils.dummy_routine import DummyRoutine, DUMMY_ROUTINE_EVENT
+from tests.pipert.core.utils.dummy_routines.dummy_routine import DummyRoutine, DUMMY_ROUTINE_EVENT
 from tests.pipert.core.utils.functions_test_utils import timeout_wrapper
 
 MAX_TIMEOUT_WAITING = 3
 
 
 @pytest.fixture()
-def dummy_routine():
+def dummy_routine(mocker: MockerFixture):
     dummy_routine = DummyRoutine()
-    dummy_routine.initialize(message_handler=Dummy(), event_notifier=Dummy())
+    mock_message_handler = mocker.MagicMock()
+    dummy_routine.initialize(mock_message_handler, event_notifier=Dummy())
     return dummy_routine
 
 
@@ -44,3 +46,9 @@ def test_routine_execution(mocker, dummy_routine):
     dummy_routine.stop()
 
     assert dummy_routine.stop_event.is_set()
+
+    number_of_main_logic_calls = dummy_routine.counter
+    message_handler = dummy_routine.message_handler
+
+    assert message_handler.get.call_count == number_of_main_logic_calls
+    assert message_handler.put.call_count == number_of_main_logic_calls

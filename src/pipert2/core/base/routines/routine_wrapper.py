@@ -3,7 +3,6 @@ import multiprocessing as mp
 from typing import Callable
 from functools import partial
 from abc import ABCMeta, abstractmethod
-
 from src.pipert2.utils.method_data import Method
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.handlers.message_handler import MessageHandler
@@ -13,7 +12,7 @@ from src.pipert2.utils.annotations import class_functions_dictionary
 from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
-class Routine(EventExecutorInterface, metaclass=ABCMeta):
+class RoutineWrapper(EventExecutorInterface, metaclass=ABCMeta):
     """A routine is responsible for performing one of the flow’s main tasks.
     It can run as either a thread or a process.
     First it runs a setup function, then it runs its main logic function in a continuous loop, until it is told to terminate.
@@ -84,7 +83,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        routine_events = cls.events.all[Routine.__name__]
+        routine_events = cls.events.all[RoutineWrapper.__name__]
         for event_name, events_functions in routine_events.items():
             cls.events.all[cls.__name__][event_name].update(events_functions)
 
@@ -93,17 +92,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     @classmethod
     def _get_runners(cls):
         return cls.runners.all[cls.__name__]
-
-    @abstractmethod
-    def main_logic(self, data):
-        """The routine logic that will be executed
-
-        Args:
-            data: The data for the routine to process
-
-        """
-
-        raise NotImplementedError
 
     @abstractmethod
     def setup(self) -> None:
@@ -121,24 +109,13 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         raise NotImplementedError
 
+    @abstractmethod
     def _extended_run(self) -> None:
         """Wrapper method for executing the entire routine logic
 
         """
 
-        self.setup()
-
-        while not self.stop_event.is_set():
-            message = self.message_handler.get()
-            try:
-                output_data = self.main_logic(message.get_payload())
-            except Exception as error:
-                self._logger.exception(f"The routine has crashed: {error}")
-            else:
-                message.update_payload(output_data)
-                self.message_handler.put(message)
-
-        self.cleanup()
+        raise NotImplementedError
 
     @runners("thread")
     def set_runner_as_thread(self):
