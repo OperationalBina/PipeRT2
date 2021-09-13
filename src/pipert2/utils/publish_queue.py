@@ -16,21 +16,23 @@ def ensure_parent(func):
 
 
 class PublishQueue(object):
+    """A class that wraps multiprocessing queue to make it possible to publish a single object to multiple queues.
+
+    """
+
     def __init__(self):
         self._queues = []
         self._creator_pid = os.getpid()
 
-    def __getstate__(self):
-        self_dict = self.__dict__
-        self_dict['_queues'] = []
-
-        return self_dict
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-
     @ensure_parent
     def register(self):
+        """Register a new queue to publish to.
+
+        Returns:
+            A multiprocessing queue object.
+
+        """
+
         q = Queue(maxsize=1)
         self._queues.append(q)
 
@@ -38,6 +40,15 @@ class PublishQueue(object):
 
     @ensure_parent
     def put(self, value, block=False, timeout=1):
+        """Publish a value to every registered queue.
+
+        Args:
+            value: The value to push to every registered queue.
+            block: Whether or not to block the queue when putting a message.
+            timeout: How long to wait if block is true.
+
+        """
+
         for q in self._queues:
             if not block:
                 force_push_to_queue(q, value)
