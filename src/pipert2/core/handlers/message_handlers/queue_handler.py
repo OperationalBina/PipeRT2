@@ -1,5 +1,6 @@
 from queue import Full, Empty
 from src.pipert2.core.handlers.message_handler import MessageHandler
+from src.pipert2.utils.exceptions.queue_not_initialized import QueueNotInitialized
 
 
 class QueueHandler(MessageHandler):
@@ -35,7 +36,7 @@ class QueueHandler(MessageHandler):
             try:
                 message = self.input_queue.get(block=self.blocking, timeout=self.timeout)
             except Empty:
-                print("The queue is empty")  # TODO: Replace with log
+                self.logger.exception("The queue is empty")
 
         return message
 
@@ -50,7 +51,7 @@ class QueueHandler(MessageHandler):
         """
 
         if self.output_queue is None:
-            raise Exception(f"{self.routine_name}'s output_queue was not initialized when put was called!")
+            raise QueueNotInitialized(f"{self.routine_name}'s output_queue was not initialized when put was called!")
 
         self._safe_push_to_queue(message) if self.blocking else self._force_push_to_queue(message)
 
@@ -69,7 +70,7 @@ class QueueHandler(MessageHandler):
             try:
                 self.output_queue.put(message, block=False)
             except Full:
-                print("The queue is full!")  # TODO: Replace with log
+                self.logger.exception("The queue is full!")
 
     def _safe_push_to_queue(self, message: bytes):
         """Try pushing a message into the queue.
@@ -83,4 +84,4 @@ class QueueHandler(MessageHandler):
         try:
             self.output_queue.put(message, block=True, timeout=self.timeout)
         except Full:
-            print("The queue is full!")  # TODO: Replace with log
+            self.logger.exception("The queue is full!")
