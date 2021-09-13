@@ -41,7 +41,7 @@ def test_encode_message(mocker: MockerFixture, dummy_message: Message):
     mocker.patch("pickle.dumps")
     payload_mock = dummy_message.payload
 
-    Message.encode(dummy_message, Mock())
+    Message.encode(dummy_message)
 
     payload_mock.encode.assert_called()
 
@@ -51,8 +51,8 @@ def test_decode_message():
     message.payload = Dummy()
     message.payload.data = MESSAGE_DATA
 
-    encoded_message = Message.encode(message, Mock())
+    encoded_message = Message.encode(message)
 
-    decoded_message:Message = Message.decode(encoded_message, decoder=Mock(), lazy=False)
+    decoded_message:Message = Message.decode(encoded_message, lazy=False)
 
     assert decoded_message.__str__() == message.__str__()
