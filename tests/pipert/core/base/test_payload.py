@@ -12,5 +12,3 @@ DATA = {
 def dummy_payload():
     payload = Payload(DATA)
     return payload
-
-

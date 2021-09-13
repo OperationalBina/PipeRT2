@@ -24,8 +24,7 @@ class Payload:
 
     @data.setter
     def data(self, new_data) -> None:
-        if self.encoded:
-            self.encoded = False
+        self.encoded = False
 
         self._data = new_data
 
