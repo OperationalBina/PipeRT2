@@ -4,6 +4,7 @@ from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.base.data_transmitter import DataTransmitter
 from src.pipert2.core.managers.network import Network
 from src.pipert2.core.handlers.message_handlers.queue_handler import QueueHandler
+from src.pipert2.utils.publish_queue import PublishQueue
 
 
 class QueueNetwork(Network):
@@ -39,12 +40,11 @@ class QueueNetwork(Network):
             data_transmitter: The data transmitter that indicates how to transfer the data.
 
         """
+        publish_queue = PublishQueue()
 
         for destination_routine in destinations:
-            queue = Queue(maxsize=1)  # TODO: Add the possibility to configure the maxsize of queues.
-            destination_routine.message_handler.input_queue = queue
-            source.message_handler.output_queue = queue
-
+            destination_routine.message_handler.input_queue = publish_queue.register()
             destination_routine.message_handler.receive = data_transmitter.receive()
 
+        source.message_handler.output_queue = publish_queue
         source.message_handler.transmit = data_transmitter.transmit()

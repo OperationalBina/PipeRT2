@@ -53,35 +53,7 @@ class QueueHandler(MessageHandler):
         if self.output_queue is None:
             raise QueueNotInitialized(f"{self.routine_name}'s output_queue was not initialized when put was called!")
 
-        self._safe_push_to_queue(message) if self.blocking else self._force_push_to_queue(message)
-
-    def _force_push_to_queue(self, message: bytes):
-        """Forcibly push a message into the queue.
-
-        Args:
-            message: The given message to push.
-
-        """
-
         try:
-            self.output_queue.put(message, block=False)
-        except Full:
-            self.output_queue.get(block=False)
-            try:
-                self.output_queue.put(message, block=False)
-            except Full:
-                self.logger.exception("The queue is full!")
-
-    def _safe_push_to_queue(self, message: bytes):
-        """Try pushing a message into the queue.
-        If the queue is full, do nothing.
-
-        Args:
-            message: The given message to push.
-
-        """
-
-        try:
-            self.output_queue.put(message, block=True, timeout=self.timeout)
+            self.output_queue.put(message, block=self.blocking, timeout=self.timeout)
         except Full:
             self.logger.exception("The queue is full!")
