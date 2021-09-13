@@ -1,5 +1,4 @@
 from typing import Tuple
-from multiprocessing import Queue
 from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.base.data_transmitter import DataTransmitter
 from src.pipert2.core.managers.network import Network
