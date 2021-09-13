@@ -1,5 +1,6 @@
-from multiprocessing import Process
 from typing import List
+from multiprocessing import Process
+from src.pipert2.utils.method_data import Method
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.handlers.event_handler import EventHandler
@@ -7,7 +8,6 @@ from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.annotations import class_functions_dictionary
 from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
-from src.pipert2.utils.method_data import Method
 from src.pipert2.utils.dummy_object import Dummy
 
 
@@ -64,7 +64,7 @@ class Flow(EventExecutorInterface):
         """
 
         event: Method = self.event_handler.wait()
-        while event.name != KILL_EVENT_NAME:
+        while event.event_name != KILL_EVENT_NAME:
             self.execute_event(event)
             event = self.event_handler.wait()
 
@@ -89,10 +89,17 @@ class Flow(EventExecutorInterface):
 
         """
 
-        for routine in self.routines.values():
-            routine.execute_event(event)
+        if event.is_flow_valid(self.name):
+            if event.do_run_specific_routines(self.name):
+                routines = event.routines_by_flow.get(self.name)
+                for routine in routines:
+                    if routine in self.routines.keys():
+                        self.routines.get(routine).execute_event(event)
+            else:
+                for routine in self.routines.values():
+                    routine.execute_event(event)
 
-        EventExecutorInterface.execute_event(self, event)
+            EventExecutorInterface.execute_event(self, event)
 
     def join(self) -> None:
         """Block until the flow process terminates
