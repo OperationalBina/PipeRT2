@@ -1,7 +1,8 @@
 import os
 from queue import Full
 from functools import wraps
-from multiprocessing import Queue
+from multiprocessing import Manager, Queue
+from typing import Optional
 
 
 def ensure_parent(func):
@@ -25,7 +26,7 @@ class PublishQueue(object):
         self._creator_pid = os.getpid()
 
     @ensure_parent
-    def register(self):
+    def register(self, queue: Optional[Queue]):
         """Register a new queue to publish to.
 
         Returns:
@@ -33,7 +34,10 @@ class PublishQueue(object):
 
         """
 
-        q = Queue(maxsize=1)
+        if queue is not None:
+            q = queue
+        else:
+            q = Manager().Queue(maxsize=1)
         self._queues.append(q)
 
         return q

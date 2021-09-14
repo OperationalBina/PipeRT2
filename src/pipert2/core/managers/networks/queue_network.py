@@ -42,7 +42,8 @@ class QueueNetwork(Network):
         publish_queue = PublishQueue()
 
         for destination_routine in destinations:
-            destination_routine.message_handler.input_queue = publish_queue.register()
+            destination_routine.message_handler.input_queue = \
+                publish_queue.register(destination_routine.message_handler.input_queue)
             destination_routine.message_handler.receive = data_transmitter.receive()
 
         source.message_handler.output_queue = publish_queue

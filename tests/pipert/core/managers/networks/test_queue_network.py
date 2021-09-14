@@ -43,3 +43,17 @@ def test_link_multiple_destinations(dummy_queue_network):
 
     for index, routine in enumerate(destination_routines):
         assert source_routine.message_handler.output_queue._queues[index] == routine.message_handler.input_queue
+
+
+def test_link_multiple_sources(dummy_queue_network):
+    source_routine1 = Mock()
+    source_routine2 = Mock()
+    destination_routines = (Mock(),)
+    data_transmitter = Mock()
+
+    dummy_queue_network.link(source_routine1, destination_routines, data_transmitter)
+    dummy_queue_network.link(source_routine2, destination_routines, data_transmitter)
+
+    for index, routine in enumerate(destination_routines):
+        assert source_routine1.message_handler.output_queue._queues[index] == routine.message_handler.input_queue
+        assert source_routine2.message_handler.output_queue._queues[index] == routine.message_handler.input_queue
