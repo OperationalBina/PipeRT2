@@ -1,6 +1,6 @@
 import sys
 import logging
-from src.pipert2.core.base.logger import PipeLogger
+from src.pipert2.core.base.pipe_logger import PipeLogger
 
 
 class PrintLogger(PipeLogger):
@@ -33,6 +33,5 @@ class PrintLogger(PipeLogger):
     def exception(self, message: str):
         self.logger.exception(message)
 
-    def getChild(self, child_name: str) -> 'PipeLogger':
-        self.logger.getChild(child_name)
-
+    def get_child(self, child_name: str):
+        return self.logger.getChild(child_name)
