@@ -1,7 +1,7 @@
 from src.pipert2.core.base.flow import Flow
 from src.pipert2.core.base.wire import Wire
 from src.pipert2.core.base.routine import Routine
-from src.pipert2.core.base.logger import PipeLogger
+from src.pipert2.core.base.pipe_logger import PipeLogger
 from src.pipert2.core.managers.network import Network
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME
@@ -56,7 +56,7 @@ class Pipe:
             routine.initialize(message_handler=self.network.get_message_handler(routine.name),
                                event_notifier=self.event_board.get_event_notifier())
 
-        flow = Flow(flow_name, self.event_board, self.logger.get_child(), routines=list(routines))
+        flow = Flow(flow_name, self.event_board, self.logger.get_child(flow_name), routines=list(routines))
         self.flows[flow_name] = flow
 
         if auto_wire:
@@ -87,6 +87,8 @@ class Pipe:
         # TODO: add validations to pipe architecture
         for flow in self.flows.values():
             flow.build()
+
+        self.event_board.build()
 
     def notify_event(self, event_name: str, **event_parameters) -> None:
         """Notify an event has started

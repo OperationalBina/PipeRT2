@@ -75,7 +75,7 @@ class PipeLogger(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def getChild(self, child_name: str) -> 'PipeLogger':
+    def get_child(self, child_name: str) -> 'PipeLogger':
         """Get a logger which is a descendant to this one.
 
         Args:
