@@ -54,8 +54,8 @@ def test_get(blocking_queue_handler, non_blocking_queue_handler, input_queue):
     assert blocking_queue_handler.get() == message
     input_queue.put(Message.encode(message))
     assert non_blocking_queue_handler.get() == message
-    assert blocking_queue_handler.get().payload.data == {}
-    assert non_blocking_queue_handler.get().payload.data == {}
+    assert blocking_queue_handler.get() is None
+    assert non_blocking_queue_handler.get() is None
 
 
 def test_force_push(non_blocking_queue_handler, output_queue):
@@ -113,8 +113,8 @@ def test_get_no_receive_method(blocking_queue_handler, non_blocking_queue_handle
     assert blocking_queue_handler.get() == message
     input_queue.put(Message.encode(message))
     assert non_blocking_queue_handler.get() == message
-    assert blocking_queue_handler.get().payload.data == {}
-    assert non_blocking_queue_handler.get().payload.data == {}
+    assert blocking_queue_handler.get() is None
+    assert non_blocking_queue_handler.get() is None
 
 
 class StrMessage(Message):

@@ -84,6 +84,7 @@ class Pipe:
 
         """
 
+        # TODO: add validations to pipe architecture
         for flow in self.flows.values():
             flow.build()
 

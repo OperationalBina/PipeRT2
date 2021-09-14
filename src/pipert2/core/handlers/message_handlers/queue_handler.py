@@ -34,7 +34,10 @@ class QueueHandler(MessageHandler):
 
         if self.input_queue is not None:  # TODO: If a queue doesn't exist, an exception is supposed to occur at pipe
                                                 # base
-            message = self.input_queue.get()
+            try:
+                message = self.input_queue.get(block=self.blocking, timeout=self.timeout)
+            except Empty:
+                pass
 
         return message
 
