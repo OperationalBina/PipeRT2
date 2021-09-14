@@ -1,4 +1,5 @@
 import cv2
+import pafy
 from src.pipert2.core.base.routine import Routine
 
 
@@ -19,7 +20,9 @@ class OpenCVCaptureFrame(Routine):
         self.isFile = str(self.stream_address).endswith("mp4")
 
     def begin_capture(self):
-        self.stream = cv2.VideoCapture(self.stream_address)
+        video = pafy.new(self.stream_address)
+        best = video.getbest(preftype="mp4")
+        self.stream = cv2.VideoCapture(best.url)
         if self.isFile:
             self.fps = self.stream.get(cv2.CAP_PROP_FPS)
             self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
