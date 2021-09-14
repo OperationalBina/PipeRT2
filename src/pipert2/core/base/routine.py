@@ -3,9 +3,9 @@ import multiprocessing as mp
 from typing import Callable
 from functools import partial
 from abc import ABCMeta, abstractmethod
-
 from src.pipert2.utils.method_data import Method
-from src.pipert2.core.base.logger import PipeLogger
+from src.pipert2.core.base.pipe_logger import PipeLogger
+from src.pipert2.core.base.message import Message
 from src.pipert2.core.handlers.message_handler import MessageHandler
 from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from src.pipert2.utils.dummy_object import Dummy
@@ -132,13 +132,20 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         while not self.stop_event.is_set():
             message = self.message_handler.get()
+            # if message is not None:
             try:
-                output_data = self.main_logic(message.get_data())
+                if self.name == 'FirstRoutine':
+                    output_data = self.main_logic({})
+                    message = Message({}, 'FirstRoutine')
+                else:
+                    output_data = self.main_logic(message.get_data())
             except Exception as error:
                 self._logger.exception(f"The routine has crashed: {error}")
+                pass
             else:
                 message.update_data(output_data)
-                self.message_handler.put(message)
+                if not self.name == 'LastRoutine':
+                    self.message_handler.put(message)
 
         self.cleanup()
 
