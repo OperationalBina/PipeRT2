@@ -6,7 +6,7 @@ from src.pipert2.core.base.routine import Routine
 class OpenCVDisplayFrame(Routine):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.counter_frame_fps = 1
+        self.counter_frame_fps = 0
         self.last_frame_time = time.time()
         self.fps = 0
 
