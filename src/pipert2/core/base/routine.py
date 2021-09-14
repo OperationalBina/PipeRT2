@@ -67,6 +67,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.message_handler = message_handler
         self.event_notifier = event_notifier
 
+        self.message_handler.logger = self._logger
+
         if "runner" in kwargs and kwargs["runner"] in self.runners.all:
             self._get_runners()[kwargs["runner"]](self)
         else:

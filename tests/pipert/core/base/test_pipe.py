@@ -44,9 +44,8 @@ def test_create_flow_auto_wire_true(dummy_pipe: Pipe):
     network_mock: Mock = dummy_pipe.network
 
     for first_routine_mock, second_routine_mock in zip(routine_mocks, routine_mocks[1:]):
-        network_mock.link.assert_any_call(source=first_routine_mock, destinations=second_routine_mock,
-                                          transmit=data_transmitter_mock.transmit(),
-                                          receive=data_transmitter_mock.receive())
+        network_mock.link.assert_any_call(source=first_routine_mock, destinations=(second_routine_mock,),
+                                          data_transmitter=data_transmitter_mock)
 
 
 def test_link(dummy_pipe: Pipe):
@@ -64,8 +63,7 @@ def test_link(dummy_pipe: Pipe):
 
     for first_routine_mock, second_routine_mock in zip(routine_mocks, routine_mocks[1:]):
         network_mock.link.assert_any_call(source=first_routine_mock, destinations=(second_routine_mock,),
-                                          transmit=data_transmitter_mock.transmit(),
-                                          receive=data_transmitter_mock.receive())
+                                          data_transmitter=data_transmitter_mock)
 
 
 def test_build(dummy_pipe_with_flows):
