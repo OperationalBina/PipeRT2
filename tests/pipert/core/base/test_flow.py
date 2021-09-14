@@ -25,7 +25,7 @@ def dummy_flow_with_two_routines(mocker: MockerFixture):
     second_routine_mocker.name = SECOND_ROUTINE_NAME
 
     logger_mocker = mocker.MagicMock()
-    logger_mocker.getChild.return_value = mocker.MagicMock()
+    logger_mocker.get_child.return_value = mocker.MagicMock()
 
     dummy_flow = Flow(name="Flow1",
                       event_board=event_board_mocker,
