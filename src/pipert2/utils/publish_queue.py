@@ -1,8 +1,8 @@
 import os
 from queue import Full
+from typing import Optional
 from functools import wraps
 from multiprocessing import Manager, Queue
-from typing import Optional
 
 
 def ensure_parent(func):

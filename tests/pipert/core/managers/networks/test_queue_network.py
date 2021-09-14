@@ -21,6 +21,19 @@ def test_get_message_handler(dummy_queue_network):
     assert message_handler == message_handler2
 
 
+def test_link_single_destination_no_input_queue(dummy_queue_network):
+    source_routine = Mock()
+    destination_routine = (Mock(),)
+    destination_routine[0].message_handler.input_queue = None
+    data_transmitter = Mock()
+
+    dummy_queue_network.link(source_routine, destination_routine, data_transmitter)
+
+    assert type(source_routine.message_handler.output_queue) == PublishQueue
+    assert destination_routine[0].message_handler.input_queue is not None
+    assert source_routine.message_handler.output_queue._queues[0] == destination_routine[0].message_handler.input_queue
+
+
 def test_link_single_destination(dummy_queue_network):
     source_routine = Mock()
     destination_routine = (Mock(),)
