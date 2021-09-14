@@ -1,5 +1,8 @@
+from typing import Optional
 from abc import ABC, abstractmethod
+from src.pipert2.utils.dummy_object import Dummy
 from src.pipert2.core.base.message import Message
+from src.pipert2.core.base.logger import PipeLogger
 
 
 class MessageHandler(ABC):
@@ -12,10 +15,13 @@ class MessageHandler(ABC):
 
     def __init__(self, routine_name: str):
         self.routine_name = routine_name
+        self.transmit = None
+        self.receive = None
+        self.logger: PipeLogger = Dummy()
 
     @abstractmethod
-    def _get(self) -> bytes:
-        """Returns the message from the input object.
+    def _get(self) -> Optional[bytes]:
+        """Returns the message from the input object. If the input object is not initialized return None.
 
         Returns:
             A message object.
@@ -43,19 +49,29 @@ class MessageHandler(ABC):
 
         """
 
+        if callable(self.transmit):
+            transmitted_data = self.transmit(message.payload.data)
+            message.update_data(transmitted_data)
+
         self._put(Message.encode(message))
 
     def get(self) -> Message:
         """Decodes the message received from the implemented get method.
 
-        Returns: A decoded message object.
+        Returns:
+            A decoded message object.
 
         """
-        try:
-            message = Message.decode(self._get())
-        except TypeError:
-            message = None
-        else:
+
+        message = self._get()
+
+        if message is not None:
+            message = Message.decode(message)
+
+            if callable(self.receive):
+                received_data = self.receive(message.payload.data)
+                message.update_data(received_data)
+
             message.record_entry(self.routine_name)
 
         return message

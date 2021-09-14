@@ -1,4 +1,5 @@
 import pytest
+from mock import Mock
 from pytest_mock import MockerFixture
 from src.pipert2.core.base.message import Message
 from src.pipert2.utils.dummy_object import Dummy
@@ -43,6 +44,16 @@ def test_encode_message(mocker: MockerFixture, dummy_message: Message):
     Message.encode(dummy_message)
 
     payload_mock.encode.assert_called()
+
+
+def test_encode_message_when_unable_pickling(mocker: MockerFixture, dummy_message: Message):
+    mocker.patch("pickle.dumps", side_effect=TypeError)
+    payload_mock = dummy_message.payload
+
+    encoded_msg = Message.encode(dummy_message)
+
+    payload_mock.encode.assert_called()
+    assert encoded_msg == dummy_message
 
 
 def test_decode_message():

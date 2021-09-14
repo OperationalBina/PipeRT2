@@ -3,10 +3,11 @@ import multiprocessing as mp
 from typing import Callable
 from functools import partial
 from abc import ABCMeta, abstractmethod
+
+from src.pipert2.utils.method_data import Method
 from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.handlers.message_handler import MessageHandler
 from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
-from src.pipert2.utils.method_data import Method
 from src.pipert2.utils.dummy_object import Dummy
 from src.pipert2.utils.annotations import class_functions_dictionary
 from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
@@ -45,7 +46,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.name = f"{self.__class__.__name__}-{self.routines_created_counter}"
             self.routines_created_counter += 1
 
-        self.message_handler = None
+        self.message_handler: MessageHandler = None
         self.runner_creator = None
         self.event_notifier: Callable = Dummy()
         self._logger: PipeLogger = Dummy()
@@ -65,6 +66,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         self.message_handler = message_handler
         self.event_notifier = event_notifier
+
+        self.message_handler.logger = self._logger
 
         if "runner" in kwargs and kwargs["runner"] in self.runners.all:
             self._get_runners()[kwargs["runner"]](self)
@@ -130,11 +133,11 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         while not self.stop_event.is_set():
             message = self.message_handler.get()
             try:
-                output_data = self.main_logic(message.get_payload())
+                output_data = self.main_logic(message.get_data())
             except Exception as error:
                 self._logger.exception(f"The routine has crashed: {error}")
             else:
-                message.update_payload(output_data)
+                message.update_data(output_data)
                 self.message_handler.put(message)
 
         self.cleanup()

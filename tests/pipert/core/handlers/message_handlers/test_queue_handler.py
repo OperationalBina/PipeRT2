@@ -3,6 +3,7 @@ import collections
 from multiprocessing import Manager
 from src.pipert2.core.handlers.message_handlers.queue_handler import QueueHandler
 from src.pipert2.core.base.message import Message
+from src.pipert2.core.base.basic_transmitter import BasicTransmitter
 
 
 @pytest.fixture()
@@ -19,14 +20,22 @@ def output_queue():
 
 @pytest.fixture()
 def blocking_queue_handler(input_queue, output_queue):
-    blocking_queue_handler = QueueHandler("dummy", input_queue, output_queue, blocking=True, timeout=1)
+    blocking_queue_handler = QueueHandler("dummy", blocking=True, timeout=1)
+    blocking_queue_handler.input_queue = input_queue
+    blocking_queue_handler.output_queue = output_queue
+    blocking_queue_handler.transmit = BasicTransmitter().transmit()
+    blocking_queue_handler.receive = BasicTransmitter().receive()
 
     return blocking_queue_handler
 
 
 @pytest.fixture()
 def non_blocking_queue_handler(input_queue, output_queue):
-    non_blocking_queue_handler = QueueHandler("dummy", input_queue, output_queue, blocking=False)
+    non_blocking_queue_handler = QueueHandler("dummy", blocking=False)
+    non_blocking_queue_handler.input_queue = input_queue
+    non_blocking_queue_handler.output_queue = output_queue
+    non_blocking_queue_handler.transmit = BasicTransmitter().transmit()
+    non_blocking_queue_handler.receive = BasicTransmitter().receive()
 
     return non_blocking_queue_handler
 
@@ -84,6 +93,28 @@ def test_record_entry(blocking_queue_handler, non_blocking_queue_handler, input_
     assert blocking_queue_handler.get().history["dummy"]
     input_queue.put(Message.encode(non_blocking_message))
     assert non_blocking_queue_handler.get().history["dummy"]
+
+
+def test_put_no_transmit_method(blocking_queue_handler, non_blocking_queue_handler, output_queue):
+    message = StrMessage("Test Message", "dummy")
+    blocking_queue_handler.transmit = None
+    non_blocking_queue_handler.transmit = None
+    blocking_queue_handler.put(message)
+    assert Message.decode(output_queue.get()) == message
+    non_blocking_queue_handler.put(message)
+    assert Message.decode(output_queue.get()) == message
+
+
+def test_get_no_receive_method(blocking_queue_handler, non_blocking_queue_handler, input_queue):
+    message = StrMessage("Test Message", "dummy")
+    blocking_queue_handler.receive = None
+    non_blocking_queue_handler.receive = None
+    input_queue.put(Message.encode(message))
+    assert blocking_queue_handler.get() == message
+    input_queue.put(Message.encode(message))
+    assert non_blocking_queue_handler.get() == message
+    assert blocking_queue_handler.get() is None
+    assert non_blocking_queue_handler.get() is None
 
 
 class StrMessage(Message):
