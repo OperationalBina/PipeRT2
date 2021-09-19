@@ -1,14 +1,14 @@
 from src.pipert2.core.handlers.message_handler import MessageHandler
-from src.pipert2.core.base.routines.end_routine import EndRoutine
+from src.pipert2.core.base.routines.destination_routine import DestinationRoutine
 
 
-class DummyEndRoutine(EndRoutine):
+class DummyEndRoutine(DestinationRoutine):
     
     def __init__(self):
         super(DummyEndRoutine, self).__init__("dummy_end_routine")
         self.counter = 0
 
-    def main_logic(self, param) -> None:
+    def main_logic(self, data) -> None:
         self.counter += 1
 
     def setup(self) -> None:

@@ -1,7 +1,7 @@
 from typing import Tuple
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from src.pipert2.core.base.routines.routine import Routine
+from pipert2.core.base.routine import Routine
 from src.pipert2.core.handlers.message_handler import MessageHandler
 
 

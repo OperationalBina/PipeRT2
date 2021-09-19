@@ -1,16 +1,16 @@
 from abc import ABCMeta, abstractmethod
 from src.pipert2.core.base.message import Message
-from src.pipert2.core.base.routines.routine_wrapper import RoutineWrapper
+from pipert2.core.base.routine import Routine
 
 
-class StartRoutine(RoutineWrapper, metaclass=ABCMeta):
+class SourceRoutine(Routine, metaclass=ABCMeta):
 
     @abstractmethod
-    def main_logic(self) -> any:
-        """Main logic of the routine.
+    def main_logic(self) -> dict:
+        """Routine that starts generate data.
 
             Returns:
-                The main logic result.
+                The generated data.
         """
 
         raise NotImplementedError

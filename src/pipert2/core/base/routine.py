@@ -12,7 +12,7 @@ from src.pipert2.utils.annotations import class_functions_dictionary
 from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
-class RoutineWrapper(EventExecutorInterface, metaclass=ABCMeta):
+class Routine(EventExecutorInterface, metaclass=ABCMeta):
     """A routine is responsible for performing one of the flow’s main tasks.
     It can run as either a thread or a process.
     First it runs a setup function, then it runs its main logic function in a continuous loop, until it is told to terminate.
@@ -83,7 +83,7 @@ class RoutineWrapper(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        routine_events = cls.events.all[RoutineWrapper.__name__]
+        routine_events = cls.events.all[Routine.__name__]
         for event_name, events_functions in routine_events.items():
             cls.events.all[cls.__name__][event_name].update(events_functions)
 

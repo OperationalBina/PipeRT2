@@ -1,10 +1,10 @@
-from src.pipert2.core.base.routines.routine import Routine
+from pipert2.core.base.routines.middle_routine import MiddleRoutine
 from src.pipert2.utils.method_data import Method
 
 DUMMY_ROUTINE_EVENT = Method("Change")
 
 
-class DummyRoutine(Routine):
+class DummyRoutine(MiddleRoutine):
 
     def __init__(self, counter=0, **kwargs):
         super().__init__(**kwargs)
@@ -23,6 +23,6 @@ class DummyRoutine(Routine):
     def cleanup(self) -> None:
         pass
 
-    @Routine.events(DUMMY_ROUTINE_EVENT.event_name)
+    @MiddleRoutine.events(DUMMY_ROUTINE_EVENT.event_name)
     def change_logic(self):
         self.inc = not self.inc

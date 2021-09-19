@@ -1,15 +1,15 @@
 from abc import ABCMeta, abstractmethod
-from src.pipert2.core.base.routines.routine_wrapper import RoutineWrapper
+from pipert2.core.base.routine import Routine
 
 
-class Routine(RoutineWrapper, metaclass=ABCMeta):
+class MiddleRoutine(Routine, metaclass=ABCMeta):
 
     @abstractmethod
-    def main_logic(self, param) -> any:
-        """Main logic of the routine.
+    def main_logic(self, data) -> dict:
+        """Process the given data to the routine.
 
         Args:
-            param: The main logic parameter.
+            data: The data that the routine processes and sends.
 
         Returns:
             The main logic result.
@@ -23,11 +23,11 @@ class Routine(RoutineWrapper, metaclass=ABCMeta):
         while not self.stop_event.is_set():
             message = self.message_handler.get()
             try:
-                output_data = self.main_logic(message.get_payload())
+                output_data = self.main_logic(message.get_data())
             except Exception as error:
                 self._logger.exception(f"The routine has crashed: {error}")
             else:
-                message.update_payload(output_data)
+                message.update_data(output_data)
                 self.message_handler.put(message)
 
         self.cleanup()

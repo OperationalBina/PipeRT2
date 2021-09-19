@@ -1,7 +1,7 @@
-from src.pipert2.core.base.routines.start_routine import StartRoutine
+from src.pipert2.core.base.routines.source_routine import SourceRoutine
 
 
-class DummyStartRoutine(StartRoutine):
+class DummyStartRoutine(SourceRoutine):
     
     def __init__(self):
         super(DummyStartRoutine, self).__init__("dummy_start_routine")
