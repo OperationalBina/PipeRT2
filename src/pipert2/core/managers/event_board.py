@@ -78,3 +78,6 @@ class EventBoard:
         self.new_events_queue.put(Method(event_name=event_name,
                                          routines_by_flow=routines_by_flow,
                                          params=params))
+
+    def join(self):
+        self.event_board_thread.join()
