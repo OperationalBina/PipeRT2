@@ -1,0 +1,3 @@
+START_EVENT_NAME = "start"
+STOP_EVENT_NAME = "stop"
+KILL_EVENT_NAME = "kill"
