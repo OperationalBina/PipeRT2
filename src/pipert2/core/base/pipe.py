@@ -1,7 +1,7 @@
+from logging import Logger
 from src.pipert2.core.base.flow import Flow
 from src.pipert2.core.base.wire import Wire
 from src.pipert2.core.base.routine import Routine
-from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.managers.network import Network
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME
@@ -17,16 +17,16 @@ class Pipe:
 
     """
 
-    def __init__(self, network: Network, logger: PipeLogger, data_transmitter: DataTransmitter = BasicTransmitter()):  # TODO - default logger and default networking (Queue)
+    def __init__(self, network: Network, logger: Logger, data_transmitter: DataTransmitter = BasicTransmitter()):  # TODO - default logger and default networking (Queue)
         """
         Args:
             network: Network object responsible for the routine's communication.
-            logger: PipeLogger object for logging the pipe actions.
+            logger: Logger object for logging the pipe actions.
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
 
         Attributes:
             network: Network object responsible for the routine's communication.
-            logger: PipeLogger object for logging the pipe actions.
+            logger: Logger object for logging the pipe actions.
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             flows (dict[str, Flow]): Dictionary mapping the pipe flows to their name.
             event_board (EventBoard): EventBoard object responsible for the pipe events.
@@ -111,7 +111,7 @@ class Pipe:
         for flow in self.flows.values():
             flow.join()
 
-        self.logger.debug(f"Joined all flows")
+        self.logger.debug(f"Joined all flows") # TODO - Maybe remove these logs
 
         self.event_board.join()
         self.logger.debug(f"Joined event board")

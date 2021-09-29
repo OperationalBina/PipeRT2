@@ -1,8 +1,8 @@
+from logging import Logger
 from typing import Optional
 from abc import ABC, abstractmethod
 from src.pipert2.utils.dummy_object import Dummy
 from src.pipert2.core.base.message import Message
-from src.pipert2.core.base.logger import PipeLogger
 
 
 class MessageHandler(ABC):
@@ -17,7 +17,7 @@ class MessageHandler(ABC):
         self.routine_name = routine_name
         self.transmit = None
         self.receive = None
-        self.logger: PipeLogger = Dummy()
+        self.logger: Logger = Dummy()
 
     @abstractmethod
     def _get(self) -> Optional[bytes]:

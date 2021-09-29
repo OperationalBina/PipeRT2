@@ -1,7 +1,7 @@
 from typing import List
+from logging import Logger
 from multiprocessing import Process
 from src.pipert2.utils.method_data import Method
-from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.handlers.event_handler import EventHandler
 from src.pipert2.core.managers.event_board import EventBoard
@@ -19,18 +19,18 @@ class Flow(EventExecutorInterface):
 
     events = class_functions_dictionary()
 
-    def __init__(self, name: str, event_board: EventBoard, logger: PipeLogger, routines: List[Routine]):
+    def __init__(self, name: str, event_board: EventBoard, logger: Logger, routines: List[Routine]):
         """
         Args:
             name (str): Name of the flow.
             event_board (EventBoard): The EventBoard of the pipe.
-            logger (PipeLogger): PipeLogger object for logging the flow actions.
+            logger (Logger): Logger object for logging the flow actions.
             routines (Routine): The routines that will be in the flow.
 
         Attributes:
             routines (dict[str, Routine]): Dictionary mapping the routines to their name.
             name (str): Name of the flow.
-            logger (PipeLogger): PipeLogger object for logging the flow actions.
+            logger (Logger): Logger object for logging the flow actions.
             event_handler (EventHandler): EventHandler object for communicating with the
                 event system of the pipe.
 
