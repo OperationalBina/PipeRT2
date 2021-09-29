@@ -23,7 +23,7 @@ class EventBoard:
         """Return an event handler adjusted to the given events.
 
         Args:
-            events_to_listen: The routines message.
+            events_to_listen: List of event names to listen.
 
         Returns:
             An event handler adjusted to the given events.
@@ -78,3 +78,6 @@ class EventBoard:
         self.new_events_queue.put(Method(event_name=event_name,
                                          routines_by_flow=routines_by_flow,
                                          params=params))
+
+    def join(self):
+        self.event_board_thread.join()
