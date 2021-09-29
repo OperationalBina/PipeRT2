@@ -45,7 +45,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.name = f"{self.__class__.__name__}-{self.routines_created_counter}"
             self.routines_created_counter += 1
 
-        self.message_handler = None
+        self.message_handler: MessageHandler = None
         self.runner_creator = None
         self.event_notifier: Callable = Dummy()
         self._logger: PipeLogger = Dummy()
@@ -65,6 +65,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         self.message_handler = message_handler
         self.event_notifier = event_notifier
+
+        self.message_handler.logger = self._logger
 
         if "runner" in kwargs and kwargs["runner"] in self.runners.all:
             self._get_runners()[kwargs["runner"]](self)
@@ -115,7 +117,23 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
+<<<<<<< HEAD
         raise NotImplementedError
+=======
+        self.setup()
+
+        while not self.stop_event.is_set():
+            message = self.message_handler.get()
+            try:
+                output_data = self.main_logic(message.get_data())
+            except Exception as error:
+                self._logger.exception(f"The routine has crashed: {error}")
+            else:
+                message.update_data(output_data)
+                self.message_handler.put(message)
+
+        self.cleanup()
+>>>>>>> 7678db007eb4dfe486269ffee27de2781d303adf
 
     @runners("thread")
     def set_runner_as_thread(self):

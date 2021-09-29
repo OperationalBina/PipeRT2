@@ -22,10 +22,12 @@ class Pipe:
         Args:
             network: Network object responsible for the routine's communication.
             logger: PipeLogger object for logging the pipe actions.
+            data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
 
         Attributes:
             network: Network object responsible for the routine's communication.
             logger: PipeLogger object for logging the pipe actions.
+            data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             flows (dict[str, Flow]): Dictionary mapping the pipe flows to their name.
             event_board (EventBoard): EventBoard object responsible for the pipe events.
 
@@ -42,11 +44,11 @@ class Pipe:
         """Create a new flow in the pipe.
 
         Args:
-            data_transmitter (DataTransmitter): A data transmitter object that indicates how data will be transferred
-                                                inside the flow.
             flow_name (str): The name of the flow to be created.
             auto_wire (bool): Automatically connect the routines to each other by the order of their entry.
             routines: (Routine): List of routines to register to the flow.
+            data_transmitter (DataTransmitter): A data transmitter object that indicates how data will be transferred
+                                                inside the flow.
 
         """
 
@@ -58,12 +60,11 @@ class Pipe:
         self.flows[flow_name] = flow
 
         if auto_wire:
-            transmit = data_transmitter.transmit() if data_transmitter else self.default_data_transmitter.transmit()
-            receive = data_transmitter.receive() if data_transmitter else self.default_data_transmitter.receive()
+            data_transmitter = self.default_data_transmitter if data_transmitter is None else data_transmitter
 
             for first_routine, second_routine in zip(routines, routines[1:]):
-                self.network.link(source=first_routine, destinations=second_routine, transmit=transmit,
-                                  receive=receive)
+                self.network.link(source=first_routine, destinations=(second_routine,),
+                                  data_transmitter=data_transmitter)
 
     def link(self, *wires):
         """Connect the routines to each other by their wires configuration.
@@ -76,14 +77,14 @@ class Pipe:
         for wire in wires:
             data_transmitter = wire.data_transmitter if wire.data_transmitter else self.default_data_transmitter
 
-            self.network.link(source=wire.source, destinations=wire.destinations, transmit=data_transmitter.transmit(),
-                              receive=data_transmitter.receive())
+            self.network.link(source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
 
     def build(self):
         """Build the pipe to be ready to start working.
 
         """
 
+        # TODO: add validations to pipe architecture
         for flow in self.flows.values():
             flow.build()
 

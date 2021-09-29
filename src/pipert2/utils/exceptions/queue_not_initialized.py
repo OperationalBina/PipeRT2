@@ -1,0 +1,2 @@
+class QueueNotInitialized(Exception):
+    pass

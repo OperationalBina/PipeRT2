@@ -2,6 +2,7 @@ from typing import Tuple
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from src.pipert2.core.base.routine import Routine
+from src.pipert2.core.base.data_transmitter import DataTransmitter
 from src.pipert2.core.handlers.message_handler import MessageHandler
 
 
@@ -29,12 +30,13 @@ class Network(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def link(self, source: Routine, destinations: Tuple[Routine]):
+    def link(self, source: Routine, destinations: Tuple[Routine], data_transmitter: DataTransmitter):
         """Rewire the destinations of a given routine.
 
         Args:
             source: The source routine to be linked.
             destinations: A list of all of the destination routines.
+            data_transmitter: The DataTransmitter object that provides the methods to move data between routines.
 
         """
 
