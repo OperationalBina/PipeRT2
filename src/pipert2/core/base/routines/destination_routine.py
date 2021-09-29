@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from pipert2.core.base.routine import Routine
+from src.pipert2.core.base.routine import Routine
 
 
 class DestinationRoutine(Routine, metaclass=ABCMeta):

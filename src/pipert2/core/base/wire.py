@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from pipert2.core.base.routines.middle_routine import Routine
+from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.base.data_transmitter import DataTransmitter
 
 

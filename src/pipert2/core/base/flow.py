@@ -2,7 +2,7 @@ from typing import List
 from multiprocessing import Process
 from src.pipert2.utils.method_data import Method
 from src.pipert2.core.base.logger import PipeLogger
-from pipert2.core.base.routine import Routine
+from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.handlers.event_handler import EventHandler
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.annotations import class_functions_dictionary

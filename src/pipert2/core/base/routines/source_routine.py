@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from src.pipert2.core.base.message import Message
-from pipert2.core.base.routine import Routine
+from src.pipert2.core.base.routine import Routine
 
 
 class SourceRoutine(Routine, metaclass=ABCMeta):
