@@ -96,17 +96,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         return cls.runners.all[cls.__name__]
 
     @abstractmethod
-    def main_logic(self, data):
-        """The routine logic that will be executed
-
-        Args:
-            data: The data for the routine to process
-
-        """
-
-        raise NotImplementedError
-
-    @abstractmethod
     def setup(self) -> None:
         """An initial setup before running
 
@@ -122,24 +111,12 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         raise NotImplementedError
 
+    @abstractmethod
     def _extended_run(self) -> None:
         """Wrapper method for executing the entire routine logic
 
         """
-
-        self.setup()
-
-        while not self.stop_event.is_set():
-            message = self.message_handler.get()
-            try:
-                output_data = self.main_logic(message.get_data())
-            except Exception as error:
-                self._logger.exception(f"The routine has crashed: {error}")
-            else:
-                message.update_data(output_data)
-                self.message_handler.put(message)
-
-        self.cleanup()
+        raise NotImplementedError
 
     @runners("thread")
     def set_runner_as_thread(self):
