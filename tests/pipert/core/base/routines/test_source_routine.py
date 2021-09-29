@@ -1,13 +1,13 @@
 import pytest
 from pytest_mock import MockerFixture
 from src.pipert2.utils.dummy_object import Dummy
-from tests.pipert.core.utils.dummy_routines.dummy_start_routine import DummyStartRoutine, DummyStartRoutineException
+from tests.pipert.core.utils.dummy_routines.dummy_source_routine import DummySourceRoutine, DummySourceRoutineException
 
 MAX_TIMEOUT_WAITING = 3
 
 
 def test_routine_execution(mocker: MockerFixture):
-    dummy_routine = DummyStartRoutine()
+    dummy_routine = DummySourceRoutine()
     mock_message_handler = mocker.MagicMock()
     dummy_routine.initialize(mock_message_handler, event_notifier=Dummy())
 
@@ -27,7 +27,7 @@ def test_routine_execution(mocker: MockerFixture):
 
 
 def test_throws_exception(mocker: MockerFixture):
-    dummy_routine = DummyStartRoutineException()
+    dummy_routine = DummySourceRoutineException()
     mock_message_handler = mocker.MagicMock()
     mock_message_handler.get.get_data.side_effect = Exception()
     dummy_routine.initialize(mock_message_handler, event_notifier=Dummy())
