@@ -3,8 +3,8 @@ import multiprocessing as mp
 from typing import Callable
 from functools import partial
 from abc import ABCMeta, abstractmethod
+from logging import Logger
 from src.pipert2.utils.method_data import Method
-from src.pipert2.core.base.logger import PipeLogger
 from src.pipert2.core.handlers.message_handler import MessageHandler
 from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from src.pipert2.utils.dummy_object import Dummy
@@ -34,7 +34,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             message_handler (MessageHandler): Message handler of the routine to send and receive messages
             runner_creator (Callback): Callback for running the routine's main logic
             event_notifier (Callback): Callback for notifying an event has occurred
-            _logger (PipeLogger): The routines logger object
+            _logger (Logger): The routines logger object
             stop_event (mp.Event): A multiprocessing event object indicating the routine state (run/stop)
 
         """
@@ -48,7 +48,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.message_handler: MessageHandler = None
         self.runner_creator = None
         self.event_notifier: Callable = Dummy()
-        self._logger: PipeLogger = Dummy()
+        self._logger: Logger = Dummy()
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
@@ -73,7 +73,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         else:
             self.set_runner_as_thread()
 
-    def set_logger(self, logger: PipeLogger):
+    def set_logger(self, logger: Logger):
         self._logger = logger
 
     @classmethod
@@ -116,24 +116,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """Wrapper method for executing the entire routine logic
 
         """
-
-<<<<<<< HEAD
         raise NotImplementedError
-=======
-        self.setup()
-
-        while not self.stop_event.is_set():
-            message = self.message_handler.get()
-            try:
-                output_data = self.main_logic(message.get_data())
-            except Exception as error:
-                self._logger.exception(f"The routine has crashed: {error}")
-            else:
-                message.update_data(output_data)
-                self.message_handler.put(message)
-
-        self.cleanup()
->>>>>>> 7678db007eb4dfe486269ffee27de2781d303adf
 
     @runners("thread")
     def set_runner_as_thread(self):
