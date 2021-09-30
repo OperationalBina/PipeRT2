@@ -1,11 +1,11 @@
 import sys
 import pytest
-from src.pipert2.core.base.basic_transmitter import BasicTransmitter
+from src.pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 
 
 @pytest.fixture
 def dummy_shared_memory_transmitter():
-    from src.pipert2.core.base.shared_memory_transmitter import SharedMemoryTransmitter
+    from src.pipert2.core.base.transmitters.shared_memory_transmitter import SharedMemoryTransmitter
     if sys.version_info.minor <= 7:
         dummy_shared_memory_transmitter = SharedMemoryTransmitter()
     else:

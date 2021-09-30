@@ -1,6 +1,6 @@
+import pytest
 from queue import Full
 
-import pytest
 from src.pipert2.utils.publish_queue import PublishQueue
 
 
