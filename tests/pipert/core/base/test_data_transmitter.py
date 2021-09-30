@@ -1,6 +1,6 @@
 import sys
 import pytest
-from src.pipert2.core import BasicTransmitter
+from src.pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 
 
 @pytest.fixture

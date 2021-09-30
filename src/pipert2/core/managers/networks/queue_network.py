@@ -1,5 +1,8 @@
 from typing import Tuple
-from src.pipert2.core import Routine, Network, QueueHandler, DataTransmitter
+from src.pipert2.core.base.routine import Routine
+from src.pipert2.core.managers.network import Network
+from src.pipert2.core.base.data_transmitter import DataTransmitter
+from src.pipert2.core.handlers.message_handlers.queue_handler import QueueHandler
 from src.pipert2.utils.publish_queue import PublishQueue
 
 

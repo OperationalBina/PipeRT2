@@ -1,6 +1,12 @@
 from logging import Logger
-from src.pipert2.core import Flow, Routine,  Wire, BasicTransmitter, DataTransmitter, Network, EventBoard
+from src.pipert2.core.base.flow import Flow
+from src.pipert2.core.base.wire import Wire
+from src.pipert2.core.base.routine import Routine
+from src.pipert2.core.managers.network import Network
+from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME
+from src.pipert2.core.base.data_transmitter import DataTransmitter
+from src.pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 
 
 class Pipe:

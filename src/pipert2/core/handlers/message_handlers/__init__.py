@@ -1,1 +1,1 @@
-from .queue_handler import QueueHandler
+from .queue_handler import QueueHandler as QueueHandler

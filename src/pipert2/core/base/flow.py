@@ -1,7 +1,9 @@
 from typing import List
 from logging import Logger
 from multiprocessing import Process
-from src.pipert2.core import EventBoard, EventHandler, Routine
+from src.pipert2.core.base.routine import Routine
+from src.pipert2.core.handlers import EventHandler
+from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.method_data import Method
 from src.pipert2.utils.annotations import class_functions_dictionary
 from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME

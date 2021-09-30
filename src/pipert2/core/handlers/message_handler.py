@@ -1,8 +1,8 @@
 from logging import Logger
 from typing import Optional
 from abc import ABC, abstractmethod
-from src.pipert2.core import Message
 from src.pipert2.utils.dummy_object import Dummy
+from src.pipert2.core.base.message import Message
 
 
 class MessageHandler(ABC):

@@ -1,1 +1,1 @@
-from .queue_network import QueueNetwork
+from .queue_network import QueueNetwork as QueueNetwork

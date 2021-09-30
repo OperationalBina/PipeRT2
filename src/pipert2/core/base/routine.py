@@ -4,7 +4,7 @@ from logging import Logger
 from typing import Callable
 from functools import partial
 from abc import ABCMeta, abstractmethod
-from src.pipert2.core import MessageHandler
+from src.pipert2.core.handlers.message_handler import MessageHandler
 from src.pipert2.utils.method_data import Method
 from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from src.pipert2.utils.dummy_object import Dummy
