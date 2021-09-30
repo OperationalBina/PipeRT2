@@ -1,7 +1,7 @@
 import collections
 import time
 import pickle
-from src.pipert2.core.base.payload import Payload
+from src.pipert2.core import Payload
 
 
 class Message:

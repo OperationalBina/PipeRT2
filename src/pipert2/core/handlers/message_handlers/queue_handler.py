@@ -1,5 +1,5 @@
 from queue import Full, Empty
-from src.pipert2.core.handlers.message_handler import MessageHandler
+from src.pipert2.core import MessageHandler
 from src.pipert2.utils.exceptions.queue_not_initialized import QueueNotInitialized
 
 

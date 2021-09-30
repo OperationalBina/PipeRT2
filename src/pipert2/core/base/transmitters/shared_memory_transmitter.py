@@ -1,5 +1,5 @@
 import numpy as np
-from src.pipert2.core.base.data_transmitter import DataTransmitter
+from src.pipert2.core import DataTransmitter
 from src.pipert2.utils.shared_memory_manager import SharedMemoryManager
 
 
