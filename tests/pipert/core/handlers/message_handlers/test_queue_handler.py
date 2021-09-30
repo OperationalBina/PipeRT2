@@ -3,7 +3,7 @@ import collections
 from multiprocessing import Manager
 from src.pipert2.core.handlers.message_handlers.queue_handler import QueueHandler
 from src.pipert2.core.base.message import Message
-from src.pipert2.core.base.basic_transmitter import BasicTransmitter
+from src.pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 
 
 @pytest.fixture()
