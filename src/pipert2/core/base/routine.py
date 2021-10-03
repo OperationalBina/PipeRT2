@@ -24,7 +24,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     runners = class_functions_dictionary()
     routines_created_counter = 0
 
-    def __init__(self, name: str = None):
+    def __init__(self, flow_name: str, name: str = None):
         """
         Args:
             name: Name of the routine
@@ -45,6 +45,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.name = f"{self.__class__.__name__}-{self.routines_created_counter}"
             self.routines_created_counter += 1
 
+        self.flow_name = flow_name
         self.message_handler: MessageHandler = None
         self.runner_creator = None
         self.event_notifier: Callable = Dummy()
