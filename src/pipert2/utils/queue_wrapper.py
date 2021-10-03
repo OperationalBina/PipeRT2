@@ -23,24 +23,6 @@ class QueueWrapper:
     out_queue = None
     threads = {'threading': None, 'multiprocessing': None}
 
-    def get_queue(self, process_safe: bool):
-        """Get a queue according to necessity.
-
-        Args:
-            process_safe: Indicate if the queue needs to be process safe or not.
-
-        Returns:
-            If process_safe is true, return a multiprocessing queue, otherwise return a multithreading queue.
-
-        """
-
-        if process_safe:
-            in_queue = self._get_mp_queue()
-        else:
-            in_queue = self._get_th_queue()
-
-        return in_queue
-
     def get(self, block: bool, timeout: int):
         """Return whatever is in the out_queue.
 
@@ -59,6 +41,24 @@ class QueueWrapper:
             raise Empty
 
         return message
+
+    def get_queue(self, process_safe: bool):
+        """Get a queue according to necessity.
+
+        Args:
+            process_safe: Indicate if the queue needs to be process safe or not.
+
+        Returns:
+            If process_safe is true, return a multiprocessing queue, otherwise return a multithreading queue.
+
+        """
+
+        if process_safe:
+            in_queue = self._get_mp_queue()
+        else:
+            in_queue = self._get_th_queue()
+
+        return in_queue
 
     def _get_mp_queue(self):
         """Start listening to the multiprocessing queue and change the out_queue to work with multiprocessing.
