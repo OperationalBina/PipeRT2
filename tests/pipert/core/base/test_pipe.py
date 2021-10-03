@@ -63,6 +63,7 @@ def test_link(dummy_pipe: Pipe, mocker: MockerFixture):
     dummy_pipe.link(middle_to_destination_wire)
 
     assert dummy_pipe.wires[1] == middle_to_destination_wire
+    assert len(dummy_pipe.wires) == 2
 
 
 def test_build(dummy_pipe_with_flows):
