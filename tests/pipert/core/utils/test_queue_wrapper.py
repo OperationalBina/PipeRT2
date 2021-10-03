@@ -1,5 +1,6 @@
+import time
 import pytest
-from queue import Queue as thQueue
+from queue import Queue as thQueue, Empty
 from multiprocessing import Queue as mpQueue
 from src.pipert2.utils.queue_wrapper import QueueWrapper
 
@@ -27,4 +28,20 @@ def test_get_queue_not_process_safe(dummy_queue_wrapper):
     dummy_queue_wrapper.th_queue.put(None)
 
 
+def test_get_from_threading_and_processing_queue(dummy_queue_wrapper):
+    thread_queue = dummy_queue_wrapper.get_queue(process_safe=False)
+    process_queue = dummy_queue_wrapper.get_queue(process_safe=True)
 
+    thread_queue.put("message")
+    time.sleep(0.1)
+    assert dummy_queue_wrapper.get(block=False, timeout=1) == "message"
+
+    process_queue.put("message")
+    time.sleep(0.1)
+    assert dummy_queue_wrapper.get(block=False, timeout=1) == "message"
+
+    with pytest.raises(Empty):
+        dummy_queue_wrapper.get(block=True, timeout=1)
+
+    thread_queue.put(None)
+    process_queue.put(None)
