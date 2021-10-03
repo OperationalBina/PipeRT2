@@ -1,10 +1,10 @@
 __version__ = "2.1"
 
 # User interaction classes
-from .core import Pipe, Wire
+from src.pipert2.core import Pipe, Wire
 
 # Interfaces for user implementations
-from .core import SourceRoutine, MiddleRoutine, DestinationRoutine, Network, MessageHandler, DataTransmitter
+from src.pipert2.core import SourceRoutine, MiddleRoutine, DestinationRoutine, Network, MessageHandler, DataTransmitter
 
 # Given implementations
-from .core import QueueNetwork, QueueHandler, SharedMemoryTransmitter, BasicTransmitter
+from src.pipert2.core import QueueNetwork, QueueHandler, SharedMemoryTransmitter, BasicTransmitter

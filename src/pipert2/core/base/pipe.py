@@ -1,4 +1,7 @@
 from logging import Logger
+from typing import List
+
+from src.pipert2.core.base import wires_validator
 from src.pipert2.core.base.flow import Flow
 from src.pipert2.core.base.wire import Wire
 from src.pipert2.core.base.routine import Routine
@@ -38,6 +41,7 @@ class Pipe:
         self.flows = {}
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
+        self.wires: List[Wire] = []
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -59,12 +63,13 @@ class Pipe:
         flow = Flow(flow_name, self.event_board, self.logger.getChild(flow_name), routines=list(routines))
         self.flows[flow_name] = flow
 
-        if auto_wire:
-            data_transmitter = self.default_data_transmitter if data_transmitter is None else data_transmitter
+        flow_data_transmitter = data_transmitter if data_transmitter else self.default_data_transmitter
 
+        if auto_wire:
             for first_routine, second_routine in zip(routines, routines[1:]):
-                self.network.link(source=first_routine, destinations=(second_routine,),
-                                  data_transmitter=data_transmitter)
+                self.wires.append(
+                    Wire(source=first_routine, destinations=(second_routine,), data_transmitter=flow_data_transmitter)
+                )
 
     def link(self, *wires):
         """Connect the routines to each other by their wires configuration.
@@ -73,16 +78,20 @@ class Pipe:
             wires (Wire): List of wires to connect their routines
 
         """
-
         for wire in wires:
-            data_transmitter = wire.data_transmitter if wire.data_transmitter else self.default_data_transmitter
-
-            self.network.link(source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
+            self.wires.append(wire)
 
     def build(self):
         """Build the pipe to be ready to start working.
 
         """
+
+        wires_validator.validate_wires(self.wires)
+
+        for wire in self.wires:
+            data_transmitter = wire.data_transmitter if wire.data_transmitter else self.default_data_transmitter
+
+            self.network.link(source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
 
         # TODO: add validations to pipe architecture
         for flow in self.flows.values():

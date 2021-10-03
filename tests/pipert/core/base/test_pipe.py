@@ -1,5 +1,8 @@
 import pytest
 from mock import patch, Mock
+from pytest_mock import MockerFixture
+from src.pipert2 import MiddleRoutine, DestinationRoutine
+from src.pipert2 import SourceRoutine
 from src.pipert2.core.base.pipe import Pipe
 from src.pipert2.core.base.wire import Wire
 
@@ -13,11 +16,20 @@ def dummy_pipe():
 
 
 @pytest.fixture()
-def dummy_pipe_with_flows(dummy_pipe: Pipe):
+def dummy_pipe_with_flows(dummy_pipe: Pipe, mocker: MockerFixture):
     FLOW_NAMES = ["f1", "f2", "f3"]
-    routine_mocks = [Mock(), Mock(), Mock()]
-    for flow_name, routine_mock in zip(FLOW_NAMES, routine_mocks):
-        dummy_pipe.create_flow(flow_name, False, routine_mock)
+
+    source_routine = mocker.MagicMock(spec=SourceRoutine)
+    source_routine.name = "source"
+
+    middle_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle_routine.name = "middle_routine"
+
+    destination_routine = mocker.MagicMock(spec=DestinationRoutine)
+    destination_routine.name = "destination_routine"
+
+    for flow_name in FLOW_NAMES:
+        dummy_pipe.create_flow(flow_name, True, source_routine, middle_routine, destination_routine)
 
     return dummy_pipe, FLOW_NAMES
 
@@ -32,38 +44,25 @@ def test_create_flow_auto_wire_false(dummy_pipe: Pipe):
     assert FLOW_NAME in dummy_pipe.flows
 
 
-def test_create_flow_auto_wire_true(dummy_pipe: Pipe):
-    FLOW_NAME = "f1"
-    data_transmitter_mock = Mock()
-    routine_mocks = [Mock(), Mock(), Mock()]
-    dummy_pipe.create_flow(FLOW_NAME, True, *routine_mocks, data_transmitter=data_transmitter_mock)
+def test_link(dummy_pipe: Pipe, mocker: MockerFixture):
+    source_routine = mocker.MagicMock(spec=SourceRoutine)
+    source_routine.name = "source"
 
-    for routine_mock in routine_mocks:
-        routine_mock.initialize.assert_called_once()
+    middle_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle_routine.name = "middle_routine"
 
-    network_mock: Mock = dummy_pipe.network
+    destination_routine = mocker.MagicMock(spec=DestinationRoutine)
+    destination_routine.name = "destination_routine"
 
-    for first_routine_mock, second_routine_mock in zip(routine_mocks, routine_mocks[1:]):
-        network_mock.link.assert_any_call(source=first_routine_mock, destinations=(second_routine_mock,),
-                                          data_transmitter=data_transmitter_mock)
+    source_wire = Wire(source_routine, middle_routine)
+    dummy_pipe.link(source_wire)
 
+    assert dummy_pipe.wires[0] == source_wire
 
-def test_link(dummy_pipe: Pipe):
-    routine_mocks = [Mock(), Mock(), Mock()]
-    data_transmitter_mock = Mock()
-    wires = []
+    middle_to_destination_wire = Wire(middle_routine, destination_routine)
+    dummy_pipe.link(middle_to_destination_wire)
 
-    for first_routine_mock, second_routine_mock in zip(routine_mocks, routine_mocks[1:]):
-        wires.append(Wire(source=first_routine_mock, destinations=(second_routine_mock,),
-                          data_transmitter=data_transmitter_mock))
-
-    dummy_pipe.link(*wires)
-
-    network_mock: Mock = dummy_pipe.network
-
-    for first_routine_mock, second_routine_mock in zip(routine_mocks, routine_mocks[1:]):
-        network_mock.link.assert_any_call(source=first_routine_mock, destinations=(second_routine_mock,),
-                                          data_transmitter=data_transmitter_mock)
+    assert dummy_pipe.wires[1] == middle_to_destination_wire
 
 
 def test_build(dummy_pipe_with_flows):
