@@ -97,30 +97,6 @@ class Pipe:
 
         self.event_board.build()
 
-    def _validate_pipe(self):
-        """Validate routines and wires in current pipeline.
-
-        Raises:
-            FloatingRoutine: If flows contain a routine that don't link to any other routine.
-            WiresValidation: If wires are not valid.
-        """
-
-        self._validate_flows_routines_are_linked()
-        wires_validator.validate_wires(self.wires.values())
-
-    def _validate_flows_routines_are_linked(self):
-        for flow in self.flows.values():
-            for routine in flow.routines:
-                routine_contained = False
-                for wire in self.wires.values():
-                    if wire.source.name == routine.name or routine in wire.destinations:
-                        routine_contained = True
-                        break
-
-                if not routine_contained:
-                    raise FloatingRoutine(f"The routine {routine.name} "
-                                          f"in flow {flow.name} isn't linked to any other routine.")
-
     def notify_event(self, event_name: str, **event_parameters) -> None:
         """Notify an event has started
 
@@ -146,3 +122,34 @@ class Pipe:
 
         self.event_board.join()
         self.logger.debug(f"Joined event board")
+
+    def _validate_pipe(self):
+        """Validate routines and wires in current pipeline.
+
+        Raises:
+            FloatingRoutine: If flows contain a routine that don't link to any other routine.
+            WiresValidation: If wires are not valid.
+        """
+
+        self._validate_flows_routines_are_linked()
+        wires_validator.validate_wires(self.wires.values())
+
+    def _validate_flows_routines_are_linked(self):
+        """Validate that all routines flows are linked to other routines.
+
+        Raises:
+            FloatingRoutine: If a routine contained in flow but not link to any other routines.
+
+        """
+
+        for flow in self.flows.values():
+            for routine in flow.routines:
+                routine_contained = False
+                for wire in self.wires.values():
+                    if wire.source.name == routine.name or routine in wire.destinations:
+                        routine_contained = True
+                        break
+
+                if not routine_contained:
+                    raise FloatingRoutine(f"The routine {routine.name} "
+                                          f"in flow {flow.name} isn't linked to any other routine.")
