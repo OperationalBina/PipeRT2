@@ -1,3 +1,4 @@
+import logging
 from logging import Logger
 from src.pipert2.core.base.flow import Flow
 from src.pipert2.core.base.wire import Wire
@@ -6,7 +7,10 @@ from src.pipert2.core.managers.network import Network
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from src.pipert2.core.base.data_transmitter import DataTransmitter
+from src.pipert2.utils.logging_module_modifiers import add_pipe_log_level
 from src.pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
+
+add_pipe_log_level()
 
 
 class Pipe:
@@ -111,7 +115,7 @@ class Pipe:
         for flow in self.flows.values():
             flow.join()
 
-        self.logger.debug(f"Joined all flows") # TODO - Maybe remove these logs
+        self.logger.plog(f"Joined all flows") # TODO - Maybe remove these logs
 
         self.event_board.join()
-        self.logger.debug(f"Joined event board")
+        self.logger.plog(f"Joined event board")
