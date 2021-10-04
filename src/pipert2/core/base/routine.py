@@ -4,11 +4,11 @@ from logging import Logger
 from typing import Callable
 from functools import partial
 from abc import ABCMeta, abstractmethod
-from src.pipert2.core.handlers.message_handler import MessageHandler
 from src.pipert2.utils.method_data import Method
-from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from src.pipert2.utils.dummy_object import Dummy
+from src.pipert2.core.handlers.message_handler import MessageHandler
 from src.pipert2.utils.annotations import class_functions_dictionary
+from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from src.pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
@@ -131,7 +131,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """
 
         if self.stop_event.is_set():
-            self._logger.info("Starting")  # TODO - Maybe add an infrastructure logg type instead of info
+            self._logger.plog("Starting")  # TODO - Maybe add an infrastructure logg type instead of info
             self.stop_event.clear()
             self.runner = self.runner_creator()
             self.runner.start()
@@ -145,7 +145,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """
 
         if not self.stop_event.is_set():
-            self._logger.info("Stopping")
+            self._logger.plog("Stopping")
             self.stop_event.set()
             self.runner.join()
 
