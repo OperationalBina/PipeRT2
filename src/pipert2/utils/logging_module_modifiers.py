@@ -1,7 +1,7 @@
 import logging
 
 PIPE_INFRASTRUCTURE_LOG_LEVEL = 5
-
+PIPE_INFRASTRUCTURE_LOG_LEVEL_NAME = "PIPE_INFRASTRUCTURE"
 
 def add_pipe_log_level():
     """Add a new log level to the logging module named PIPE_INFRASTRUCTURE.
@@ -14,11 +14,12 @@ def add_pipe_log_level():
         >>> add_pipe_log_level()
         >>> logger = logging.getLogger()
         >>> logger.addHandler(logging.StreamHandler(sys.stdout))
+        >>> logger.setLevel(PIPE_INFRASTRUCTURE_LOG_LEVEL)
         >>> logger.plog("wow")
 
     """
 
-    logging.addLevelName(PIPE_INFRASTRUCTURE_LOG_LEVEL, "PIPE_INFRASTRUCTURE")
+    logging.addLevelName(PIPE_INFRASTRUCTURE_LOG_LEVEL, PIPE_INFRASTRUCTURE_LOG_LEVEL_NAME)
 
     def plog(self, message, *args, **kws):
         if self.isEnabledFor(PIPE_INFRASTRUCTURE_LOG_LEVEL):
