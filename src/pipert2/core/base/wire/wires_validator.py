@@ -1,9 +1,7 @@
 from typing import List
-from .wire import Wire
-from .routines import DestinationRoutine
-from .routines import MiddleRoutine
-from .routines import SourceRoutine
-from ...utils.exceptions.pipe_validation_failed import PipeValidationError
+from src.pipert2.core.base.wire import Wire
+from src.pipert2.utils.exceptions.wires_validation import WiresValidation
+from src.pipert2.core.base.routines import DestinationRoutine, MiddleRoutine, SourceRoutine
 
 
 def validate_wires(wires: List[Wire]):
@@ -11,10 +9,11 @@ def validate_wires(wires: List[Wire]):
                                         link source to middle/end and source/middle to end,
                                         each middle routine is consumed and produced by another routines.
 
-        Throws a pipe_validation_failed if validation failed.
-
     Args:
         wires: Wires to validate.
+
+    Raises:
+        WiresValidation: If validation failed.
     """
 
     validate_existing_source_and_destination_routines(wires)
@@ -23,20 +22,24 @@ def validate_wires(wires: List[Wire]):
 
 
 def validate_routines_place_properly(wires: List[Wire]):
-    """Validate the source and destination routines - Raise a PipeValidationError if source placed as middle or
-    destination routine placed as source routine.
+    """Validate the source and destination routines.
 
     Args:
         wires: Wires to validate.
+
+    Raises:
+        WiresValidation: If source placed as middle or destination routine placed as source routine.
     """
 
     for wire in wires:
         if isinstance(wire.source, DestinationRoutine):
-            raise PipeValidationError("Can't link any destination routine to any routine")
+            raise WiresValidation(f"The destination routine {wire.source.name} "
+                                  f"can't be a source routine to any other routine.")
         else:
             for destination_routine in wire.destinations:
                 if isinstance(destination_routine, SourceRoutine):
-                    raise PipeValidationError("Can't link any routine to source routine")
+                    raise WiresValidation(f"The source routine {destination_routine.name} "
+                                          f"can't be a destination routine to any other routine.")
 
 
 def validate_existing_source_and_destination_routines(wires: List[Wire]):
@@ -44,6 +47,9 @@ def validate_existing_source_and_destination_routines(wires: List[Wire]):
 
     Args:
         wires: Wires to validate.
+
+    Raises:
+        WiresValidation: If source and destination routines don't exist
     """
 
     source_routine_exists = False
@@ -58,9 +64,11 @@ def validate_existing_source_and_destination_routines(wires: List[Wire]):
                 destination_routine_exists = True
 
     if not source_routine_exists:
-        raise PipeValidationError("Source routine doesn't exist")
+        raise WiresValidation("Your pipe doesn't contain any source routine,"
+                              " add a routine for consuming data.")
     if not destination_routine_exists:
-        raise PipeValidationError("Destination routine doesn't exist")
+        raise WiresValidation("Your pipe doesn't contain any destination routine,"
+                              " add a routine for producing result.")
 
 
 def validate_consume_and_produce_on_middle_routines(wires: List[Wire]):
@@ -69,22 +77,27 @@ def validate_consume_and_produce_on_middle_routines(wires: List[Wire]):
 
     Args:
         wires: Wires to validate.
+
+    Raises:
+        WiresValidation: If exists middle routine that doesn't consume or consumed by
     """
 
     middle_routines = {}
 
     for wire in wires:
         if isinstance(wire.source, MiddleRoutine):
-            middle_routines.setdefault(wire.source.name, {"source": True, "destination": False})
-            middle_routines[wire.source.name].update({"source": True})
+            middle_routines.setdefault(wire.source.name, {"destination": True, "source": False})
+            middle_routines[wire.source.name].update({"destination": True})
 
         for destination_routine in wire.destinations:
             if isinstance(destination_routine, MiddleRoutine):
-                middle_routines.setdefault(destination_routine.name, {"destination": True, "source": False})
-                middle_routines[destination_routine.name].update({"destination": True})
+                middle_routines.setdefault(destination_routine.name, {"source": True, "destination": False})
+                middle_routines[destination_routine.name].update({"source": True})
 
     for routine_name, middle_routine in middle_routines.items():
         if not middle_routine["source"]:
-            raise PipeValidationError(f"{routine_name} doesn't have a source routine")
+            raise WiresValidation(f"The routine {routine_name} isn't link to any routine,"
+                                  f"add a routine that consume current routine's result.")
         if not middle_routine["destination"]:
-            raise PipeValidationError(f"{routine_name} doesn't have a destination routine")
+            raise WiresValidation(f"The routine {routine_name} isn't have a destination routine,"
+                                  f"add a routine that produce data from current routine.")

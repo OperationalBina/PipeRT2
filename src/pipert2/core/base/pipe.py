@@ -1,7 +1,7 @@
 from logging import Logger
-from typing import List
-
-from src.pipert2.core.base import wires_validator
+from typing import Dict
+from src.pipert2.utils.exceptions.floating_routine import FloatingRoutine
+from src.pipert2.core.base.wire import wires_validator
 from src.pipert2.core.base.flow import Flow
 from src.pipert2.core.base.wire import Wire
 from src.pipert2.core.base.routine import Routine
@@ -41,7 +41,7 @@ class Pipe:
         self.flows = {}
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
-        self.wires: List[Wire] = []
+        self.wires: Dict[str, Wire] = {}
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -63,13 +63,12 @@ class Pipe:
         flow = Flow(flow_name, self.event_board, self.logger.getChild(flow_name), routines=list(routines))
         self.flows[flow_name] = flow
 
-        flow_data_transmitter = data_transmitter if data_transmitter else self.default_data_transmitter
+        flow_data_transmitter = data_transmitter if data_transmitter is not None else self.default_data_transmitter
 
         if auto_wire:
             for first_routine, second_routine in zip(routines, routines[1:]):
-                self.wires.append(
-                    Wire(source=first_routine, destinations=(second_routine,), data_transmitter=flow_data_transmitter)
-                )
+                wire = Wire(source=first_routine, destinations=(second_routine,), data_transmitter=flow_data_transmitter)
+                self.wires[wire.source.name] = wire
 
     def link(self, *wires):
         """Connect the routines to each other by their wires configuration.
@@ -79,25 +78,48 @@ class Pipe:
 
         """
         for wire in wires:
-            self.wires.append(wire)
+            self.wires[wire.source.name] = wire
 
     def build(self):
         """Build the pipe to be ready to start working.
 
         """
 
-        wires_validator.validate_wires(self.wires)
+        self._validate_pipe()
 
-        for wire in self.wires:
-            data_transmitter = wire.data_transmitter if wire.data_transmitter else self.default_data_transmitter
+        for wire in self.wires.values():
+            data_transmitter = wire.data_transmitter if wire.data_transmitter is not None else self.default_data_transmitter
 
             self.network.link(source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
 
-        # TODO: add validations to pipe architecture
         for flow in self.flows.values():
             flow.build()
 
         self.event_board.build()
+
+    def _validate_pipe(self):
+        """Validate routines and wires in current pipeline.
+
+        Raises:
+            FloatingRoutine: If flows contain a routine that don't link to any other routine.
+            WiresValidation: If wires are not valid.
+        """
+
+        self._validate_flows_routines_are_linked()
+        wires_validator.validate_wires(self.wires.values())
+
+    def _validate_flows_routines_are_linked(self):
+        for flow in self.flows.values():
+            for routine in flow.routines:
+                routine_contained = False
+                for wire in self.wires.values():
+                    if wire.source.name == routine.name or routine in wire.destinations:
+                        routine_contained = True
+                        break
+
+                if not routine_contained:
+                    raise FloatingRoutine(f"The routine {routine.name} "
+                                          f"in flow {flow.name} isn't linked to any other routine.")
 
     def notify_event(self, event_name: str, **event_parameters) -> None:
         """Notify an event has started
