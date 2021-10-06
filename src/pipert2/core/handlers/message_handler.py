@@ -41,6 +41,14 @@ class MessageHandler(ABC):
 
         raise NotImplementedError
 
+    @abstractmethod
+    def teardown(self):
+        """Teardown resources used by the message handler.
+
+        """
+
+        raise NotImplementedError
+
     def put(self, message: Message):
         """Encodes a given message and calls the implemented put method.
 

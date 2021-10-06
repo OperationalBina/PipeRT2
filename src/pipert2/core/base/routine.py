@@ -27,15 +27,17 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     def __init__(self, flow_name: str, name: str = None):
         """
         Args:
-            name: Name of the routine
+            flow_name: Name of the flow containing the routine.
+            name: Name of the routine.
 
         Attributes:
+            flow_name (str): Name of the flow containing the routine.
             name (str): Name of the flow
-            message_handler (MessageHandler): Message handler of the routine to send and receive messages
-            runner_creator (Callback): Callback for running the routine's main logic
-            event_notifier (Callback): Callback for notifying an event has occurred
-            _logger (Logger): The routines logger object
-            stop_event (mp.Event): A multiprocessing event object indicating the routine state (run/stop)
+            message_handler (MessageHandler): Message handler of the routine to send and receive messages.
+            runner_creator (Callback): Callback for running the routine's main logic.
+            event_notifier (Callback): Callback for notifying an event has occurred.
+            _logger (Logger): The routines logger object.
+            stop_event (mp.Event): A multiprocessing event object indicating the routine state (run/stop).
 
         """
 
@@ -97,27 +99,25 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         return cls.runners.all[cls.__name__]
 
     @abstractmethod
-    def setup(self) -> None:
-        """An initial setup before running
-
-        """
-
-        raise NotImplementedError
-
-    @abstractmethod
-    def cleanup(self) -> None:
-        """The final method that ends the routine execution
-
-        """
-
-        raise NotImplementedError
-
-    @abstractmethod
     def _extended_run(self) -> None:
         """Wrapper method for executing the entire routine logic
 
         """
         raise NotImplementedError
+
+    def setup(self) -> None:
+        """An initial setup before running
+
+        """
+
+        pass
+
+    def cleanup(self) -> None:
+        """The final method that ends the routine execution
+
+        """
+
+        self.message_handler.teardown()
 
     @runners("thread")
     def set_runner_as_thread(self):

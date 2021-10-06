@@ -11,17 +11,16 @@ class QueueWrapper:
     queues.
 
     Attributes:
-        th_queue: A multithreading queue. Will be initiated once necessary.
         mp_queue: A multiprocessing queue. Will be initiated once necessary.
         out_queue: Either a multiprocessing or a multithreading queue according to which queues exist.
-        threads: A dictionary of the threads listening to the queues.
+        multiprocess_thread: A thread listening to the multiprocessing queue if it exists.
 
     """
 
-    th_queue = None
-    mp_queue = None
-    out_queue = None
-    threads = {'threading': None, 'multiprocessing': None}
+    def __init__(self):
+        self.mp_queue = None
+        self.out_queue = thQueue(maxsize=1)
+        self.multiprocess_thread = Thread()
 
     def get(self, block: bool, timeout: int):
         """Return whatever is in the out_queue.
@@ -34,6 +33,11 @@ class QueueWrapper:
             A message passed through the queue.
 
         """
+
+        if self.mp_queue is not None:
+            if not self.multiprocess_thread.is_alive():
+                self.multiprocess_thread = Thread(target=self.queue_worker, args=(self.mp_queue,))
+                self.multiprocess_thread.start()
 
         try:
             message = self.out_queue.get(block=block, timeout=timeout)
@@ -56,7 +60,7 @@ class QueueWrapper:
         if process_safe:
             in_queue = self._get_mp_queue()
         else:
-            in_queue = self._get_th_queue()
+            in_queue = self.out_queue
 
         return in_queue
 
@@ -70,50 +74,20 @@ class QueueWrapper:
 
         if self.mp_queue is None:
             self.mp_queue = mpQueue(maxsize=1)
-            self.out_queue = mpQueue(maxsize=1)
-
-            if self.threads['threading'] is not None:
-                force_push_to_queue(self.th_queue, None)
-                self.threads['threading'] = Thread(target=queue_worker, args=(self.th_queue, self.out_queue))
-                self.threads['threading'].start()
-
-            self.threads['multiprocessing'] = Thread(target=queue_worker, args=(self.mp_queue, self.out_queue))
-            self.threads['multiprocessing'].start()
 
         return self.mp_queue
 
-    def _get_th_queue(self):
-        """Start listening to the multithreading queue and create the out_queue to work with multithreading if it
-        doesn't exist.
+    def queue_worker(self, in_queue):
+        """A worker that pushes messages forward to the out_queue.
+        If the in queue receives None, exit the loop.
 
-        Returns:
-            A multithreading queue.
+        Args:
+            in_queue: The queue to listen to until None is received.
 
         """
 
-        if self.th_queue is None:
-            self.th_queue = thQueue(maxsize=1)
-
-            if self.out_queue is None:
-                self.out_queue = thQueue(maxsize=1)
-
-            self.threads['threading'] = Thread(target=queue_worker, args=(self.th_queue, self.out_queue))
-            self.threads['threading'].start()
-
-        return self.th_queue
-
-
-def queue_worker(in_queue, out_queue):
-    """A worker that pushes messages forward to the out_queue.
-
-    Args:
-        in_queue: The queue to listen to until None is received.
-        out_queue: The queue to forward the messages into.
-
-    """
-
-    for item in iter(in_queue.get, None):
-        try:
-            out_queue.put(item)
-        except Full:
-            pass
+        for item in iter(in_queue.get, None):
+            try:
+                self.out_queue.put(item)
+            except Full:
+                pass

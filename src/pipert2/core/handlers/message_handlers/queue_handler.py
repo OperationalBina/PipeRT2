@@ -14,7 +14,7 @@ class QueueHandler(MessageHandler):
 
     """
 
-    def __init__(self, routine_name: str, blocking=False, timeout=1):
+    def __init__(self, routine_name: str, blocking=True, timeout=1):
         super().__init__(routine_name)
         self.input_queue = QueueWrapper()
         self.output_queue = None
@@ -57,3 +57,7 @@ class QueueHandler(MessageHandler):
             self.output_queue.put(message, block=self.blocking, timeout=self.timeout)
         except Full:
             self.logger.exception("The queue is full!")
+
+    def teardown(self):
+        if self.input_queue.mp_queue is not None:
+            self.input_queue.mp_queue.put(None)

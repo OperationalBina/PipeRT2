@@ -37,7 +37,6 @@ class QueueNetwork(Network):
             source: The source routine that generates data.
             destinations: Destination routines that receive the data.
             data_transmitter: The data transmitter that indicates how to transfer the data.
-            external_routine: Whether or not the destination routine is within the same flow as the source.
 
         """
 
