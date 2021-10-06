@@ -1,25 +1,30 @@
 import sys
+import pytest
 import logging
 from src.pipert2.utils.logging_module_modifiers import add_pipe_log_level, \
     PIPE_INFRASTRUCTURE_LOG_LEVEL_NAME, PIPE_INFRASTRUCTURE_LOG_LEVEL
 
 
-def test_plog_works_when_using_his_level(caplog):
-    LOGGING_TEXT = "wow Mayo Meleh"
+@pytest.fixture()
+def pipe_logger():
     add_pipe_log_level()
     logger = logging.getLogger()
     logger.addHandler(logging.StreamHandler(sys.stdout))
-    logger.setLevel(PIPE_INFRASTRUCTURE_LOG_LEVEL)
-    logger.plog(LOGGING_TEXT)
+    logger.setLevel(logging.WARNING)
+    return logger
+
+
+def test_plog_works_when_using_his_level(caplog, pipe_logger):
+    LOGGING_TEXT = "wow Mayo Meleh"
+    pipe_logger.setLevel(PIPE_INFRASTRUCTURE_LOG_LEVEL)
+    pipe_logger.plog(LOGGING_TEXT)
 
     assert f"{PIPE_INFRASTRUCTURE_LOG_LEVEL_NAME}" in caplog.text and LOGGING_TEXT in caplog.text
 
 
-def test_plog_works_when_not_using_his_level(caplog):
+def test_plog_works_when_not_using_his_level(caplog, pipe_logger):
     LOGGING_TEXT = "wow Mayo Meleh"
-    add_pipe_log_level()
-    logger = logging.getLogger()
-    logger.addHandler(logging.StreamHandler(sys.stdout))
-    logger.plog(LOGGING_TEXT)
+    pipe_logger.setLevel(logging.WARNING)
+    pipe_logger.plog(LOGGING_TEXT)
 
     assert f"{PIPE_INFRASTRUCTURE_LOG_LEVEL_NAME}" not in caplog.text and LOGGING_TEXT not in caplog.text
