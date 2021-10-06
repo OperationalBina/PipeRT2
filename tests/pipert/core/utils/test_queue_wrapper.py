@@ -25,7 +25,7 @@ def test_get_queue_not_process_safe(dummy_queue_wrapper):
 
     assert isinstance(return_queue, type(thQueue()))
 
-    dummy_queue_wrapper.th_queue.put(None)
+    dummy_queue_wrapper.out_queue.put(None)
 
 
 def test_get_from_threading_and_processing_queue(dummy_queue_wrapper):
@@ -43,5 +43,4 @@ def test_get_from_threading_and_processing_queue(dummy_queue_wrapper):
     with pytest.raises(Empty):
         dummy_queue_wrapper.get(block=True, timeout=1)
 
-    thread_queue.put(None)
     process_queue.put(None)
