@@ -1,4 +1,3 @@
-import logging
 from logging import Logger
 from src.pipert2.core.base.flow import Flow
 from src.pipert2.core.base.wire import Wire
