@@ -6,8 +6,8 @@ from src.pipert2.core.managers.network import Network
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from src.pipert2.core.base.data_transmitter import DataTransmitter
-from src.pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 from src.pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
+from src.pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 
 add_pipe_log_level()
 
