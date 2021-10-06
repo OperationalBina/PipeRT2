@@ -7,8 +7,8 @@ PIPE_INFRASTRUCTURE_LOG_LEVEL_NAME = "PIPE_INFRASTRUCTURE"
 
 def add_pipe_log_level():
     """Add a new log level to the logging module named PIPE_INFRASTRUCTURE.
-    You can use this level using the plog method in the Logger.
-    The level of PIPE_INFRASTRUCTURE is below the DEBUG level (10).
+    You can use this level by using the plog method in the Logger.
+    The level of PIPE_INFRASTRUCTURE is smaller than DEBUG level (10).
 
 
     Examples:
