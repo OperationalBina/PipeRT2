@@ -7,7 +7,7 @@ from src.pipert2.core.managers.network import Network
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from src.pipert2.core.base.data_transmitter import DataTransmitter
-from src.pipert2.utils.logging_module_modifiers import add_pipe_log_level
+from src.pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 from src.pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 
 add_pipe_log_level()
@@ -21,7 +21,8 @@ class Pipe:
 
     """
 
-    def __init__(self, network: Network, logger: Logger, data_transmitter: DataTransmitter = BasicTransmitter()):  # TODO - default logger and default networking (Queue)
+    def __init__(self, network: Network, logger: Logger = get_default_print_logger("Pipe"),
+                 data_transmitter: DataTransmitter = BasicTransmitter()):  # TODO - default networking (Queue)
         """
         Args:
             network: Network object responsible for the routine's communication.

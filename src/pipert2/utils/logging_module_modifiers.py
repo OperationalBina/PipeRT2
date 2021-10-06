@@ -1,7 +1,9 @@
 import logging
+import sys
 
 PIPE_INFRASTRUCTURE_LOG_LEVEL = 5
 PIPE_INFRASTRUCTURE_LOG_LEVEL_NAME = "PIPE_INFRASTRUCTURE"
+
 
 def add_pipe_log_level():
     """Add a new log level to the logging module named PIPE_INFRASTRUCTURE.
@@ -26,3 +28,10 @@ def add_pipe_log_level():
             self._log(PIPE_INFRASTRUCTURE_LOG_LEVEL, message, args, **kws)
 
     logging.Logger.plog = plog
+
+
+def get_default_print_logger(logger_name):
+    logger = logging.getLogger(logger_name)
+    logger.addHandler(logging.StreamHandler(sys.stdout))
+    logger.setLevel(logging.INFO)
+    return logger
