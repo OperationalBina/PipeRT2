@@ -18,16 +18,11 @@ class MiddleRoutine(Routine, metaclass=ABCMeta):
         raise NotImplementedError
 
     def _extended_run(self) -> None:
-        self.setup()
-
-        while not self.stop_event.is_set():
-            message = self.message_handler.get()
-            try:
-                output_data = self.main_logic(message.get_data())
-            except Exception as error:
-                self._logger.exception(f"The routine has crashed: {error}")
-            else:
-                message.update_data(output_data)
-                self.message_handler.put(message)
-
-        self.cleanup()
+        message = self.message_handler.get()
+        try:
+            output_data = self.main_logic(message.get_data())
+        except Exception as error:
+            self._logger.exception(f"The routine has crashed: {error}")
+        else:
+            message.update_data(output_data)
+            self.message_handler.put(message)
