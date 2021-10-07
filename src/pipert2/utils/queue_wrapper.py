@@ -101,5 +101,7 @@ class QueueWrapper:
 
         """
 
-        if (self.mp_queue is not None) and (self.multiprocess_thread.is_alive()):
-            self.mp_queue.put(None)
+        if self.mp_queue is not None:
+            while self.multiprocess_thread.is_alive():
+                self.mp_queue.put(None)
+                self.multiprocess_thread.join(timeout=0.1)
