@@ -39,11 +39,15 @@ class QueueNetwork(Network):
             data_transmitter: The data transmitter that indicates how to transfer the data.
 
         """
+
         publish_queue = PublishQueue()
 
         for destination_routine in destinations:
-            destination_routine.message_handler.input_queue = \
-                publish_queue.register(destination_routine.message_handler.input_queue)
+            if source.flow_name == destination_routine.flow_name:
+                publish_queue.register(destination_routine.message_handler.input_queue.get_queue(process_safe=False))
+            else:
+                publish_queue.register(destination_routine.message_handler.input_queue.get_queue(process_safe=True))
+
             destination_routine.message_handler.receive = data_transmitter.receive()
 
         source.message_handler.output_queue = publish_queue

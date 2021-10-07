@@ -1,19 +1,4 @@
-import os
-from queue import Full
-from typing import Optional
-from functools import wraps
-from multiprocessing import Manager, Queue
-
-
-def ensure_parent(func):
-    @wraps(func)
-    def inner(self, *args, **kwargs):
-        if os.getpid() != self._creator_pid:
-            raise RuntimeError("{} can only be called in the "
-                               "parent.".format(func.__name__))
-        return func(self, *args, **kwargs)
-
-    return inner
+from queue import Full, Empty, Queue
 
 
 class PublishQueue(object):
@@ -23,26 +8,14 @@ class PublishQueue(object):
 
     def __init__(self):
         self._queues = []
-        self._creator_pid = os.getpid()
 
-    @ensure_parent
-    def register(self, queue: Optional[Queue]):
+    def register(self, queue: Queue):
         """Register a new queue to publish to.
-
-        Returns:
-            A multiprocessing queue object.
 
         """
 
-        if queue is not None:
-            q = queue
-        else:
-            q = Manager().Queue(maxsize=1)
-        self._queues.append(q)
+        self._queues.append(queue)
 
-        return q
-
-    @ensure_parent
     def put(self, value, block=False, timeout=1):
         """Publish a value to every registered queue.
 
@@ -75,8 +48,11 @@ def force_push_to_queue(queue: Queue, value):
     try:
         queue.put(value, block=False)
     except Full:
-        queue.get(block=False)
+        try:
+            queue.get(block=False)
+        except Empty:
+            pass
         try:
             queue.put(value, block=False)
-        except Full as e:
-            raise e
+        except Full:
+            pass

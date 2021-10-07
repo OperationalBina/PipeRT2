@@ -1,5 +1,6 @@
 from queue import Full, Empty
 from src.pipert2.core.handlers.message_handler import MessageHandler
+from src.pipert2.utils.queue_wrapper import QueueWrapper
 from src.pipert2.utils.exceptions.queue_not_initialized import QueueNotInitialized
 
 
@@ -13,9 +14,9 @@ class QueueHandler(MessageHandler):
 
     """
 
-    def __init__(self, routine_name: str, blocking=False, timeout=1):
+    def __init__(self, routine_name: str, blocking=True, timeout=1):
         super().__init__(routine_name)
-        self.input_queue = None
+        self.input_queue = QueueWrapper()
         self.output_queue = None
         self.blocking = blocking
         self.timeout = timeout
@@ -32,12 +33,10 @@ class QueueHandler(MessageHandler):
 
         message = None
 
-        if self.input_queue is not None:  # TODO: If a queue doesn't exist, an exception is supposed to occur at pipe
-                                                # base
-            try:
-                message = self.input_queue.get(block=self.blocking, timeout=self.timeout)
-            except Empty:
-                pass
+        try:
+            message = self.input_queue.get(block=self.blocking, timeout=self.timeout)
+        except Empty:
+            pass
 
         return message
 
@@ -58,3 +57,6 @@ class QueueHandler(MessageHandler):
             self.output_queue.put(message, block=self.blocking, timeout=self.timeout)
         except Full:
             self.logger.exception("The queue is full!")
+
+    def teardown(self):
+        self.input_queue.kill_queue_worker()
