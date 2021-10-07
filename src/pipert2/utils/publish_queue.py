@@ -54,5 +54,5 @@ def force_push_to_queue(queue: Queue, value):
             pass
         try:
             queue.put(value, block=False)
-        except Full as e:
+        except Full:
             pass

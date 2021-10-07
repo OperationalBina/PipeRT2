@@ -59,5 +59,4 @@ class QueueHandler(MessageHandler):
             self.logger.exception("The queue is full!")
 
     def teardown(self):
-        if self.input_queue.mp_queue is not None:
-            self.input_queue.mp_queue.put(None)
+        self.input_queue.kill_queue_worker()

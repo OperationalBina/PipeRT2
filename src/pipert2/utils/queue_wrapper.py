@@ -36,8 +36,7 @@ class QueueWrapper:
 
         if self.mp_queue is not None:
             if not self.multiprocess_thread.is_alive():
-                self.multiprocess_thread = Thread(target=self.queue_worker, args=(self.mp_queue,))
-                self.multiprocess_thread.start()
+                self.restart_queue_worker()
 
         try:
             message = self.out_queue.get(block=block, timeout=timeout)
@@ -77,17 +76,30 @@ class QueueWrapper:
 
         return self.mp_queue
 
-    def queue_worker(self, in_queue):
+    def queue_worker(self):
         """A worker that pushes messages forward to the out_queue.
-        If the in queue receives None, exit the loop.
-
-        Args:
-            in_queue: The queue to listen to until None is received.
+        If the input queue (`self.mp_queue`) receives None, exit the loop.
 
         """
 
-        for item in iter(in_queue.get, None):
+        for item in iter(self.mp_queue.get, None):
             try:
                 self.out_queue.put(item)
             except Full:
                 pass
+
+    def restart_queue_worker(self):
+        """Restarts the queue worker.
+
+        """
+
+        self.multiprocess_thread = Thread(target=self.queue_worker)
+        self.multiprocess_thread.start()
+
+    def kill_queue_worker(self):
+        """Kills the queue worker.
+
+        """
+
+        if (self.mp_queue is not None) and (self.multiprocess_thread.is_alive()):
+            self.mp_queue.put(None)
