@@ -24,15 +24,14 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     runners = class_functions_dictionary()
     routines_created_counter = 0
 
-    def __init__(self, flow_name: str, name: str = None):
+    def __init__(self, name: str = None):
         """
         Args:
-            flow_name: Name of the flow containing the routine.
             name: Name of the routine.
 
         Attributes:
-            flow_name (str): Name of the flow containing the routine.
             name (str): Name of the flow
+            flow_name (str): Name of the flow containing the routine.
             message_handler (MessageHandler): Message handler of the routine to send and receive messages.
             runner_creator (Callback): Callback for running the routine's main logic.
             event_notifier (Callback): Callback for notifying an event has occurred.
@@ -47,7 +46,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.name = f"{self.__class__.__name__}-{self.routines_created_counter}"
             self.routines_created_counter += 1
 
-        self.flow_name = flow_name
+        self.flow_name = None
         self.message_handler: MessageHandler = None
         self.runner_creator = None
         self.event_notifier: Callable = Dummy()

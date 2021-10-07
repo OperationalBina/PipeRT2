@@ -45,6 +45,7 @@ class Flow(EventExecutorInterface):
 
         for routine in routines:
             routine.set_logger(logger=logger.getChild(routine.name))
+            routine.flow_name = self.name
             flow_events_to_listen.update(routine.get_events().keys())
             self.routines[routine.name] = routine
 

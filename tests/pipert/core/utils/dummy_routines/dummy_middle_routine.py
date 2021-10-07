@@ -7,7 +7,7 @@ DUMMY_ROUTINE_EVENT = Method("Change")
 class DummyMiddleRoutine(MiddleRoutine):
 
     def __init__(self, counter=0, **kwargs):
-        super().__init__(flow_name='dummy', **kwargs)
+        super().__init__(**kwargs)
         self.counter = counter
         self.inc = True
 
@@ -31,7 +31,7 @@ class DummyMiddleRoutine(MiddleRoutine):
 class DummyMiddleRoutineException(MiddleRoutine):
 
     def __init__(self, counter=0, **kwargs):
-        super().__init__(flow_name='dummy', **kwargs)
+        super().__init__(**kwargs)
         self.counter = counter
         self.inc = True
 
