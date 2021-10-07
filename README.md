@@ -11,3 +11,6 @@ Real-time pipeline for video analytics. V2
     <img src="https://codecov.io/gh/OperationalBina/PipeRT2/branch/master/graph/badge.svg?token=ze7192iCby"/>
   </a>
 </p>
+
+
+The pipe logs his actions using the logging module at the level of PIPE_INFRASTRUCTURE_LOG_LEVEL.

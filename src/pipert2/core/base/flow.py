@@ -75,11 +75,11 @@ class Flow(EventExecutorInterface):
 
     @events(START_EVENT_NAME)
     def start(self):
-        self._logger.info("Starting")
+        self._logger.plog("Starting")
 
     @events(STOP_EVENT_NAME)
     def stop(self):
-        self._logger.info("Stopping")
+        self._logger.plog("Stopping")
 
     def execute_event(self, event: Method) -> None:
         """Execute the event callbacks in the flow and its routines.
