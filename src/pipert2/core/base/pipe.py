@@ -1,15 +1,18 @@
 from logging import Logger
 from typing import Dict
-from src.pipert2.utils.exceptions.floating_routine import FloatingRoutine
-from src.pipert2.core.base.wire import wires_validator
 from src.pipert2.core.base.flow import Flow
 from src.pipert2.core.base.wire import Wire
 from src.pipert2.core.base.routine import Routine
 from src.pipert2.core.managers.network import Network
+from src.pipert2.core.base.wire import wires_validator
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from src.pipert2.core.base.data_transmitter import DataTransmitter
+from src.pipert2.utils.exceptions.floating_routine import FloatingRoutine
 from src.pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
+from src.pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
+
+add_pipe_log_level()
 
 
 class Pipe:
@@ -20,7 +23,8 @@ class Pipe:
 
     """
 
-    def __init__(self, network: Network, logger: Logger, data_transmitter: DataTransmitter = BasicTransmitter()):  # TODO - default logger and default networking (Queue)
+    def __init__(self, network: Network, logger: Logger = get_default_print_logger("Pipe"),
+                 data_transmitter: DataTransmitter = BasicTransmitter()):  # TODO - default networking (Queue)
         """
         Args:
             network: Network object responsible for the routine's communication.
@@ -77,6 +81,7 @@ class Pipe:
             wires (Wire): List of wires to connect their routines
 
         """
+
         for wire in wires:
             self.wires[wire.source.name] = wire
 
@@ -118,10 +123,10 @@ class Pipe:
         for flow in self.flows.values():
             flow.join()
 
-        self.logger.debug(f"Joined all flows") # TODO - Maybe remove these logs
+        self.logger.plog(f"Joined all flows")
 
         self.event_board.join()
-        self.logger.debug(f"Joined event board")
+        self.logger.plog(f"Joined event board")
 
     def _validate_pipe(self):
         """Validate routines and wires in current pipeline.
