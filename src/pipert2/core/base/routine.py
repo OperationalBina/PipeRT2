@@ -131,7 +131,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """
 
         if self.stop_event.is_set():
-            self._logger.plog("Starting")  # TODO - Maybe add an infrastructure logg type instead of info
+            self._logger.plog("Starting")
             self.stop_event.clear()
             self.runner = self.runner_creator()
             self.runner.start()

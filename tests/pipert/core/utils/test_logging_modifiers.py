@@ -14,7 +14,7 @@ def pipe_logger():
     return logger
 
 
-def test_plog_log_works_when_using_his_level_expecting_the_log_showing(caplog, pipe_logger):
+def test_plog_when_using_his_level_expecting_the_log_showing(caplog, pipe_logger):
     LOGGING_TEXT = "wow Mayo Meleh"
     pipe_logger.setLevel(PIPE_INFRASTRUCTURE_LOG_LEVEL)
     pipe_logger.plog(LOGGING_TEXT)
