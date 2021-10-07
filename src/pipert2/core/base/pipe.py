@@ -115,7 +115,7 @@ class Pipe:
         for flow in self.flows.values():
             flow.join()
 
-        self.logger.plog(f"Joined all flows") # TODO - Maybe remove these logs
+        self.logger.plog(f"Joined all flows")
 
         self.event_board.join()
         self.logger.plog(f"Joined event board")
