@@ -1,4 +1,4 @@
-from src.pipert2.core.base.routines.destination_routine import DestinationRoutine
+from pipert2.core.base.routines import DestinationRoutine
 
 
 class DummyDestinationRoutine(DestinationRoutine):

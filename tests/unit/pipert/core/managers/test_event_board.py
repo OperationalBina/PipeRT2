@@ -1,7 +1,7 @@
 import pytest
 from mock import patch
-from src.pipert2.core.managers.event_board import EventBoard
-from src.pipert2.utils.dummy_object import Dummy
+from pipert2.utils.dummy_object import Dummy
+from pipert2.core.managers.event_board import EventBoard
 from tests.unit.pipert.core.utils.events_utils import EVENT1, START_EVENT, KILL_EVENT, STOP_EVENT
 
 EVENTS = [START_EVENT, EVENT1, STOP_EVENT, KILL_EVENT]
@@ -15,7 +15,7 @@ def dummy_event_board():
 
 @pytest.fixture()
 def dummy_event_board_no_thread():
-    with patch('src.pipert2.core.managers.event_board.Thread', return_value=Dummy()):
+    with patch('pipert2.core.managers.event_board.Thread', return_value=Dummy()):
         dummy_event_board = EventBoard()
         yield dummy_event_board
 

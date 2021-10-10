@@ -1,5 +1,5 @@
 from pytest_mock import MockerFixture
-from src.pipert2.utils.dummy_object import Dummy
+from pipert2.utils.dummy_object import Dummy
 from tests.unit.pipert.core.utils.dummy_routines.dummy_source_routine import DummySourceRoutine, DummySourceRoutineException
 
 MAX_TIMEOUT_WAITING = 3
@@ -43,6 +43,3 @@ def test_throws_exception(mocker: MockerFixture):
 
     assert message_handler.put.call_count == 0
     assert message_handler.get.call_count == 0
-
-
-

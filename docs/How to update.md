@@ -20,6 +20,3 @@ make html
 
 
 Now all you have to do is to push to master (After CR of course)
-
-
-

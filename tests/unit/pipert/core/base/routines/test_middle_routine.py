@@ -1,7 +1,7 @@
 import pytest
 from functools import partial
 from pytest_mock import MockerFixture
-from src.pipert2.utils.dummy_object import Dummy
+from pipert2.utils.dummy_object import Dummy
 from tests.unit.pipert.core.utils.dummy_routines.dummy_middle_routine import DummyMiddleRoutine, DUMMY_ROUTINE_EVENT, \
     DummyMiddleRoutineException
 from tests.unit.pipert.core.utils.functions_test_utils import timeout_wrapper

@@ -2,7 +2,7 @@ import time
 import pytest
 from queue import Queue as thQueue, Empty
 from multiprocessing import Queue as mpQueue
-from src.pipert2.utils.queue_wrapper import QueueWrapper
+from pipert2.utils.queue_wrapper import QueueWrapper
 
 
 @pytest.fixture()

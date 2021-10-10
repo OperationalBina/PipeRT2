@@ -1,9 +1,9 @@
 import pytest
 from pytest_mock import MockerFixture
-from src.pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
-from src.pipert2 import Wire
-from src.pipert2.core.base.wire import wires_validator
-from src.pipert2.utils.exceptions.wires_validation import WiresValidation
+from pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
+from pipert2 import Wire
+from pipert2.core.base.wire import wires_validator
+from pipert2.utils.exceptions import WiresValidation
 
 
 @pytest.fixture()

@@ -1,6 +1,6 @@
 import pytest
 from pytest_mock import MockerFixture
-from src.pipert2.utils.dummy_object import Dummy
+from pipert2.utils.dummy_object import Dummy
 from tests.unit.pipert.core.utils.dummy_routines.dummy_destination_routine import DummyDestinationRoutine
 
 MAX_TIMEOUT_WAITING = 3

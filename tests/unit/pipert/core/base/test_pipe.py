@@ -1,16 +1,17 @@
 import pytest
 from mock import patch, Mock
+from collections import defaultdict
 from pytest_mock import MockerFixture
-from src.pipert2.utils.exceptions.floating_routine import FloatingRoutine
-from src.pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
-from src.pipert2.core.base.pipe import Pipe
-from src.pipert2.core.base.wire import Wire
+from pipert2 import Wire
+from pipert2.core.base.pipe import Pipe
+from pipert2.utils.exceptions import FloatingRoutine
+from pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
 
 
 @pytest.fixture()
 def dummy_pipe():
-    with patch('src.pipert2.core.base.pipe.Flow'):
-        with patch('src.pipert2.core.base.pipe.EventBoard'):
+    with patch('pipert2.core.base.pipe.Flow'):
+        with patch('pipert2.core.base.pipe.EventBoard'):
             pipe = Pipe(network=Mock(), logger=Mock())
             yield pipe
 
@@ -137,7 +138,7 @@ def test_notify_event(dummy_pipe: Pipe):
     EVENT_PARAMS = {"State": True}
     dummy_pipe.notify_event(EVENT_NAME, **EVENT_PARAMS)
     event_board_mock: Mock = dummy_pipe.event_board
-    event_board_mock.notify_event.assert_called_with(EVENT_NAME, {}, **EVENT_PARAMS)
+    event_board_mock.notify_event.assert_called_with(EVENT_NAME, defaultdict(list), **EVENT_PARAMS)
 
 
 def test_join(dummy_pipe_with_flows):
