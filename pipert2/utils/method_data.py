@@ -15,7 +15,7 @@ class Method:
     specific_flow_routines: Dict[str, Optional[list]] = field(default_factory=lambda: defaultdict(list))
     params: dict = field(default_factory=lambda: {})
 
-    def is_apply_on_flow(self, flow_name_to_validate: str):
+    def is_applied_on_flow(self, flow_name_to_validate: str):
         """Check if current method apply on the given flow.
 
         Args:
@@ -30,7 +30,7 @@ class Method:
         else:
             return True
 
-    def is_apply_on_specific_routines(self, flow_name_to_validate: str):
+    def is_applied_on_specific_routines(self, flow_name_to_validate: str):
         """Check if current method applies on specific routines.
 
         Args:
