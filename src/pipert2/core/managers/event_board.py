@@ -69,10 +69,10 @@ class EventBoard:
 
         """
 
-        def notify_event(event_name, output_event_queue, routines_by_flow: dict = {}, **params):
+        def notify_event(output_event_queue, event_name, routines_by_flow: dict = {}, **params):
             output_event_queue.put(Method(event_name, routines_by_flow=routines_by_flow, params=params))
 
-        return partial(notify_event, output_event_queue=self.new_events_queue)
+        return partial(notify_event, self.new_events_queue)
 
     def notify_event(self, event_name, routines_by_flow: dict = {}, **params):
         self.new_events_queue.put(Method(event_name=event_name,
