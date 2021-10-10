@@ -1,3 +1,4 @@
+from collections import defaultdict
 from logging import Logger
 from typing import Dict
 from pipert2.core.base.flow import Flow
@@ -102,7 +103,7 @@ class Pipe:
 
         self.event_board.build()
 
-    def notify_event(self, event_name: str, specific_flows_to_routines: dict = None, **event_parameters) -> None:
+    def notify_event(self, event_name: str, specific_flows_to_routines: dict = defaultdict(list), **event_parameters) -> None:
         """Notify an event has started
 
         Args:
@@ -152,7 +153,7 @@ class Pipe:
         """
 
         for flow in self.flows.values():
-            for routine in flow.routines:
+            for routine in flow.routines.values():
                 routine_contained = False
                 for wire in self.wires.values():
                     if wire.source.name == routine.name or routine in wire.destinations:
