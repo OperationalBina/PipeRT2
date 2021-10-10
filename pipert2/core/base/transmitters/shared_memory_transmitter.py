@@ -40,22 +40,23 @@ class SharedMemoryTransmitter(DataTransmitter):
 
             return_dict = {}
 
-            for key, value in data.items():
-                try:
-                    new_val = bytes(value)
-                except TypeError:
-                    return_dict[key] = value
-                else:
-                    if len(new_val) >= self.data_size_threshold:
-                        address = SharedMemoryManager().write_to_mem(new_val)
-
-                        if type(value) == np.ndarray:
-                            return_dict[key] = {"address": address, "size": len(new_val), "shape": value.shape,
-                                                "dtype": value.dtype}
-                        else:
-                            return_dict[key] = {"address": address, "size": len(new_val)}
-                    else:
+            if data is not None:
+                for key, value in data.items():
+                    try:
+                        new_val = bytes(value)
+                    except TypeError:
                         return_dict[key] = value
+                    else:
+                        if len(new_val) >= self.data_size_threshold:
+                            address = SharedMemoryManager().write_to_mem(new_val)
+
+                            if type(value) == np.ndarray:
+                                return_dict[key] = {"address": address, "size": len(new_val), "shape": value.shape,
+                                                    "dtype": value.dtype}
+                            else:
+                                return_dict[key] = {"address": address, "size": len(new_val)}
+                        else:
+                            return_dict[key] = value
 
             return return_dict
 
@@ -97,7 +98,7 @@ class SharedMemoryTransmitter(DataTransmitter):
                             returned_value = np.frombuffer(returned_value, dtype=value["dtype"])
                             returned_value = returned_value.reshape(value["shape"])
 
-                    if returned_value:
+                    if returned_value is not None:
                         return_dict[key] = returned_value
                     else:
                         return_dict[key] = value
