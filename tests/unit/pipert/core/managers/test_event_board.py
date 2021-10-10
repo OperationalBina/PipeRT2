@@ -2,7 +2,7 @@ import pytest
 from mock import patch
 from src.pipert2.core.managers.event_board import EventBoard
 from src.pipert2.utils.dummy_object import Dummy
-from tests.pipert.core.utils.events_utils import EVENT1, START_EVENT, KILL_EVENT, STOP_EVENT
+from tests.unit.pipert.core.utils.events_utils import EVENT1, START_EVENT, KILL_EVENT, STOP_EVENT
 
 EVENTS = [START_EVENT, EVENT1, STOP_EVENT, KILL_EVENT]
 

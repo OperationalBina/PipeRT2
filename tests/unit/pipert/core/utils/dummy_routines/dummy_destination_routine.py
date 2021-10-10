@@ -5,7 +5,7 @@ from src.pipert2.core.base.routines.destination_routine import DestinationRoutin
 class DummyDestinationRoutine(DestinationRoutine):
     
     def __init__(self):
-        super(DummyDestinationRoutine, self).__init__(name="dummy_end_routine")
+        super(DummyDestinationRoutine, self).__init__(flow_name="dummy", name="dummy_end_routine")
         self.counter = 0
 
     def main_logic(self, data) -> None:

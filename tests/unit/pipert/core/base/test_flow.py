@@ -4,7 +4,7 @@ from pytest_mock import MockerFixture
 from src.pipert2.core.base.flow import Flow
 from src.pipert2.utils.method_data import Method
 from src.pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
-from tests.pipert.core.utils.events_utils import START_EVENT, EVENT1, KILL_EVENT, STOP_EVENT
+from tests.unit.pipert.core.utils.events_utils import START_EVENT, EVENT1, KILL_EVENT, STOP_EVENT
 
 
 FIRST_ROUTINE_NAME = "R1"
