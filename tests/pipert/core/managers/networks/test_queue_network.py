@@ -1,8 +1,8 @@
 import pytest
 from mock import Mock
-from src.pipert2.utils.publish_queue import PublishQueue
-from src.pipert2.utils.queue_wrapper import QueueWrapper
-from src.pipert2.core.managers.networks.queue_network import QueueNetwork
+from pipert2.utils.publish_queue import PublishQueue
+from pipert2.utils.queue_wrapper import QueueWrapper
+from pipert2.core.managers.networks.queue_network import QueueNetwork
 
 
 @pytest.fixture

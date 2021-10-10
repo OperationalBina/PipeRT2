@@ -1,16 +1,18 @@
+from collections import defaultdict
+
 import pytest
 from mock import patch, Mock
 from pytest_mock import MockerFixture
-from src.pipert2.utils.exceptions.floating_routine import FloatingRoutine
-from src.pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
-from src.pipert2.core.base.pipe import Pipe
-from src.pipert2.core.base.wire import Wire
+from pipert2.utils.exceptions import FloatingRoutine
+from pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
+from pipert2.core.base.pipe import Pipe
+from pipert2 import Wire
 
 
 @pytest.fixture()
 def dummy_pipe():
-    with patch('src.pipert2.core.base.pipe.Flow'):
-        with patch('src.pipert2.core.base.pipe.EventBoard'):
+    with patch('pipert2.core.base.pipe.Flow'):
+        with patch('pipert2.core.base.pipe.EventBoard'):
             pipe = Pipe(network=Mock(), logger=Mock())
             yield pipe
 
@@ -101,7 +103,8 @@ def test_build_floating_routine_build_raises_error(mocker: MockerFixture):
 
     dummy_flow1 = mocker.MagicMock()
     dummy_flow1.name = "flow1"
-    dummy_flow1.routines = [dummy_routine1, dummy_routine2]
+    dummy_flow1.routines = {"r1": dummy_routine1,
+                            "r2": dummy_routine2}
 
     dummy_routine3 = mocker.MagicMock()
     dummy_routine3.name = "r3"
@@ -114,7 +117,9 @@ def test_build_floating_routine_build_raises_error(mocker: MockerFixture):
 
     dummy_flow2 = mocker.MagicMock()
     dummy_flow2.name = "flow2"
-    dummy_flow2.routines = [dummy_routine3, dummy_routine4, dummy_routine5]
+    dummy_flow2.routines = {"r3": dummy_routine3,
+                            "r4": dummy_routine4,
+                            "r5": dummy_routine5}
 
     pipe.flows = {"flow1": dummy_flow1, "flow2": dummy_flow2}
 
@@ -134,7 +139,7 @@ def test_notify_event(dummy_pipe: Pipe):
     EVENT_PARAMS = {"State": True}
     dummy_pipe.notify_event(EVENT_NAME, **EVENT_PARAMS)
     event_board_mock: Mock = dummy_pipe.event_board
-    event_board_mock.notify_event.assert_called_with(EVENT_NAME, **EVENT_PARAMS)
+    event_board_mock.notify_event.assert_called_with(EVENT_NAME, defaultdict(list), **EVENT_PARAMS)
 
 
 def test_join(dummy_pipe_with_flows):

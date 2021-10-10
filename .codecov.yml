@@ -20,11 +20,11 @@ coverage:
 ignore:
   - "tests/"
   - "docs/"
-  - "src/pipert2/utils/data_class/"
-  
+  - "pipert2/utils/data_class/"
+
 flags:
   # filter the folder(s) you wish to measure by that flag
   base_pipe:
     # only include files in the backend folder
     paths:
-      - src/pipert2/
+      - pipert2/

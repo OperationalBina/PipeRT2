@@ -1,4 +1,4 @@
-from src.pipert2.core.base.routines.source_routine import SourceRoutine
+from pipert2.core.base.routines import SourceRoutine
 
 
 class DummySourceRoutine(SourceRoutine):

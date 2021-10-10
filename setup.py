@@ -23,7 +23,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="PipeRT",
-    version=get_version("src/pipert2/__init__.py"),
+    version=get_version("pipert2/__init__.py"),
     author="digitalTevel",
     author_email="digitalTevel@gmail.com",
     description="Real-time pipeline 4 analytics",
@@ -38,8 +38,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src"),
+    packages=setuptools.find_packages(),
     install_requires=["posix-ipc", "numpy"],
     python_requires=">=3.6",
 )
