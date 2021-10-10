@@ -157,17 +157,20 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        EventExecutorInterface.execute_event(self, event)  # TODO - Can be removed but i think it should stay
+        EventExecutorInterface.execute_event(self, event)
 
-    def notify_event(self, event_name: str, **event_params) -> None:
-        """Notify that an event has happened
+    def notify_event(self, event_name: str, routines_by_flow: dict = {}, **event_parameters) -> None:
+        """Notify an event has started
 
         Args:
             event_name: The name of the event to notify
+            routines_by_flow: Which flows and routines to notify about the event, the dictionary in the format of
+                                flows as keys and list of routines in the flow as value.
+            **event_parameters: Parameters for the event to be executed
 
         """
 
-        self.event_notifier(event_name, **event_params)
+        self.event_notifier(event_name, routines_by_flow,  **event_parameters)
 
     def join(self):
         """Block until all routine thread terminates
