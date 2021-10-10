@@ -28,7 +28,8 @@ class SourceRoutine(Routine, metaclass=ABCMeta):
             except Exception as error:
                 self._logger.exception(f"The routine has crashed: {error}")
             else:
-                message = Message(output_data, source_address=self.name)
-                self.message_handler.put(message)
+                if output_data is not None:
+                    message = Message(output_data, source_address=self.name)
+                    self.message_handler.put(message)
 
         self.cleanup()
