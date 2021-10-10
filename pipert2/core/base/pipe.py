@@ -103,19 +103,18 @@ class Pipe:
 
         self.event_board.build()
 
-    def notify_event(self, event_name: str, specific_flows_to_routines: dict = defaultdict(list), **event_parameters) -> None:
+    def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list), **event_parameters) -> None:
         """Notify an event has started
 
         Args:
             event_name: The name of the event to notify
-            specific_flows_to_routines: For notify specific routines/flows we insert a dictionary in this format -
-            For specific routines in specific flow, each key/value element need to be in this format - "flow_name": [routines]
-            For all routines in specific flow, each element need to be in this format - "flow_name" - []
-
+            specific_flow_routines: In order to notify specific routines/flows we insert a dictionary in the following format -
+            For specific routines in a specific flow, each key/value element needs to be in this format - "flow_name": [routines]
+            For all of the routines in a specific flow, each element needs to be in this format - "flow_name" - []
 
         """
 
-        self.event_board.notify_event(event_name, specific_flows_to_routines, **event_parameters)
+        self.event_board.notify_event(event_name, specific_flow_routines, **event_parameters)
 
     def join(self, to_kill=False):
         """Block the execution until all of the flows have been killed

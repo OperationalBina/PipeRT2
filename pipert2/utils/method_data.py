@@ -12,18 +12,36 @@ else:
 @dataclass
 class Method:
     event_name: str
-    routines_by_flow: Dict[str, Optional[list]] = field(default_factory=lambda: defaultdict(list))
+    specific_flow_routines: Dict[str, Optional[list]] = field(default_factory=lambda: defaultdict(list))
     params: dict = field(default_factory=lambda: {})
 
-    def is_flow_valid(self, flow_name_to_validate: str):
-        if self.routines_by_flow is not None and any(self.routines_by_flow):
-            return flow_name_to_validate in self.routines_by_flow
+    def is_apply_on_flow(self, flow_name_to_validate: str):
+        """Check if current method apply on the given flow.
+
+        Args:
+            flow_name_to_validate: The flow name to validate.
+
+        Returns:
+            True if flow can run, false otherwise.
+        """
+
+        if self.specific_flow_routines is not None and any(self.specific_flow_routines):
+            return flow_name_to_validate in self.specific_flow_routines
         else:
             return True
 
-    def do_run_specific_routines(self, flow_name_to_validate: str):
-        if self.routines_by_flow is not None and any(self.routines_by_flow):
-            return flow_name_to_validate in self.routines_by_flow and \
-                   self.routines_by_flow.get(flow_name_to_validate)
+    def is_apply_on_specific_routines(self, flow_name_to_validate: str):
+        """Check if current method applies on specific routines.
+
+        Args:
+            flow_name_to_validate: The flow name to validate.
+
+        Returns:
+            True if method applies on specific routines, false otherwise.
+        """
+
+        if self.specific_flow_routines is not None and any(self.specific_flow_routines):
+            return flow_name_to_validate in self.specific_flow_routines and \
+                   self.specific_flow_routines.get(flow_name_to_validate)
         else:
             return False
