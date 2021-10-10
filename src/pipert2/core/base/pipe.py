@@ -1,5 +1,5 @@
-from logging import Logger
 from typing import Dict
+from logging import Logger
 from src.pipert2.core.base.flow import Flow
 from src.pipert2.core.base.wire import Wire
 from src.pipert2.core.base.routine import Routine
@@ -102,15 +102,18 @@ class Pipe:
 
         self.event_board.build()
 
-    def notify_event(self, event_name: str, **event_parameters) -> None:
+    def notify_event(self, event_name: str, routines_by_flow: dict = {}, **event_parameters) -> None:
         """Notify an event has started
 
-        Args:
-            event_name: The name of the event to notify
+            Args:
+                event_name: The name of the event to notify
+                routines_by_flow: Which flows and routines to notify about the event, the dictionary in the format of
+                                    flows as keys and list of routines in the flow as value.
+                **event_parameters: Parameters for the event to be executed
 
-        """
+            """
 
-        self.event_board.notify_event(event_name, **event_parameters)
+        self.event_board.notify_event(event_name, routines_by_flow, **event_parameters)
 
     def join(self, to_kill=False):
         """Block the execution until all of the flows have been killed
@@ -148,7 +151,7 @@ class Pipe:
         """
 
         for flow in self.flows.values():
-            for routine in flow.routines:
+            for routine in flow.routines.values():
                 routine_contained = False
                 for wire in self.wires.values():
                     if wire.source.name == routine.name or routine in wire.destinations:
