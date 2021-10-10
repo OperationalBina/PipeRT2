@@ -1,16 +1,16 @@
 import pytest
 from mock import patch, Mock
 from pytest_mock import MockerFixture
-from src.pipert2.utils.exceptions.floating_routine import FloatingRoutine
-from src.pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
-from src.pipert2.core.base.pipe import Pipe
-from src.pipert2.core.base.wire import Wire
+from pipert2.utils.exceptions import FloatingRoutine
+from pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
+from pipert2.core.base.pipe import Pipe
+from pipert2 import Wire
 
 
 @pytest.fixture()
 def dummy_pipe():
-    with patch('src.pipert2.core.base.pipe.Flow'):
-        with patch('src.pipert2.core.base.pipe.EventBoard'):
+    with patch('pipert2.core.base.pipe.Flow'):
+        with patch('pipert2.core.base.pipe.EventBoard'):
             pipe = Pipe(network=Mock(), logger=Mock())
             yield pipe
 
