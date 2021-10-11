@@ -104,7 +104,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    def setup(self) -> None:
+    def setup(self) -> None:  # TODO - Can be auto created with annotation
         """An initial setup before running
         The user supposed to implement this method
 
@@ -112,7 +112,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         pass
 
-    def cleanup(self) -> None:
+    def cleanup(self) -> None:  # TODO - Can be auto created with annotation
         """The final method that ends the routine execution
         The user supposed to implement this method
 
@@ -125,7 +125,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        # Currently we don't have any setup we need
+        # Currently we don't have any additional setup
         self.setup()
 
     def _base_cleanup(self) -> None:
