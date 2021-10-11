@@ -9,8 +9,8 @@
     <img src="https://codecov.io/gh/OperationalBina/PipeRT2/branch/master/graph/badge.svg?token=ze7192iCby"/>
   </a>
 
-PipeRT2 is an infrastructure for analyze videos with the ability 
-of handling a high FPS rate.
+PipeRT2 is an infrastructure for data processing with the ability 
+of handling a high flow rate.
 
 Design a complex dataflow dynamically can be done using PipeRT2. 
 With a simple implementation of pipe's components a full dataflow can be dispatched. 
@@ -18,6 +18,7 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 **Table of contents**
 - [Requirements](#requirements)
 - [Components](#components)
+- [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Contributing](#contributing)
 
@@ -42,10 +43,13 @@ to the pipeline.
 
 **Pipe** - Contains all flows. Notifies events through all its components.
 
-## Getting Started 
+## Installation
 
 We publish PipeRT2 as `PipeRT` package in PyPi. 
-Run `pip3 install PipeRT` for installing the official PipeRT2 stable version. 
+
+Run `pip3 install PipeRT` for installing the official PipeRT2 stable version.
+
+## Getting Started 
 
 For example, we're going to create a pipe contains simple flows created by routines.
 
