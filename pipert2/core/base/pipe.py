@@ -73,7 +73,7 @@ class Pipe:
         if auto_wire:
             for first_routine, second_routine in zip(routines, routines[1:]):
                 wire = Wire(source=first_routine, destinations=(second_routine,), data_transmitter=flow_data_transmitter)
-                self.wires[wire.source.name] = wire
+                self.wires[f"{wire.source.flow_name}-{wire.source.name}"] = wire
 
     def link(self, *wires):
         """Connect the routines to each other by their wires configuration.
@@ -84,7 +84,7 @@ class Pipe:
         """
 
         for wire in wires:
-            self.wires[wire.source.name] = wire
+            self.wires[f"{wire.source.flow_name}-{wire.source.name}"] = wire
 
     def build(self):
         """Build the pipe to be ready to start working.
