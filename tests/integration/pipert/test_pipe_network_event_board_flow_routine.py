@@ -59,6 +59,7 @@ def multiple_flows_pipe_with_input_output_validations_routines():
     return pipe, input_data_routine, data_validation_routine
 
 
+@pytest.mark.timeout(15)
 def test_pipe_start_flow_using_events_expecting_the_validation_routine_to_get_all_of_the_given_data(
         single_flow_pipe_with_input_output_validations_routines):
     pipe, input_routine, validation_routine = single_flow_pipe_with_input_output_validations_routines
@@ -66,6 +67,7 @@ def test_pipe_start_flow_using_events_expecting_the_validation_routine_to_get_al
 
     try:
         input_routine.does_data_sent.wait()
+        time.sleep(5)
         pipe.join(to_kill=True)
     except TimeoutError:
         assert not validation_routine.is_data_equals_to_expected_data_flag.is_set(), validation_routine.get_error()
