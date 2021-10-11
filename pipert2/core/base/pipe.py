@@ -1,6 +1,9 @@
 from collections import defaultdict
 from logging import Logger
 from typing import Dict
+
+from pipert2 import QueueNetwork
+
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
@@ -24,8 +27,9 @@ class Pipe:
 
     """
 
-    def __init__(self, network: Network, logger: Logger = get_default_print_logger("Pipe"),
-                 data_transmitter: DataTransmitter = BasicTransmitter()):  # TODO - default networking (Queue)
+    def __init__(self, network: Network = QueueNetwork(),
+                 logger: Logger = get_default_print_logger("Pipe"),
+                 data_transmitter: DataTransmitter = BasicTransmitter()):
         """
         Args:
             network: Network object responsible for the routine's communication.

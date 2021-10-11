@@ -86,7 +86,7 @@ from pipert2 import Pipe, QueueNetwork
 from pipert2.utils.consts.event_names import START_EVENT_NAME, KILL_EVENT_NAME
 
 # Creating the pipe.
-example_pipe = Pipe(QueueNetwork())
+example_pipe = Pipe()
 
 # Create an instance of each routine.
 generate_data_routine = GenerateData()
