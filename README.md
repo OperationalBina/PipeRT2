@@ -27,20 +27,20 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 
 ## Components
 
-Routine - the smallest component in the pipe.
+**Routine** - the smallest component in the pipe.
 
 Each routine has to implement a `main_logic` function that contains the business logic of the routine.
 
 There are three types of routines - 
 
-- SourceRoutine - The first routine in a pipe. Using for generating new data and producing it 
+- **SourceRoutine** - The first routine in a pipe. Using for generating new data and producing it 
 to the pipeline. 
-- MiddleRoutine - Consumes data and produce its manipulation into the pipeline. 
-- DestinationRoutine - The last routine of the pipe. Using for storing the results from all data manipulation. 
+- **MiddleRoutine** - Consumes data and produce its manipulation into the pipeline. 
+- **DestinationRoutine** - The last routine of the pipe. Using for storing the results from all data manipulation. 
 
-Flow - Contains a multiple routines with a same logic.
+**Flow** - Contains a multiple routines with a same logic.
 
-Pipe - Contains all flows. Notifies events through all its components.
+**Pipe** - Contains all flows. Notifies events through all its components.
 
 ## Getting Started 
 
