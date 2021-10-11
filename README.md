@@ -29,27 +29,27 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 
 Routine - the smallest component in the pipe.
 
-Each routine has to implement a `main_logic` function that contain the business logic of the routine.
+Each routine has to implement a `main_logic` function that contains the business logic of the routine.
 
 There are three types of routines - 
 
-- SourceRoutine - The first routine in a pipe. Using for generate new data and produce it 
+- SourceRoutine - The first routine in a pipe. Using for generating new data and producing it 
 to the pipeline. 
-- MiddleRoutine - Consume data and produce its manipulation into the pipeline. 
-- DestinationRoutine - The last routine of the pipe. Using for store the results from all data manipulation. 
+- MiddleRoutine - Consumes data and produce its manipulation into the pipeline. 
+- DestinationRoutine - The last routine of the pipe. Using for storing the results from all data manipulation. 
 
 Flow - Contains a multiple routines with a same logic.
 
-Pipe - Contains all flows. Notifies events through all the routines.
+Pipe - Contains all flows. Notifies events through all its components.
 
 ## Getting Started 
 
 We publish PipeRT2 as `PipeRT` package in PyPi. 
 Run `pip3 install PipeRT` for installing the official PipeRT2 stable version. 
 
-For example, we're going to create a pipe contain simple flows created by routines
+For example, we're going to create a pipe contains simple flows created by routines.
 
-First we create the source function that generate data. 
+First we create the source class that generates data:
 
 ```'''Python
 from pipert2 import SourceRoutine
@@ -62,7 +62,7 @@ class GenerateData(SourceRoutine):
         }
 ```
 
-Then we create the destination routine to store (in our case, to print) the pipeline's result.
+Then we create the destination routine to store (in our case print) the pipeline's result:
 
 ```'''Python
 from pipert2 import DestinationRoutine
@@ -73,7 +73,7 @@ class PrintResult(DestinationRoutine):
         print(data["value"])
 ```
 
-Now we create new pipe that contains a flow made by those two routines.
+Now we create new pipe that contains a flow made by those two routines:
 
 ```Python
 
@@ -100,19 +100,19 @@ example_pipe.notify_event(START_EVENT_NAME)
 example_pipe.notify_event(KILL_EVENT_NAME)
 ```
 
-For connecting routines in a different order we use `example_pipe.link` function, for an example
+For connecting routines in a different order we use `example_pipe.link` function, for example:
 
 ```Python
 example_pipe.create_flow("example_flow", False, generate_data_routine, print_result_routine)
 example_pipe.link(Wire(source=generate_data_routine, destinations=(print_result_routine,)))
 ```
 
-For triggering an event for a specific flow or routine we add a dictionary of the required specific flows and routines
-- for an example trigger all routines in `example_flow`
+For triggering an event for a specific flow or routine we add a dictionary of the required specific flows and routines:
+- for example trigger all routines in `example_flow`: 
     ```Python
     example_pipe.notify_event(START_EVENT_NAME, {"example_flow": []})
     ```
-- for an example trigger specific routines in `example_flow`
+- for example trigger specific routines in `example_flow`:
     ```Python
   example_pipe.notify_event(START_EVENT_NAME, {"example_flow": [generate_data_routine.name, print_result_routine.name]})  
   ```
