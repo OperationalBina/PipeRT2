@@ -34,14 +34,14 @@ Each routine has to implement a `main_logic` function that contains the business
 
 There are three types of routines - 
 
-- **SourceRoutine** - The first routine in a pipe. Using for generating new data and producing it 
-to the pipeline. 
-- **MiddleRoutine** - Consumes data and produce its manipulation into the pipeline. 
-- **DestinationRoutine** - The last routine of the pipe. Using for storing the results from all data manipulation. 
+- **SourceRoutine** - The first routine in a pipe. Used for generating new data and streaming it 
+through the pipeline. 
+- **MiddleRoutine** - Consumes data from other routines in the pipeline. Perform desired operations on any given data and send the results into the next routine. 
+- **DestinationRoutine** - The last routine of the pipe. Used for storing the results from all data manipulation. 
 
-**Flow** - Contains a multiple routines with a same logic.
+**Flow** - Contains multiple routines with the same context.
 
-**Pipe** - Contains all flows. Notifies events through all its components.
+**Pipe** - Controls the different elements and aspects of the system. Contains all flows. Distributing events through all components.
 
 ## Installation
 
@@ -51,9 +51,10 @@ Run `pip3 install PipeRT` for installing the official PipeRT2 stable version.
 
 ## Getting Started 
 
-For example, we're going to create a pipe contains simple flows created by routines.
+For example, we're going to create a pipe which contains simple flows with very simple routines.
 
-First we create the source class that generates data:
+The First step is to create a 'SourceRoutine', which will be responsible for generating data inside our pipeline. 
+    We create the source class that generates data:
 
 ```Python
 from pipert2 import SourceRoutine
@@ -127,6 +128,6 @@ For contributing please contact with [San-Moshe](https://github.com/San-Moshe) f
 
 Please follow the conventions using in the project and make sure all checks pass.
 
-The PR name needs to be in the format of [jira_ticket_id] [Task description] 
+The PR name needs to be in the format of [jira_ticket_id] - [Task description] 
 
 </p>
