@@ -62,7 +62,7 @@ class GenerateData(SourceRoutine):
         }
 ```
 
-Then we create the destination routine to store (in our case print) the pipeline's result.
+Then we create the destination routine to store (in our case, to print) the pipeline's result.
 
 ```'''Python
 from pipert2 import DestinationRoutine
@@ -73,7 +73,7 @@ class PrintResult(DestinationRoutine):
         print(data["value"])
 ```
 
-Now we create new pipe contains a flow made by those two routines.
+Now we create new pipe that contains a flow made by those two routines.
 
 ```Python
 
