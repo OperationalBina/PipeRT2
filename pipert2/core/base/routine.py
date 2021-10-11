@@ -106,6 +106,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     def setup(self) -> None:
         """An initial setup before running
+        The user supposed to implement this method
 
         """
 
@@ -113,18 +114,35 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     def cleanup(self) -> None:
         """The final method that ends the routine execution
+        The user supposed to implement this method
+
+        """
+
+        pass
+
+    def _base_setup(self) -> None:
+        """An initial setup before running
+
+        """
+
+        # Currently we don't have any setup we need
+        self.setup()
+
+    def _base_cleanup(self) -> None:
+        """The final method that ends the routine execution
 
         """
 
         self.message_handler.teardown()
+        self.cleanup()
 
     def _start_routine_logic(self) -> None:
-        self.setup()
+        self._base_setup()
 
         while not self.stop_event.is_set():
             self._extended_run()
 
-        self.cleanup()
+        self._base_cleanup()
 
     @runners("thread")
     def set_runner_as_thread(self):
