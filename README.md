@@ -127,6 +127,6 @@ For contributing please contact with [San-Moshe](https://github.com/San-Moshe) f
 
 Please follow the conventions using in the project and make sure all checks pass.
 
-The PR name needs to be in the format of [jira_ticket_id] - [Task description] 
+The PR name needs to be in the format of [jira_ticket_id] [Task description] 
 
 </p>
