@@ -1,7 +1,6 @@
 from collections import defaultdict
 from logging import Logger
 from typing import Dict
-from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
@@ -10,6 +9,7 @@ from pipert2.core.base.wire import wires_validator
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
+from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.utils.exceptions.floating_routine import FloatingRoutine
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
