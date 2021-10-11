@@ -118,9 +118,17 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         self.message_handler.teardown()
 
+    def _start_routine_logic(self) -> None:
+        self.setup()
+
+        while not self.stop_event.is_set():
+            self._extended_run()
+
+        self.cleanup()
+
     @runners("thread")
     def set_runner_as_thread(self):
-        self.runner_creator = partial(threading.Thread, target=self._extended_run)
+        self.runner_creator = partial(threading.Thread, target=self._start_routine_logic)
 
     @events(START_EVENT_NAME)
     def start(self) -> None:
