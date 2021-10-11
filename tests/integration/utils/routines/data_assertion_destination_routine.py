@@ -11,9 +11,9 @@ class DataAssertionDestinationRoutine(DestinationRoutine):
     """
 
     def __init__(self, data_to_expect: list, shared_process_dict: dict,  name="dummy_end_routine"):
-        super(DataAssertionDestinationRoutine, self).__init__(name=name)
+        super().__init__(name=name)
         self.data_to_expect = data_to_expect
-        self.is_data_equal = Event()
+        self.is_data_equals_to_expected_data_flag = Event()
         self.ERROR_KEY = "error"
         self.error_dict = shared_process_dict
         self.error_dict[self.ERROR_KEY] = "No Error"
