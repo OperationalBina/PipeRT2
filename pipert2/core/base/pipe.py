@@ -1,9 +1,7 @@
 from collections import defaultdict
 from logging import Logger
 from typing import Dict
-
-from pipert2 import QueueNetwork
-
+from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
