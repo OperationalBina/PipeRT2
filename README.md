@@ -119,4 +119,10 @@ For triggering an event for a specific flow or routine we add a dictionary of th
 
 # Contributing
 
+For contributing please contact with [San-Moshe](https://github.com/San-Moshe) for accessing our Jira. 
+
+Please follow the conventions using in the project and make sure all checks pass.
+
+The PR name needs to be in the format of [jira_ticket_id] - [Task description] 
+
 </p>
