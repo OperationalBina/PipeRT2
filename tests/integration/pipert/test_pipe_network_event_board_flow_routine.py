@@ -46,7 +46,7 @@ def single_flow_pipe_with_input_output_validations_routines(pipe_and_validations
 
 
 @pytest.fixture()
-def multiple_flows_pipe_with_input_output_validations_routines():
+def multiple_flows_pipe_with_input_output_validations_routines(pipe_and_validations_routines):
     pipe, input_data_routine, data_validation_routine = pipe_and_validations_routines
 
     pipe.create_flow("Flow1", False, input_data_routine)
