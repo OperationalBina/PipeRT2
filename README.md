@@ -28,7 +28,7 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 
 ## Components
 
-**Routine** - the smallest component in the pipe.
+**Routine** - The smallest component in the pipe.
 
 Each routine has to implement a `main_logic` function that contains the business logic of the routine.
 
@@ -55,7 +55,7 @@ For example, we're going to create a pipe contains simple flows created by routi
 
 First we create the source class that generates data:
 
-```'''Python
+```Python
 from pipert2 import SourceRoutine
 
 class GenerateData(SourceRoutine):
@@ -68,7 +68,7 @@ class GenerateData(SourceRoutine):
 
 Then we create the destination routine to store (in our case print) the pipeline's result:
 
-```'''Python
+```Python
 from pipert2 import DestinationRoutine
 
 class PrintResult(DestinationRoutine):
