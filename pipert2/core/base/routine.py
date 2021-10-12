@@ -1,5 +1,6 @@
 import threading
 import multiprocessing as mp
+from collections import defaultdict
 from logging import Logger
 from typing import Callable
 from functools import partial
@@ -120,14 +121,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         pass
 
-    def _base_setup(self) -> None:
-        """An initial setup before running
-
-        """
-
-        # Currently we don't have any additional setup
-        self.setup()
-
     def _base_cleanup(self) -> None:
         """The final method that ends the routine execution
 
@@ -137,8 +130,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.cleanup()
 
     def _start_routine_logic(self) -> None:
-        self._base_setup()
-
         while not self.stop_event.is_set():
             self._extended_run()
 
@@ -185,7 +176,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         EventExecutorInterface.execute_event(self, event)
 
-    def notify_event(self, event_name: str, routines_by_flow: dict = {}, **event_parameters) -> None:
+    def notify_event(self, event_name: str, routines_by_flow: dict = defaultdict(list), **event_parameters) -> None:
         """Notify an event has started
 
         Args:
