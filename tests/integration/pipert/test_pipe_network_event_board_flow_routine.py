@@ -77,7 +77,7 @@ def test_pipe_start_flow_using_events_expecting_the_validation_routine_to_get_al
 
 
 @pytest.mark.timeout(15)
-def test_pipe_start_2_flows_using_events_expecting_the_validation_routine_to_get_all_of_the_given_data(
+def test_pipe_start_multiple_flows_using_events_expecting_the_validation_routine_to_get_all_of_the_given_data(
         multiple_flows_pipe_with_input_output_validations_routines):
     pipe, input_routine, validation_routine = multiple_flows_pipe_with_input_output_validations_routines
     pipe.notify_event(START_EVENT.event_name)
