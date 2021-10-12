@@ -1,6 +1,6 @@
-from collections import defaultdict
-from logging import Logger
 from typing import Dict
+from logging import Logger
+from collections import defaultdict
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
@@ -48,7 +48,7 @@ class Pipe:
         self.flows = {}
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
-        self.wires: Dict[str, Wire] = {}
+        self.wires: Dict[tuple, Wire] = {}
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -75,7 +75,7 @@ class Pipe:
         if auto_wire:
             for first_routine, second_routine in zip(routines, routines[1:]):
                 wire = Wire(source=first_routine, destinations=(second_routine,), data_transmitter=flow_data_transmitter)
-                self.wires[wire.source.name] = wire
+                self.wires[(wire.source.flow_name, wire.source.name)] = wire
 
     def link(self, *wires):
         """Connect the routines to each other by their wires configuration.
@@ -86,7 +86,7 @@ class Pipe:
         """
 
         for wire in wires:
-            self.wires[wire.source.name] = wire
+            self.wires[(wire.source.flow_name, wire.source.name)] = wire
 
     def build(self):
         """Build the pipe to be ready to start working.
@@ -111,10 +111,11 @@ class Pipe:
         Args:
             event_name: The name of the event to notify
             specific_flow_routines: In order to notify specific routines/flows we insert a dictionary in the following format -
-            For specific routines in a specific flow, each key/value element needs to be in this format - "flow_name": [routines]
-            For all of the routines in a specific flow, each element needs to be in this format - "flow_name" - []
+                For specific routines in a specific flow, each key/value element needs to be in this format - "flow_name": [routines]
+                For all of the routines in a specific flow, each element needs to be in this format - "flow_name" - []
+            **event_parameters: Parameters for the event to be executed
 
-        """
+            """
 
         self.event_board.notify_event(event_name, specific_flow_routines, **event_parameters)
 

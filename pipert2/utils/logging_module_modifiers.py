@@ -32,6 +32,9 @@ def add_pipe_log_level():
 
 def get_default_print_logger(logger_name):
     logger = logging.getLogger(logger_name)
-    logger.addHandler(logging.StreamHandler(sys.stdout))
+    console_handler = (logging.StreamHandler(sys.stdout))
+    console_handler.setFormatter(logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s",
+                                                   datefmt="%d-%m-%y %H:%M:%S"))
+    logger.addHandler(console_handler)
     logger.setLevel(logging.INFO)
     return logger

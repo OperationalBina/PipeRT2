@@ -17,6 +17,8 @@ class DummyMiddleRoutine(MiddleRoutine):
         else:
             self.counter -= 1
 
+        return {"value": self.counter}
+
     def setup(self) -> None:
         self.counter = 0
 

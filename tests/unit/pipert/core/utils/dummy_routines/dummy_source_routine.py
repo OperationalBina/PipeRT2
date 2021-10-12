@@ -3,8 +3,8 @@ from pipert2.core.base.routines import SourceRoutine
 
 class DummySourceRoutine(SourceRoutine):
     
-    def __init__(self):
-        super(DummySourceRoutine, self).__init__(name="dummy_start_routine")
+    def __init__(self, name="dummy_start_routine"):
+        super(DummySourceRoutine, self).__init__(name=name)
         self.counter = 0
     
     def main_logic(self) -> any:

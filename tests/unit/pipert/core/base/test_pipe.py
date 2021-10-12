@@ -1,12 +1,11 @@
-from collections import defaultdict
-
 import pytest
 from mock import patch, Mock
+from collections import defaultdict
 from pytest_mock import MockerFixture
+from pipert2 import Wire
+from pipert2.core.base.pipe import Pipe
 from pipert2.utils.exceptions import FloatingRoutine
 from pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
-from pipert2.core.base.pipe import Pipe
-from pipert2 import Wire
 
 
 @pytest.fixture()
@@ -23,12 +22,15 @@ def dummy_pipe_with_flows(dummy_pipe: Pipe, mocker: MockerFixture):
 
     source_routine = mocker.MagicMock(spec=SourceRoutine)
     source_routine.name = "source"
+    source_routine.flow_name = "Flow"
 
     middle_routine = mocker.MagicMock(spec=MiddleRoutine)
     middle_routine.name = "middle_routine"
+    middle_routine.flow_name = "Flow"
 
     destination_routine = mocker.MagicMock(spec=DestinationRoutine)
     destination_routine.name = "destination_routine"
+    destination_routine.flow_name = "Flow"
 
     for flow_name in FLOW_NAMES:
         dummy_pipe.create_flow(flow_name, True, source_routine, middle_routine, destination_routine)
@@ -49,9 +51,11 @@ def test_create_flow_auto_wire_false(dummy_pipe: Pipe):
 def test_link_link_new_wires_should_add_to_dictionary(dummy_pipe: Pipe, mocker: MockerFixture):
     source_routine = mocker.MagicMock(spec=SourceRoutine)
     source_routine.name = "source"
+    source_routine.flow_name = "Flow"
 
     middle_routine = mocker.MagicMock(spec=MiddleRoutine)
     middle_routine.name = "middle_routine"
+    middle_routine.flow_name = "Flow"
 
     destination_routine = mocker.MagicMock(spec=DestinationRoutine)
     destination_routine.name = "destination_routine"
@@ -59,17 +63,18 @@ def test_link_link_new_wires_should_add_to_dictionary(dummy_pipe: Pipe, mocker: 
     source_to_middle_wire = Wire(source_routine, middle_routine)
     dummy_pipe.link(source_to_middle_wire)
 
-    assert dummy_pipe.wires["source"] == source_to_middle_wire
+    assert dummy_pipe.wires[(source_routine.flow_name, source_routine.name)] == source_to_middle_wire
 
     middle_to_destination_wire = Wire(middle_routine, destination_routine)
     dummy_pipe.link(middle_to_destination_wire)
 
-    assert dummy_pipe.wires["middle_routine"] == middle_to_destination_wire
+    assert dummy_pipe.wires[(middle_routine.flow_name, middle_routine.name)] == middle_to_destination_wire
 
 
 def test_link_link_existing_wires_sources_should_override_existing_in_dictionary(dummy_pipe: Pipe, mocker: MockerFixture):
     source_routine = mocker.MagicMock(spec=SourceRoutine)
     source_routine.name = "source"
+    source_routine.flow_name = "Flow"
 
     middle_routine = mocker.MagicMock(spec=MiddleRoutine)
     middle_routine.name = "middle_routine"
@@ -83,7 +88,7 @@ def test_link_link_existing_wires_sources_should_override_existing_in_dictionary
     source_to_destination_wire = Wire(source_routine, destination_routine)
     dummy_pipe.link(source_to_destination_wire)
 
-    assert dummy_pipe.wires["source"] == source_to_destination_wire
+    assert dummy_pipe.wires[(source_routine.flow_name, source_routine.name)] == source_to_destination_wire
 
 
 def test_build(dummy_pipe_with_flows):
@@ -103,8 +108,8 @@ def test_build_floating_routine_build_raises_error(mocker: MockerFixture):
 
     dummy_flow1 = mocker.MagicMock()
     dummy_flow1.name = "flow1"
-    dummy_flow1.routines = {"r1": dummy_routine1,
-                            "r2": dummy_routine2}
+    dummy_flow1.routines = {dummy_routine1.name: dummy_routine1,
+                            dummy_routine2.name: dummy_routine2}
 
     dummy_routine3 = mocker.MagicMock()
     dummy_routine3.name = "r3"
@@ -117,9 +122,9 @@ def test_build_floating_routine_build_raises_error(mocker: MockerFixture):
 
     dummy_flow2 = mocker.MagicMock()
     dummy_flow2.name = "flow2"
-    dummy_flow2.routines = {"r3": dummy_routine3,
-                            "r4": dummy_routine4,
-                            "r5": dummy_routine5}
+    dummy_flow2.routines = {dummy_routine3.name: dummy_routine3,
+                            dummy_routine4.name: dummy_routine4,
+                            dummy_routine5.name: dummy_routine5}
 
     pipe.flows = {"flow1": dummy_flow1, "flow2": dummy_flow2}
 

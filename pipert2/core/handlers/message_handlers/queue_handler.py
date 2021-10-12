@@ -14,9 +14,9 @@ class QueueHandler(MessageHandler):
 
     """
 
-    def __init__(self, routine_name: str, blocking=True, timeout=1):
+    def __init__(self, routine_name: str, max_queue_len=1, blocking=False, timeout=5):
         super().__init__(routine_name)
-        self.input_queue = QueueWrapper()
+        self.input_queue = QueueWrapper(max_queue_len)
         self.output_queue = None
         self.blocking = blocking
         self.timeout = timeout
