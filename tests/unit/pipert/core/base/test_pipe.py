@@ -63,12 +63,12 @@ def test_link_link_new_wires_should_add_to_dictionary(dummy_pipe: Pipe, mocker: 
     source_to_middle_wire = Wire(source_routine, middle_routine)
     dummy_pipe.link(source_to_middle_wire)
 
-    assert dummy_pipe.wires[f"{source_routine.flow_name}-{source_routine.name}"] == source_to_middle_wire
+    assert dummy_pipe.wires[(source_routine.flow_name, source_routine.name)] == source_to_middle_wire
 
     middle_to_destination_wire = Wire(middle_routine, destination_routine)
     dummy_pipe.link(middle_to_destination_wire)
 
-    assert dummy_pipe.wires[f"{middle_routine.flow_name}-{middle_routine.name}"] == middle_to_destination_wire
+    assert dummy_pipe.wires[(middle_routine.flow_name, middle_routine.name)] == middle_to_destination_wire
 
 
 def test_link_link_existing_wires_sources_should_override_existing_in_dictionary(dummy_pipe: Pipe, mocker: MockerFixture):
@@ -88,7 +88,7 @@ def test_link_link_existing_wires_sources_should_override_existing_in_dictionary
     source_to_destination_wire = Wire(source_routine, destination_routine)
     dummy_pipe.link(source_to_destination_wire)
 
-    assert dummy_pipe.wires[f"{source_routine.flow_name}-{source_routine.name}"] == source_to_destination_wire
+    assert dummy_pipe.wires[(source_routine.flow_name, source_routine.name)] == source_to_destination_wire
 
 
 def test_build(dummy_pipe_with_flows):
