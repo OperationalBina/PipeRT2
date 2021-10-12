@@ -41,13 +41,12 @@ def test_link_shared_memory_transmitter_to_destination_routines_message_handlers
 
 def test_link_shared_memory_transmitter_to_source_routine_message_handlers(mocker: MockerFixture):
 
-    queue_network = QueueNetwork()
-
     source_routine = mocker.MagicMock()
     source_routine.message_handler = QueueHandler("source")
 
     shared_memory_transmitter = SharedMemoryTransmitter()
 
+    queue_network = QueueNetwork()
     queue_network.link(source=source_routine,
                        destinations=(mocker.MagicMock(),),
                        data_transmitter=shared_memory_transmitter)
@@ -57,5 +56,5 @@ def test_link_shared_memory_transmitter_to_source_routine_message_handlers(mocke
 
     expected_data_in_memory = bytes(data_to_transmit)
 
-    assert SharedMemoryManager().read_from_mem(memory_name["test"]["address"], memory_name["test"]["size"]) ==\
-           expected_data_in_memory
+    assert SharedMemoryManager().read_from_mem(memory_name["test"]["address"],
+                                               memory_name["test"]["size"]) == expected_data_in_memory
