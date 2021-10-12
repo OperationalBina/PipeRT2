@@ -3,8 +3,8 @@ import pytest
 from multiprocessing import Manager
 from pipert2 import Pipe, QueueNetwork, Wire
 from tests.unit.pipert.core.utils.events_utils import START_EVENT
-from tests.integration.utils.routines.user_input_source_routine import UserInputSourceRoutine
-from tests.integration.utils.routines.data_assertion_destination_routine import DataAssertionDestinationRoutine
+from tests.end_to_end.utils.routines.user_input_source_routine import UserInputSourceRoutine
+from tests.end_to_end.utils.routines.data_assertion_destination_routine import DataAssertionDestinationRoutine
 
 FIRST_ROUTINE_NAME = "R1"
 SECOND_ROUTINE_NAME = "R2"
