@@ -18,7 +18,6 @@ class MessageHandler(ABC):
         self.transmit = None
         self.receive = None
         self.logger: Logger = Dummy()
-        self.input_queue = None
 
     @abstractmethod
     def _get(self) -> Optional[bytes]:
