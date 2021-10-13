@@ -8,3 +8,6 @@ from .core import SourceRoutine, MiddleRoutine, DestinationRoutine, Network, Mes
 
 # Given implementations
 from .core import QueueNetwork, QueueHandler, SharedMemoryTransmitter, BasicTransmitter
+
+# Event names.
+from .utils import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
