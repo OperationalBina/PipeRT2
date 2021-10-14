@@ -2,7 +2,7 @@ import pytest
 from pytest_mock import MockerFixture
 from pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
 from pipert2 import Wire
-from pipert2.core.base.wire import wires_validator
+from pipert2.core.base.validators import wires_validator
 from pipert2.utils.exceptions import WiresValidation
 
 
