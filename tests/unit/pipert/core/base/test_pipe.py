@@ -97,48 +97,6 @@ def test_build(dummy_pipe_with_flows):
     assert dummy_pipe_object.flows[flow_names[0]].build.call_count == 3
 
 
-def test_build_floating_routine_build_raises_error(mocker: MockerFixture):
-    pipe = Pipe(network=mocker.MagicMock(), logger=mocker.MagicMock())
-
-    dummy_routine1 = mocker.MagicMock()
-    dummy_routine1.name = "r1"
-
-    dummy_routine2 = mocker.MagicMock()
-    dummy_routine2.name = "r2"
-
-    dummy_flow1 = mocker.MagicMock()
-    dummy_flow1.name = "flow1"
-    dummy_flow1.routines = {dummy_routine1.name: dummy_routine1,
-                            dummy_routine2.name: dummy_routine2}
-
-    dummy_routine3 = mocker.MagicMock()
-    dummy_routine3.name = "r3"
-
-    dummy_routine4 = mocker.MagicMock()
-    dummy_routine4.name = "r4"
-
-    dummy_routine5 = mocker.MagicMock()
-    dummy_routine5.name = "r5"
-
-    dummy_flow2 = mocker.MagicMock()
-    dummy_flow2.name = "flow2"
-    dummy_flow2.routines = {dummy_routine3.name: dummy_routine3,
-                            dummy_routine4.name: dummy_routine4,
-                            dummy_routine5.name: dummy_routine5}
-
-    pipe.flows = {"flow1": dummy_flow1, "flow2": dummy_flow2}
-
-    pipe.wires = {
-        "r1": Wire(source=dummy_routine1, destinations=(dummy_routine2, dummy_routine3,)),
-        "r3": Wire(source=dummy_routine3, destinations=(dummy_routine4,)),
-    }
-
-    with pytest.raises(FloatingRoutine) as error:
-        pipe.build()
-
-    assert "r5" in str(error)
-
-
 def test_notify_event(dummy_pipe: Pipe):
     EVENT_NAME = "Recover"
     EVENT_PARAMS = {"State": True}
