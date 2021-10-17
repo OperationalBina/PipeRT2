@@ -131,6 +131,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     def _start_routine_logic(self) -> None:
         """Start the routine main logic wrapped by setup and cleanup functions.
+
         """
 
         self.setup()
