@@ -20,7 +20,7 @@ def output_queue():
 
 @pytest.fixture()
 def blocking_queue_handler(input_queue, output_queue):
-    blocking_queue_handler = QueueHandler("dummy", blocking=True, timeout=1)
+    blocking_queue_handler = QueueHandler("dummy", block=True, timeout=1)
     blocking_queue_handler.input_queue = input_queue
     blocking_queue_handler.output_queue = output_queue
     blocking_queue_handler.transmit = BasicTransmitter().transmit()
@@ -31,7 +31,7 @@ def blocking_queue_handler(input_queue, output_queue):
 
 @pytest.fixture()
 def non_blocking_queue_handler(input_queue, output_queue):
-    non_blocking_queue_handler = QueueHandler("dummy", blocking=False)
+    non_blocking_queue_handler = QueueHandler("dummy", block=False)
     non_blocking_queue_handler.input_queue = input_queue
     non_blocking_queue_handler.output_queue = output_queue
     non_blocking_queue_handler.transmit = BasicTransmitter().transmit()
