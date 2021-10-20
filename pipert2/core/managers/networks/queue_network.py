@@ -11,9 +11,11 @@ class QueueNetwork(Network):
 
     """
 
-    def __init__(self, max_queue_sizes=1):
+    def __init__(self, max_queue_sizes=1, block=False, timeout=1):
         super().__init__()
         self.max_queue_sizes = max_queue_sizes
+        self.block = block
+        self.timeout = timeout
 
     def get_message_handler(self, routine_name: str) -> QueueHandler:
         """Generate/Retrieve a queue handler.
@@ -29,7 +31,8 @@ class QueueNetwork(Network):
         if routine_name in self.message_handlers:
             message_handler = self.message_handlers[routine_name]
         else:
-            message_handler = QueueHandler(routine_name, max_queue_len=self.max_queue_sizes)
+            message_handler = QueueHandler(routine_name, max_queue_len=self.max_queue_sizes, block=self.block,
+                                           timeout=self.timeout)
             self.message_handlers[routine_name] = message_handler
 
         return message_handler

@@ -9,16 +9,16 @@ class QueueHandler(MessageHandler):
     queues.
 
     Args:
-        blocking: If the queues will behave as blocking behavior detailed in each function or not.
+        block: If the queues will behave as blocking behavior detailed in each function or not.
         timeout: How long the queues will wait in seconds if blocking is true.
 
     """
 
-    def __init__(self, routine_name: str, max_queue_len=1, blocking=False, timeout=5):
+    def __init__(self, routine_name: str, max_queue_len=1, block=False, timeout=1):
         super().__init__(routine_name)
         self.input_queue = QueueWrapper(max_queue_len)
         self.output_queue = None
-        self.blocking = blocking
+        self.block = block
         self.timeout = timeout
 
     def _get(self) -> bytes:
@@ -34,7 +34,7 @@ class QueueHandler(MessageHandler):
         message = None
 
         try:
-            message = self.input_queue.get(block=self.blocking, timeout=self.timeout)
+            message = self.input_queue.get(block=self.block, timeout=self.timeout)
         except Empty:
             pass
 
@@ -54,7 +54,7 @@ class QueueHandler(MessageHandler):
             raise QueueNotInitialized(f"{self.routine_name}'s output_queue was not initialized when put was called!")
 
         try:
-            self.output_queue.put(message, block=self.blocking, timeout=self.timeout)
+            self.output_queue.put(message, block=self.block, timeout=self.timeout)
         except Full:
             self.logger.exception("The queue is full!")
 
