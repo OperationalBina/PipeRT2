@@ -16,9 +16,10 @@ class QueueWrapper:
 
     """
 
-    def __init__(self):
+    def __init__(self, max_queue_size=1):
         self.mp_queue = None
-        self.out_queue = thQueue(maxsize=1)
+        self.max_queue_size = max_queue_size
+        self.out_queue = thQueue(maxsize=max_queue_size)
         self.multiprocess_thread = Thread()
 
     def get(self, block: bool, timeout: int):
@@ -71,7 +72,7 @@ class QueueWrapper:
         """
 
         if self.mp_queue is None:
-            self.mp_queue = mpQueue(maxsize=1)
+            self.mp_queue = mpQueue(maxsize=self.max_queue_size)
 
         return self.mp_queue
 

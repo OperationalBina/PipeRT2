@@ -15,14 +15,9 @@ class DestinationRoutine(Routine, metaclass=ABCMeta):
         raise NotImplementedError
 
     def _extended_run(self) -> None:
-        self.setup()
-
-        while not self.stop_event.is_set():
-            message = self.message_handler.get()
-            if message is not None:
-                try:
-                    self.main_logic(message.get_data())
-                except Exception as error:
-                    self._logger.exception(f"The routine has crashed: {error}")
-
-        self.cleanup()
+        message = self.message_handler.get()
+        if message is not None:
+            try:
+                self.main_logic(message.get_data())
+            except Exception as error:
+                self._logger.exception(f"The routine has crashed: {error}")

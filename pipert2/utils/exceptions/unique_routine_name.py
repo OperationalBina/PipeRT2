@@ -1,0 +1,2 @@
+class UniqueRoutineName(Exception):
+    pass
