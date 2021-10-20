@@ -11,11 +11,13 @@ class QueueNetwork(Network):
 
     """
 
-    def get_message_handler(self, routine_name: str) -> QueueHandler:
+    def get_message_handler(self, routine_name: str, block=False, timeout=1) -> QueueHandler:
         """Generate/Retrieve a queue handler.
 
         Args:
             routine_name: The name of the routine to retrieve the queue handler for.
+            block: Whether or not the queue handlers will act as blocking or not.
+            timeout: How long a blocking queue will wait for each message.
 
         Returns:
             A QueueHandler object relevant to the routine.
@@ -25,7 +27,7 @@ class QueueNetwork(Network):
         if routine_name in self.message_handlers:
             message_handler = self.message_handlers[routine_name]
         else:
-            message_handler = QueueHandler(routine_name)
+            message_handler = QueueHandler(routine_name, block=block, timeout=timeout)
             self.message_handlers[routine_name] = message_handler
 
         return message_handler
