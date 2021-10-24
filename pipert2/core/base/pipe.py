@@ -140,7 +140,7 @@ class Pipe:
             flow.join()
         self.logger.plog(f"Joined all flows")
 
-        self.routine_delay_synchronizer.event_listening_process.join()
+        self.routine_delay_synchronizer.join()
         self.logger.plog(f"Joined synchronizer")
 
         self.event_board.join()

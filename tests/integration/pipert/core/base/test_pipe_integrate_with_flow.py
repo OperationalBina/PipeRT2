@@ -4,6 +4,7 @@ import signal
 from pipert2.core import Flow
 from pytest_mock import MockerFixture
 from pipert2 import Pipe, SourceRoutine, Wire, DestinationRoutine
+from pipert2.core.base.routine_delay_synchronizer import RoutineDelaySynchronizer
 
 FIRST_FLOW_NAME = "first_flow_name"
 SECOND_FLOW_NAME = "second_flow_name"
@@ -29,15 +30,19 @@ def pipe_with_multiple_flows(mocker: MockerFixture) -> Pipe:
     first_flow = Flow(name=FIRST_FLOW_NAME,
                       routines=[source_routine],
                       logger=mocker.MagicMock(),
-                      event_board=mocker.MagicMock())
+                      event_board=mocker.MagicMock(),
+                      routine_delay_synchronizer=mocker.MagicMock())
 
     second_flow = Flow(name=SECOND_FLOW_NAME,
                        routines=[destination_routine],
                        logger=mocker.MagicMock(),
-                       event_board=mocker.MagicMock())
+                       event_board=mocker.MagicMock(),
+                       routine_delay_synchronizer=mocker.MagicMock())
 
     pipe.flows[FIRST_FLOW_NAME] = first_flow
     pipe.flows[SECOND_FLOW_NAME] = second_flow
+
+    pipe.routine_delay_synchronizer = mocker.MagicMock()
 
     pipe.event_board = mocker.MagicMock()
 

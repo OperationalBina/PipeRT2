@@ -41,6 +41,9 @@ class RoutineDelaySynchronizer(EventExecutorInterface):
 
         self.event_listening_process.start()
 
+    def join(self):
+        self.event_listening_process.join()
+
     def listen_events(self) -> None:
         """The synchronize process, executing the pipe events that occur.
 
