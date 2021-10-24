@@ -6,12 +6,14 @@ from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
 from pipert2.core.managers.event_board import EventBoard
-from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
+from pipert2.core.base.routine_delay_synchronizer import RoutineDelaySynchronizer
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
+from pipert2.utils.consts.event_names import KILL_EVENT_NAME
+
 
 add_pipe_log_level()
 
@@ -26,7 +28,8 @@ class Pipe:
 
     def __init__(self, network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
-                 data_transmitter: DataTransmitter = BasicTransmitter()):
+                 data_transmitter: DataTransmitter = BasicTransmitter(),
+                 synchronize_interval: float = 0.01):
         """
         Args:
             network: Network object responsible for the routine's communication.
@@ -48,6 +51,9 @@ class Pipe:
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
         self.wires: Dict[tuple, Wire] = {}
+        self.routine_delay_synchronizer = RoutineDelaySynchronizer(synchronize_interval,
+                                                                   self.event_board,
+                                                                   self.logger)
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -66,7 +72,10 @@ class Pipe:
             routine.initialize(message_handler=self.network.get_message_handler(routine.name),
                                event_notifier=self.event_board.get_event_notifier())
 
-        flow = Flow(flow_name, self.event_board, self.logger.getChild(flow_name), routines=list(routines))
+        flow = Flow(flow_name, self.event_board, self.logger.getChild(flow_name),
+                    routines=list(routines),
+                    routine_delay_synchronizer=self.routine_delay_synchronizer)
+
         self.flows[flow_name] = flow
 
         flow_data_transmitter = data_transmitter if data_transmitter is not None else self.default_data_transmitter
@@ -102,6 +111,7 @@ class Pipe:
         for flow in self.flows.values():
             flow.build()
 
+        self.routine_delay_synchronizer.start_event_listening()
         self.event_board.build()
 
     def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list), **event_parameters) -> None:
@@ -128,8 +138,10 @@ class Pipe:
 
         for flow in self.flows.values():
             flow.join()
-
         self.logger.plog(f"Joined all flows")
+
+        self.routine_delay_synchronizer.event_listening_process.join()
+        self.logger.plog(f"Joined synchronizer")
 
         self.event_board.join()
         self.logger.plog(f"Joined event board")

@@ -1,15 +1,16 @@
 import threading
-import multiprocessing as mp
-from collections import defaultdict
 from logging import Logger
 from typing import Callable
+import multiprocessing as mp
 from functools import partial
+from collections import defaultdict
 from abc import ABCMeta, abstractmethod
-from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
-from pipert2.core.handlers.message_handler import MessageHandler
+from pipert2.utils.method_data import Method
 from pipert2.utils.annotations import class_functions_dictionary
+from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
+from pipert2.core.base.routine_delay_synchronizer import RoutineDelaySynchronizer
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
@@ -25,7 +26,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     runners = class_functions_dictionary()
     routines_created_counter = 0
 
-    def __init__(self, name: str = None):
+    def __init__(self, name: str = None, fps: int = 25):
         """
         Args:
             name: Name of the routine.
@@ -38,7 +39,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             event_notifier (Callback): Callback for notifying an event has occurred.
             _logger (Logger): The routines logger object.
             stop_event (mp.Event): A multiprocessing event object indicating the routine state (run/stop).
-
+            base_execution_delay_time (float): Milliseconds to delay the extended_run.
+            routine_delay_synchronizer (RoutineDelaySynchronizer): Routine delay synchronizer.
         """
 
         if name is not None:
@@ -55,6 +57,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
+        self.base_execution_delay_time = 1 / fps
+        self.routine_delay_synchronizer: RoutineDelaySynchronizer = None
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -78,6 +82,9 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     def set_logger(self, logger: Logger):
         self._logger = logger
+
+    def set_fps(self, fps: int):
+        self.base_execution_delay_time = 1000 / fps
 
     @classmethod
     def get_events(cls):
@@ -137,7 +144,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.setup()
 
         while not self.stop_event.is_set():
-            self._extended_run()
+            self.routine_delay_synchronizer.run_synchronized(self._extended_run, self.name)
 
         self._base_cleanup()
 

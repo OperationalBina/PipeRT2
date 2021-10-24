@@ -2,6 +2,7 @@ from typing import List
 from logging import Logger
 from multiprocessing import Process
 from pipert2.core.base.routine import Routine
+from pipert2.core.base.routine_delay_synchronizer import RoutineDelaySynchronizer
 from pipert2.core.handlers import EventHandler
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.method_data import Method
@@ -19,7 +20,11 @@ class Flow(EventExecutorInterface):
 
     events = class_functions_dictionary()
 
-    def __init__(self, name: str, event_board: EventBoard, logger: Logger, routines: List[Routine]):
+    def __init__(self, name: str,
+                 event_board: EventBoard,
+                 logger: Logger,
+                 routines: List[Routine],
+                 routine_delay_synchronizer: RoutineDelaySynchronizer):
         """
         Args:
             name (str): Name of the flow.
@@ -33,19 +38,21 @@ class Flow(EventExecutorInterface):
             logger (Logger): Logger object for logging the flow actions.
             event_handler (EventHandler): EventHandler object for communicating with the
                 event system of the pipe.
-
+            routine_delay_synchronizer (RoutineDelaySynchronizer): RoutineDelaySynchronizer for updating
+                the routine delay time synchronizer.
         """
 
         self.routines = {}
         self.name = name
         self._logger = logger
         self.flow_process = Dummy()
-
+        self.routine_delay_synchronizer = routine_delay_synchronizer
         flow_events_to_listen = set(self.get_events().keys())
 
         for routine in routines:
             routine.set_logger(logger=logger.getChild(routine.name))
             routine.flow_name = self.name
+            routine.routine_delay_synchronizer = routine_delay_synchronizer
             flow_events_to_listen.update(routine.get_events().keys())
             self.routines[routine.name] = routine
 
