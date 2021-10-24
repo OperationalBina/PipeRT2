@@ -30,13 +30,15 @@ def pipe_with_multiple_flows(mocker: MockerFixture) -> Pipe:
                       routines=[source_routine],
                       logger=mocker.MagicMock(),
                       event_board=mocker.MagicMock(),
-                      routine_delay_synchronizer=mocker.MagicMock())
+                      routine_delay_synchronizer=mocker.MagicMock(),
+                      use_automatic_pacing_mechanism=False)
 
     second_flow = Flow(name=SECOND_FLOW_NAME,
                        routines=[destination_routine],
                        logger=mocker.MagicMock(),
                        event_board=mocker.MagicMock(),
-                       routine_delay_synchronizer=mocker.MagicMock())
+                       routine_delay_synchronizer=mocker.MagicMock(),
+                       use_automatic_pacing_mechanism=False)
 
     pipe.flows[FIRST_FLOW_NAME] = first_flow
     pipe.flows[SECOND_FLOW_NAME] = second_flow

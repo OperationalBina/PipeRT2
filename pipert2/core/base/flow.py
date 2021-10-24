@@ -24,6 +24,7 @@ class Flow(EventExecutorInterface):
                  event_board: EventBoard,
                  logger: Logger,
                  routines: List[Routine],
+                 use_automatic_pacing_mechanism: bool,
                  routine_delay_synchronizer: RoutineSynchronizer):
         """
         Args:
@@ -53,6 +54,7 @@ class Flow(EventExecutorInterface):
             routine.set_logger(logger=logger.getChild(routine.name))
             routine.flow_name = self.name
             routine.routine_delay_synchronizer = routine_delay_synchronizer
+            routine.use_automatic_pacing_mechanism = use_automatic_pacing_mechanism
             flow_events_to_listen.update(routine.get_events().keys())
             self.routines[routine.name] = routine
 

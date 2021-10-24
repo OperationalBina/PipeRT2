@@ -22,7 +22,7 @@ def pipe_and_validations_routines():
     manager = Manager()
     shared_process_dict = manager.dict()
 
-    pipe = Pipe(network=QueueNetwork(max_queue_sizes=len(DATA_IN_PIPE)))
+    pipe = Pipe(network=QueueNetwork(max_queue_sizes=len(DATA_IN_PIPE)), use_automatic_pacing_mechanism=False)
 
     input_data_routine = UserInputSourceRoutine(name=FIRST_ROUTINE_NAME,
                                                 data_to_send=DATA_IN_PIPE.copy())

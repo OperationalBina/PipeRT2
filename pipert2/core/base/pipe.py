@@ -2,18 +2,18 @@ from typing import Dict
 from logging import Logger
 from collections import defaultdict
 from pipert2.core.base.flow import Flow
-from pipert2.core.base.routine_synchronizer import RoutineSynchronizer
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
 from pipert2.core.managers.event_board import EventBoard
+from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
+from pipert2.core.base.routine_synchronizer import RoutineSynchronizer
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.core.base.routine_synchronizers.routine_delay_synchronizer import RoutineDelaySynchronizer
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
-from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 
 
 add_pipe_log_level()
@@ -31,6 +31,7 @@ class Pipe:
                  logger: Logger = get_default_print_logger("Pipe"),
                  data_transmitter: DataTransmitter = BasicTransmitter(),
                  routine_delay_synchronizer: RoutineSynchronizer = None,
+                 use_automatic_pacing_mechanism: bool = False,
                  fps: int = 25):
         """
         Args:
@@ -53,6 +54,7 @@ class Pipe:
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
         self.wires: Dict[tuple, Wire] = {}
+        self.use_automatic_pacing_mechanism = use_automatic_pacing_mechanism
 
         if routine_delay_synchronizer is not None:
             self.routine_delay_synchronizer = routine_delay_synchronizer
@@ -81,7 +83,8 @@ class Pipe:
         flow = Flow(flow_name, self.event_board,
                     self.logger.getChild(flow_name),
                     routines=list(routines),
-                    routine_delay_synchronizer=self.routine_delay_synchronizer)
+                    routine_delay_synchronizer=self.routine_delay_synchronizer,
+                    use_automatic_pacing_mechanism=self.use_automatic_pacing_mechanism)
 
         self.flows[flow_name] = flow
 

@@ -32,6 +32,7 @@ def destination_routine_and_fps(mocker: MockerFixture):
     test_routine = DummyDestinationRoutine()
     test_routine.initialize(mocker.MagicMock(), mocker.MagicMock())
     test_routine.routine_delay_synchronizer = synchronizer
+    test_routine.use_automatic_pacing_mechanism = True
 
     return test_routine, fps
 

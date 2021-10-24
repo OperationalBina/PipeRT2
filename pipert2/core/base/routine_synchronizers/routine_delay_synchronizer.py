@@ -13,7 +13,7 @@ class RoutineDelaySynchronizer(RoutineSynchronizer):
 
     def __init__(self, fps: float, event_board: any, logger):
         self._logger = logger
-        self.synchronize_interval = fps/1000
+        self.synchronize_interval = 1/fps
 
         self.stop_event = mp.Event()
         self.stop_event.set()
@@ -22,6 +22,7 @@ class RoutineDelaySynchronizer(RoutineSynchronizer):
         self.logic_duration_time_routines = mp.Manager().dict()
 
         self.event_listening_process: mp.Process = mp.Process(target=self.listen_events)
+        self.update_delay_process: mp.Process = mp.Process(target=self.update_delay_time)
 
         synchronizer_events_to_listen = set(self.get_events().keys())
         self.event_handler = event_board.get_event_handler(synchronizer_events_to_listen)
@@ -43,6 +44,10 @@ class RoutineDelaySynchronizer(RoutineSynchronizer):
         self.event_listening_process.start()
 
     def join(self):
+        """Join the event listening process.
+
+        """
+
         self.event_listening_process.join()
 
     def listen_events(self) -> None:
@@ -105,7 +110,7 @@ class RoutineDelaySynchronizer(RoutineSynchronizer):
         """
 
         self.stop_event.clear()
-        mp.Process(target=self.update_delay_time).start()
+        self.update_delay_process.start()
 
     @events(KILL_EVENT_NAME)
     def kill_synchronized_process(self):
@@ -115,3 +120,5 @@ class RoutineDelaySynchronizer(RoutineSynchronizer):
 
         if not self.stop_event.is_set():
             self.stop_event.set()
+
+        self.update_delay_process.terminate()

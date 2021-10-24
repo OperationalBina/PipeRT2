@@ -39,6 +39,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             event_notifier (Callback): Callback for notifying an event has occurred.
             _logger (Logger): The routines logger object.
             stop_event (mp.Event): A multiprocessing event object indicating the routine state (run/stop).
+            use_automatic_pacing_mechanism (bool): Decide if use the automatic pacing mechanism or not.
             routine_delay_synchronizer (RoutineSynchronizer): Routine delay synchronizer.
         """
 
@@ -56,6 +57,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
+
+        self.use_automatic_pacing_mechanism: bool = None
         self.routine_delay_synchronizer: RoutineSynchronizer = None
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
@@ -139,7 +142,10 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.setup()
 
         while not self.stop_event.is_set():
-            self.routine_delay_synchronizer.run_synchronized(self._extended_run, self.name)
+            if self.use_automatic_pacing_mechanism:
+                self.routine_delay_synchronizer.run_synchronized(self._extended_run, self.name)
+            else:
+                self._extended_run()
 
         self._base_cleanup()
 

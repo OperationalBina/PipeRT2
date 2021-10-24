@@ -31,7 +31,8 @@ def dummy_flow_with_two_routines(mocker: MockerFixture):
                       event_board=event_board_mocker,
                       logger=logger_mocker,
                       routines=[first_routine_mocker, second_routine_mocker],
-                      routine_delay_synchronizer=mocker.MagicMock())
+                      routine_delay_synchronizer=mocker.MagicMock(),
+                      use_automatic_pacing_mechanism=False)
 
     return dummy_flow
 
