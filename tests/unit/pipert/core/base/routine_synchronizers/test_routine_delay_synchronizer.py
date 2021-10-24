@@ -4,7 +4,7 @@ from pytest_mock import MockerFixture
 from pipert2.core.base.routine_synchronizers.routine_delay_synchronizer import RoutineDelaySynchronizer
 
 
-DURATION_TEST = 1
+DURATION_TEST = 2
 MAXIMUM_RUNNING_ROUTINE_TIME = 0.2
 DUMMY_SHORT_LOGIC_DURATION = 0.01
 DUMMY_LONG_LOGIC_DURATION = 1
@@ -34,6 +34,8 @@ def dummy_logic_longer_duration():
 
 
 def test_update_delay_time_should_set_delay_time_as_maximum_value(routine_delay_synchronizer):
+    routine_delay_synchronizer.delay_time.value = 0
+
     routine_delay_synchronizer.start_notify_process()
 
     time.sleep(DURATION_TEST)
