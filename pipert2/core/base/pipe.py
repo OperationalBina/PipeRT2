@@ -2,6 +2,7 @@ from typing import Dict
 from logging import Logger
 from collections import defaultdict
 from pipert2.core.base.flow import Flow
+from pipert2.core.base.routine_synchronizer import RoutineSynchronizer
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
@@ -10,7 +11,7 @@ from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
-from pipert2.core.base.routine_delay_synchronizer import RoutineDelaySynchronizer
+from pipert2.core.base.routine_synchronizers.routine_delay_synchronizer import RoutineDelaySynchronizer
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 
@@ -29,7 +30,7 @@ class Pipe:
     def __init__(self, network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
                  data_transmitter: DataTransmitter = BasicTransmitter(),
-                 routine_delay_synchronizer: RoutineDelaySynchronizer = None,
+                 routine_delay_synchronizer: RoutineSynchronizer = None,
                  fps: int = 25):
         """
         Args:
@@ -117,7 +118,7 @@ class Pipe:
         for flow in self.flows.values():
             flow.build()
 
-        self.routine_delay_synchronizer.start_event_listening()
+        self.routine_delay_synchronizer.build()
         self.event_board.build()
 
     def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list), **event_parameters) -> None:

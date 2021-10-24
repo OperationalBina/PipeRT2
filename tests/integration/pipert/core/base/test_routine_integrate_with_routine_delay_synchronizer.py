@@ -2,7 +2,7 @@ import time
 import pytest
 from pipert2 import DestinationRoutine
 from pytest_mock import MockerFixture
-from pipert2.core.base.routine_delay_synchronizer import RoutineDelaySynchronizer
+from pipert2.core.base.routine_synchronizers.routine_delay_synchronizer import RoutineDelaySynchronizer
 
 
 class DummyDestinationRoutine(DestinationRoutine):

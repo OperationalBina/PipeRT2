@@ -4,9 +4,10 @@ from pipert2.utils.method_data import Method
 from pipert2.utils.interfaces import EventExecutorInterface
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME
+from pipert2.core.base.routine_synchronizer import RoutineSynchronizer
 
 
-class RoutineDelaySynchronizer(EventExecutorInterface):
+class RoutineDelaySynchronizer(RoutineSynchronizer):
 
     events = class_functions_dictionary()
 
@@ -34,8 +35,8 @@ class RoutineDelaySynchronizer(EventExecutorInterface):
 
         EventExecutorInterface.execute_event(self, event)
 
-    def start_event_listening(self):
-        """BStart the queue listener process.
+    def build(self):
+        """Start the queue listener process.
 
         """
 

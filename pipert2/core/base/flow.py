@@ -1,15 +1,15 @@
 from typing import List
 from logging import Logger
 from multiprocessing import Process
+from pipert2.utils.dummy_object import Dummy
+from pipert2.utils.method_data import Method
 from pipert2.core.base.routine import Routine
-from pipert2.core.base.routine_delay_synchronizer import RoutineDelaySynchronizer
 from pipert2.core.handlers import EventHandler
 from pipert2.core.managers.event_board import EventBoard
-from pipert2.utils.method_data import Method
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
+from pipert2.core.base.routine_synchronizer import RoutineSynchronizer
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
-from pipert2.utils.dummy_object import Dummy
+from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 
 
 class Flow(EventExecutorInterface):
@@ -24,7 +24,7 @@ class Flow(EventExecutorInterface):
                  event_board: EventBoard,
                  logger: Logger,
                  routines: List[Routine],
-                 routine_delay_synchronizer: RoutineDelaySynchronizer):
+                 routine_delay_synchronizer: RoutineSynchronizer):
         """
         Args:
             name (str): Name of the flow.
@@ -38,7 +38,7 @@ class Flow(EventExecutorInterface):
             logger (Logger): Logger object for logging the flow actions.
             event_handler (EventHandler): EventHandler object for communicating with the
                 event system of the pipe.
-            routine_delay_synchronizer (RoutineDelaySynchronizer): RoutineDelaySynchronizer for updating
+            routine_delay_synchronizer (RoutineSynchronizer): RoutineDelaySynchronizer for updating
                 the routine delay time synchronizer.
         """
 

@@ -1,4 +1,4 @@
-from pipert2.core.base.routine_delay_synchronizer import RoutineDelaySynchronizer
+from pipert2.core.base.routine_synchronizers.routine_delay_synchronizer import RoutineDelaySynchronizer
 
 
 class DummySynchronizer(RoutineDelaySynchronizer):
