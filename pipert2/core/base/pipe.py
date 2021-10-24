@@ -29,7 +29,8 @@ class Pipe:
     def __init__(self, network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
                  data_transmitter: DataTransmitter = BasicTransmitter(),
-                 synchronize_interval: float = 0.01):
+                 routine_delay_synchronizer: RoutineDelaySynchronizer = None,
+                 fps: int = 25):
         """
         Args:
             network: Network object responsible for the routine's communication.
@@ -51,9 +52,13 @@ class Pipe:
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
         self.wires: Dict[tuple, Wire] = {}
-        self.routine_delay_synchronizer = RoutineDelaySynchronizer(synchronize_interval,
-                                                                   self.event_board,
-                                                                   self.logger)
+
+        if routine_delay_synchronizer is not None:
+            self.routine_delay_synchronizer = routine_delay_synchronizer
+        else:
+            self.routine_delay_synchronizer = RoutineDelaySynchronizer(fps,
+                                                                       self.event_board,
+                                                                       self.logger)
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -72,7 +77,8 @@ class Pipe:
             routine.initialize(message_handler=self.network.get_message_handler(routine.name),
                                event_notifier=self.event_board.get_event_notifier())
 
-        flow = Flow(flow_name, self.event_board, self.logger.getChild(flow_name),
+        flow = Flow(flow_name, self.event_board,
+                    self.logger.getChild(flow_name),
                     routines=list(routines),
                     routine_delay_synchronizer=self.routine_delay_synchronizer)
 

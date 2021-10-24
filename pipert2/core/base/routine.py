@@ -26,7 +26,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     runners = class_functions_dictionary()
     routines_created_counter = 0
 
-    def __init__(self, name: str = None, fps: int = 25):
+    def __init__(self, name: str = None):
         """
         Args:
             name: Name of the routine.
@@ -39,7 +39,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             event_notifier (Callback): Callback for notifying an event has occurred.
             _logger (Logger): The routines logger object.
             stop_event (mp.Event): A multiprocessing event object indicating the routine state (run/stop).
-            base_execution_delay_time (float): Milliseconds to delay the extended_run.
             routine_delay_synchronizer (RoutineDelaySynchronizer): Routine delay synchronizer.
         """
 
@@ -57,7 +56,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
-        self.base_execution_delay_time = 1 / fps
         self.routine_delay_synchronizer: RoutineDelaySynchronizer = None
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
@@ -82,9 +80,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     def set_logger(self, logger: Logger):
         self._logger = logger
-
-    def set_fps(self, fps: int):
-        self.base_execution_delay_time = 1000 / fps
 
     @classmethod
     def get_events(cls):

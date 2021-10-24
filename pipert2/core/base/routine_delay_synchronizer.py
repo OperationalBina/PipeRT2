@@ -10,9 +10,9 @@ class RoutineDelaySynchronizer(EventExecutorInterface):
 
     events = class_functions_dictionary()
 
-    def __init__(self, synchronize_interval: float, event_board: any, logger):
+    def __init__(self, fps: float, event_board: any, logger):
         self._logger = logger
-        self.synchronize_interval = synchronize_interval
+        self.synchronize_interval = fps/1000
 
         self.stop_event = mp.Event()
         self.stop_event.set()
