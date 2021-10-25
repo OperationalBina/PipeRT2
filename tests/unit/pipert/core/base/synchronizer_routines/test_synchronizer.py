@@ -1,6 +1,6 @@
 import pytest
-from pipert2 import SourceRoutine, DestinationRoutine, MiddleRoutine, Wire
 from pytest_mock import MockerFixture
+from pipert2 import SourceRoutine, DestinationRoutine, MiddleRoutine, Wire
 from pipert2.core.base.synchronize_routines.synchronizer import Synchronizer
 
 
