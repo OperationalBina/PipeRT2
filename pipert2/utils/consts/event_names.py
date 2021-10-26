@@ -1,3 +1,5 @@
 START_EVENT_NAME = "start"
 STOP_EVENT_NAME = "stop"
 KILL_EVENT_NAME = "kill"
+START_ROUTINE_LOGIC_NAME = "start_routine_logic"
+FINISH_ROUTINE_LOGIC_NAME = "finish_routine_logic"

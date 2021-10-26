@@ -9,7 +9,7 @@ class SynchronizerNode:
 
         self.fps = fps
         self.name = name
-        self.nodes = nodes
+        self.nodes: List = nodes
         self.father_nodes_fps = {}
         self.notify_delay_time_callback = notify_delay_time_callback
 

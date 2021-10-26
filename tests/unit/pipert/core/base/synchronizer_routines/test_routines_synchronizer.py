@@ -1,16 +1,14 @@
+import time
+
 import pytest
 from pytest_mock import MockerFixture
 from pipert2 import SourceRoutine, DestinationRoutine, MiddleRoutine, Wire
-from pipert2.core.base.synchronize_routines.synchronizer import Synchronizer
+from pipert2.core.base.synchronize_routines.routines_synchronizer import RoutinesSynchronizer
+from pipert2.core.base.synchronize_routines.synchronizer_node import SynchronizerNode
 
 
 @pytest.fixture
 def base_synchronizer(mocker: MockerFixture):
-    return Synchronizer(mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock(), [], mocker.MagicMock())
-
-
-def test_build_routines_graph(base_synchronizer, mocker: MockerFixture):
-
     source1_routine = mocker.MagicMock(spec=SourceRoutine)
     source1_routine.name = "source1"
 
@@ -33,10 +31,15 @@ def test_build_routines_graph(base_synchronizer, mocker: MockerFixture):
         Wire(source=middle2_routine, destinations=(destination_routine,))
     ]
 
-    base_synchronizer.wires = wires
-    base_synchronizer.build_routines_graph()
+    return RoutinesSynchronizer(mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock(), wires, dummy_callback)
 
-    routine_graphs = base_synchronizer.routines_graph
+
+def dummy_callback():
+    pass
+
+
+def test_build_routines_graph(base_synchronizer):
+    routine_graphs = base_synchronizer.create_routines_graph()
 
     synchronize1_source = routine_graphs['source1']
 
@@ -49,4 +52,3 @@ def test_build_routines_graph(base_synchronizer, mocker: MockerFixture):
     assert len(synchronize1_source.nodes) == 1
     assert [node.name for node in synchronize1_source.nodes] == ["m1"]
     assert [node.nodes[0].name for node in synchronize1_source.nodes] == ["destination"]
-
