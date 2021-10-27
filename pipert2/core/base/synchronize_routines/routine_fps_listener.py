@@ -19,10 +19,10 @@ class RoutineFPSListener(EventExecutorInterface):
         self.event_listening_process: mp.Process = mp.Process(target=self.listen_events)
 
         events_to_listen = set(self.get_events().keys())
-        # self.event_handler = event_board.get_event_handler(events_to_listen)
+        self.event_handler = event_board.get_event_handler(events_to_listen)
 
-        self.latest_routines_start_time: Dict[str, float] = {}
-        self.routines_measurements: Dict[str, queue.Queue] = {}
+        self.latest_routines_start_time: Dict[str, float] = {} # TODO - work with MP
+        self.routines_measurements: Dict[str, queue.Queue] = {} # TODO - work with mp
 
     def listen_events(self):
         """The synchronize process, executing the pipe events that occur.

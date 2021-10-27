@@ -1,15 +1,13 @@
 import time
-import multiprocessing as mp
-from datetime import datetime
-
 import pytest
+import multiprocessing as mp
 from pytest_mock import MockerFixture
 from pipert2.core.base.synchronize_routines.routine_fps_listener import RoutineFPSListener
 
 
 @pytest.fixture
 def routine_fps_listener(mocker: MockerFixture):
-    return RoutineFPSListener(mocker.MagicMock)
+    return RoutineFPSListener(mocker.MagicMock())
 
 
 def test_update_start_routine_logic_time(routine_fps_listener):
@@ -30,10 +28,12 @@ def test_calculate_median(routine_fps_listener):
         'r3': mp.Queue(5)
     }
 
-    routine_fps_listener.routines_measurements['r3'].put(1)
-    routine_fps_listener.routines_measurements['r3'].put(2)
-    routine_fps_listener.routines_measurements['r3'].put(2)
-    routine_fps_listener.routines_measurements['r3'].put(4)
+    routine_fps_listener.routines_measurements['r3'].put_nowait(0.001)
+    routine_fps_listener.routines_measurements['r3'].put_nowait(0.002)
+    routine_fps_listener.routines_measurements['r3'].put_nowait(0.002)
+    routine_fps_listener.routines_measurements['r3'].put_nowait(0.004)
 
-    med = routine_fps_listener.calculate_median_fps('r3')
-    # assert med == 1/2
+    # Simulate real time situation when calculation execute in time intervals.
+    time.sleep(0.001)
+
+    assert routine_fps_listener.calculate_median_fps('r3') == 1/0.002
