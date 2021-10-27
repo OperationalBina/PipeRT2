@@ -118,8 +118,11 @@ class Message:
         Raises:
             TypeError: if encoded_msg is None or not bytes.
         """
-
-        msg = pickle.loads(encoded_msg)
+        
+        try:
+            msg = pickle.loads(encoded_msg)
+        except TypeError:
+            msg = encoded_msg
 
         if not lazy:
             msg.payload.decode()
