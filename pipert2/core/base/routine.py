@@ -1,5 +1,6 @@
 import threading
 import multiprocessing as mp
+from collections import defaultdict
 from logging import Logger
 from typing import Callable
 from functools import partial
@@ -106,6 +107,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     def setup(self) -> None:
         """An initial setup before running
+        The user supposed to implement this method
 
         """
 
@@ -113,14 +115,35 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     def cleanup(self) -> None:
         """The final method that ends the routine execution
+        The user supposed to implement this method
+
+        """
+
+        pass
+
+    def _base_cleanup(self) -> None:
+        """The final method that ends the routine execution
 
         """
 
         self.message_handler.teardown()
+        self.cleanup()
+
+    def _start_routine_logic(self) -> None:
+        """Start the routine main logic wrapped by setup and cleanup functions.
+
+        """
+
+        self.setup()
+
+        while not self.stop_event.is_set():
+            self._extended_run()
+
+        self._base_cleanup()
 
     @runners("thread")
     def set_runner_as_thread(self):
-        self.runner_creator = partial(threading.Thread, target=self._extended_run)
+        self.runner_creator = partial(threading.Thread, target=self._start_routine_logic)
 
     @events(START_EVENT_NAME)
     def start(self) -> None:
@@ -157,17 +180,20 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        EventExecutorInterface.execute_event(self, event)  # TODO - Can be removed but i think it should stay
+        EventExecutorInterface.execute_event(self, event)
 
-    def notify_event(self, event_name: str, **event_params) -> None:
-        """Notify that an event has happened
+    def notify_event(self, event_name: str, routines_by_flow: dict = defaultdict(list), **event_parameters) -> None:
+        """Notify an event has started
 
         Args:
             event_name: The name of the event to notify
+            routines_by_flow: Which flows and routines to notify about the event, the dictionary in the format of
+                                flows as keys and list of routines in the flow as value.
+            **event_parameters: Parameters for the event to be executed
 
         """
 
-        self.event_notifier(event_name, **event_params)
+        self.event_notifier(event_name, routines_by_flow,  **event_parameters)
 
     def join(self):
         """Block until all routine thread terminates

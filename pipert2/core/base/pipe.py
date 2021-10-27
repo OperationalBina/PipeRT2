@@ -1,15 +1,15 @@
-from collections import defaultdict
-from logging import Logger
 from typing import Dict
+from logging import Logger
+from collections import defaultdict
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
-from pipert2.core.base.wire import wires_validator
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
-from pipert2.utils.exceptions.floating_routine import FloatingRoutine
+from pipert2.core.managers.networks.queue_network import QueueNetwork
+from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 
@@ -24,8 +24,9 @@ class Pipe:
 
     """
 
-    def __init__(self, network: Network, logger: Logger = get_default_print_logger("Pipe"),
-                 data_transmitter: DataTransmitter = BasicTransmitter()):  # TODO - default networking (Queue)
+    def __init__(self, network: Network = QueueNetwork(),
+                 logger: Logger = get_default_print_logger("Pipe"),
+                 data_transmitter: DataTransmitter = BasicTransmitter()):
         """
         Args:
             network: Network object responsible for the routine's communication.
@@ -46,7 +47,7 @@ class Pipe:
         self.flows = {}
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
-        self.wires: Dict[str, Wire] = {}
+        self.wires: Dict[tuple, Wire] = {}
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -73,7 +74,7 @@ class Pipe:
         if auto_wire:
             for first_routine, second_routine in zip(routines, routines[1:]):
                 wire = Wire(source=first_routine, destinations=(second_routine,), data_transmitter=flow_data_transmitter)
-                self.wires[wire.source.name] = wire
+                self.wires[(wire.source.flow_name, wire.source.name)] = wire
 
     def link(self, *wires):
         """Connect the routines to each other by their wires configuration.
@@ -84,7 +85,7 @@ class Pipe:
         """
 
         for wire in wires:
-            self.wires[wire.source.name] = wire
+            self.wires[(wire.source.flow_name, wire.source.name)] = wire
 
     def build(self):
         """Build the pipe to be ready to start working.
@@ -109,10 +110,11 @@ class Pipe:
         Args:
             event_name: The name of the event to notify
             specific_flow_routines: In order to notify specific routines/flows we insert a dictionary in the following format -
-            For specific routines in a specific flow, each key/value element needs to be in this format - "flow_name": [routines]
-            For all of the routines in a specific flow, each element needs to be in this format - "flow_name" - []
+                For specific routines in a specific flow, each key/value element needs to be in this format - "flow_name": [routines]
+                For all of the routines in a specific flow, each element needs to be in this format - "flow_name" - []
+            **event_parameters: Parameters for the event to be executed
 
-        """
+            """
 
         self.event_board.notify_event(event_name, specific_flow_routines, **event_parameters)
 
@@ -140,25 +142,5 @@ class Pipe:
             WiresValidation: If wires are not valid.
         """
 
-        self._validate_flows_routines_are_linked()
+        flow_validator.validate_flow(self.flows, self.wires)
         wires_validator.validate_wires(self.wires.values())
-
-    def _validate_flows_routines_are_linked(self):
-        """Validate that all routines flows are linked to other routines.
-
-        Raises:
-            FloatingRoutine: If a routine contained in flow but not link to any other routines.
-
-        """
-
-        for flow in self.flows.values():
-            for routine in flow.routines.values():
-                routine_contained = False
-                for wire in self.wires.values():
-                    if wire.source.name == routine.name or routine in wire.destinations:
-                        routine_contained = True
-                        break
-
-                if not routine_contained:
-                    raise FloatingRoutine(f"The routine {routine.name} "
-                                          f"in flow {flow.name} isn't linked to any other routine.")

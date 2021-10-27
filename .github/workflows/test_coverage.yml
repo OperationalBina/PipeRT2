@@ -26,6 +26,7 @@ jobs:
       run: |
         pip install pytest
         pip install pytest-mock
+        pip install pytest-timeout
         pip install posix-ipc
         pip install numpy
         pip install mock

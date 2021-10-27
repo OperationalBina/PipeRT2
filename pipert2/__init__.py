@@ -1,4 +1,4 @@
-__version__ = "2.1.1"
+__version__ = "2.1.2"
 
 # User interaction classes
 from .core import Pipe, Wire
@@ -8,3 +8,6 @@ from .core import SourceRoutine, MiddleRoutine, DestinationRoutine, Network, Mes
 
 # Given implementations
 from .core import QueueNetwork, QueueHandler, SharedMemoryTransmitter, BasicTransmitter
+
+# Event names.
+from .utils import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
