@@ -1,4 +1,4 @@
-__version__ = "2.1.2"
+__version__ = "2.1.3"
 
 # User interaction classes
 from .core import Pipe, Wire
