@@ -8,7 +8,12 @@ from pipert2.core.base.synchronize_routines.synchronizer_node import Synchronize
 
 @pytest.fixture
 def base_synchronizer(mocker: MockerFixture):
-    return RoutinesSynchronizer(mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock(), [], mocker.MagicMock())
+    return RoutinesSynchronizer(mocker.MagicMock(),
+                                mocker.MagicMock(),
+                                mocker.MagicMock(),
+                                [],
+                                mocker.MagicMock(),
+                                mocker.MagicMock())
 
 
 def test_update_delay_iteration_small_fps_in_node(base_synchronizer, mocker: MockerFixture):

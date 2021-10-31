@@ -3,6 +3,7 @@ import time
 import pytest
 from pytest_mock import MockerFixture
 from pipert2 import SourceRoutine, DestinationRoutine, MiddleRoutine, Wire
+from pipert2.core.base.synchronize_routines.routine_fps_listener import RoutineFPSListener
 from pipert2.core.base.synchronize_routines.routines_synchronizer import RoutinesSynchronizer
 from pipert2.core.base.synchronize_routines.synchronizer_node import SynchronizerNode
 
@@ -31,14 +32,22 @@ def base_synchronizer(mocker: MockerFixture):
         Wire(source=middle2_routine, destinations=(destination_routine,))
     ]
 
-    return RoutinesSynchronizer(mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock(), wires, dummy_callback)
+    routine_fps_listener = mocker.MagicMock()
+    routine_fps_listener.calculate_median_fps.return_value = 0
+
+    return RoutinesSynchronizer(mocker.MagicMock(),
+                                mocker.MagicMock(),
+                                mocker.MagicMock(),
+                                wires,
+                                routine_fps_listener,
+                                dummy_callback)
 
 
 def dummy_callback():
     pass
 
 
-def test_build_routines_graph(base_synchronizer):
+def test_build_routines_graph(base_synchronizer, mocker: MockerFixture):
     routine_graphs = base_synchronizer.create_routines_graph()
 
     synchronize1_source = routine_graphs['source1']

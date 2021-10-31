@@ -1,28 +1,29 @@
-import multiprocessing as mp
-import queue
 import time
-from statistics import median
 from typing import Dict
-
-from pipert2.utils.consts import KILL_EVENT_NAME, START_ROUTINE_LOGIC_NAME, FINISH_ROUTINE_LOGIC_NAME
-
+import multiprocessing as mp
+from statistics import median
+from pipert2.utils.method_data import Method
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.interfaces import EventExecutorInterface
-from pipert2.utils.method_data import Method
+from pipert2.utils.consts import KILL_EVENT_NAME, START_ROUTINE_LOGIC_NAME, FINISH_ROUTINE_LOGIC_NAME
 
 
 class RoutineFPSListener(EventExecutorInterface):
 
     events = class_functions_dictionary()
 
-    def __init__(self, event_board):
+    def __init__(self, event_board, max_queue_size=100):
+        self.max_queue_size = max_queue_size
         self.event_listening_process: mp.Process = mp.Process(target=self.listen_events)
 
         events_to_listen = set(self.get_events().keys())
         self.event_handler = event_board.get_event_handler(events_to_listen)
 
-        self.latest_routines_start_time: Dict[str, float] = {} # TODO - work with MP
-        self.routines_measurements: Dict[str, queue.Queue] = {} # TODO - work with mp
+        self.mp_manager = mp.Manager()
+        self.latest_routines_start_time: Dict[str, float] = self.mp_manager.dict()
+
+        # Use list as a queue, because mp source code has a bug that can't use queue in manager dict.
+        self.routines_measurements: Dict[str, list] = self.mp_manager.dict()
 
     def listen_events(self):
         """The synchronize process, executing the pipe events that occur.
@@ -46,14 +47,12 @@ class RoutineFPSListener(EventExecutorInterface):
             The median fps for the required fps.
         """
 
-        routine_queue = self.routines_measurements[routine_name]
-        routine_measurements_as_list = []
+        routine_fps_list = self.routines_measurements[routine_name]
 
-        try:
-            for fps in iter(routine_queue.get_nowait, None):
-                routine_measurements_as_list.append(fps)
-        except queue.Empty:
-            return 1 / median(routine_measurements_as_list)
+        if len(routine_fps_list):
+            return 1 / median(routine_fps_list)
+        else:
+            return 0
 
     def execute_event(self, event: Method) -> None:
         """Execute the event that notified.
@@ -98,6 +97,9 @@ class RoutineFPSListener(EventExecutorInterface):
         duration = time.time() - routine_start_time
 
         if routine_name not in self.routines_measurements:
-            self.routines_measurements[routine_name] = mp.Queue(100)
+            self.routines_measurements[routine_name] = self.mp_manager.list()
 
-        self.routines_measurements[routine_name].put(duration)
+        if len(self.routines_measurements[routine_name]) >= self.max_queue_size:
+            self.routines_measurements[routine_name].pop()
+
+        self.routines_measurements[routine_name].append(duration)

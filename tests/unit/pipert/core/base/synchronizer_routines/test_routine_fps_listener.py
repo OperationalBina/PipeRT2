@@ -13,7 +13,7 @@ def routine_fps_listener(mocker: MockerFixture):
 def test_update_start_routine_logic_time(routine_fps_listener):
     routine_fps_listener.update_start_routine_logic_time(**{'routine_name': 'r1'})
 
-    assert time.time() - routine_fps_listener.latest_routines_start_time["r1"] < 0.00001
+    assert time.time() - routine_fps_listener.latest_routines_start_time["r1"] < 0.001
 
 
 def test_update_finish_routine_logic_time_empty_queue(routine_fps_listener):
@@ -23,17 +23,41 @@ def test_update_finish_routine_logic_time_empty_queue(routine_fps_listener):
     assert 'r2' in routine_fps_listener.routines_measurements
 
 
-def test_calculate_median(routine_fps_listener):
+def test_update_finish_routine_logic_time_full_queue(routine_fps_listener: RoutineFPSListener, mocker: MockerFixture):
+
+    routine_fps_listener.max_queue_size = 1
+
+    mocker.patch('time.time', return_value=5)
+    routine_fps_listener.update_start_routine_logic_time(**{'routine_name': 'r2'})
+
+    mocker.patch('time.time', return_value=7)
+    routine_fps_listener.update_finish_routine_logic_time(**{'routine_name': 'r2'})
+
+    mocker.patch('time.time', return_value=10)
+    routine_fps_listener.update_start_routine_logic_time(**{'routine_name': 'r2'})
+
+    mocker.patch('time.time', return_value=15)
+    routine_fps_listener.update_finish_routine_logic_time(**{'routine_name': 'r2'})
+
+    assert list(routine_fps_listener.routines_measurements["r2"]) == list([5])
+
+
+def test_calculate_median_not_empty_list(routine_fps_listener):
     routine_fps_listener.routines_measurements = {
-        'r3': mp.Queue(5)
+        'r3': mp.Manager().list()
     }
 
-    routine_fps_listener.routines_measurements['r3'].put_nowait(0.001)
-    routine_fps_listener.routines_measurements['r3'].put_nowait(0.002)
-    routine_fps_listener.routines_measurements['r3'].put_nowait(0.002)
-    routine_fps_listener.routines_measurements['r3'].put_nowait(0.004)
-
-    # Simulate real time situation when calculation execute in time intervals.
-    time.sleep(0.001)
+    routine_fps_listener.routines_measurements['r3'].append(0.001)
+    routine_fps_listener.routines_measurements['r3'].append(0.002)
+    routine_fps_listener.routines_measurements['r3'].append(0.002)
+    routine_fps_listener.routines_measurements['r3'].append(0.004)
 
     assert routine_fps_listener.calculate_median_fps('r3') == 1/0.002
+
+
+def test_calculate_median_empty_list(routine_fps_listener):
+    routine_fps_listener.routines_measurements = {
+        'r3': mp.Manager().list()
+    }
+
+    assert routine_fps_listener.calculate_median_fps('r3') == 0

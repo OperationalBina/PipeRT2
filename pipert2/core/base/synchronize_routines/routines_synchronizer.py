@@ -1,6 +1,8 @@
 from logging import Logger
 import multiprocessing as mp
 from typing import List, Dict
+
+from pipert2.core.base.synchronize_routines.routine_fps_listener import RoutineFPSListener
 from pipert2.core.base.wire import Wire
 from pipert2.utils.method_data import Method
 from pipert2.utils.interfaces import EventExecutorInterface
@@ -14,11 +16,18 @@ class RoutinesSynchronizer(EventExecutorInterface):
 
     events = class_functions_dictionary()
 
-    def __init__(self, updating_interval: int, event_board: any, logger: Logger, wires: List[Wire], notify: callable):
+    def __init__(self, updating_interval: int,
+                 event_board: any,
+                 logger: Logger,
+                 wires: List[Wire],
+                 routine_fps_listener: RoutineFPSListener,
+                 notify: callable):
+
         self.wires = wires
         self._logger = logger
         self.notify_callback = notify
         self.updating_interval = updating_interval
+        self.routine_fps_listener: RoutineFPSListener = routine_fps_listener
 
         self.stop_event = mp.Event()
 
@@ -100,7 +109,7 @@ class RoutinesSynchronizer(EventExecutorInterface):
             The routine's rps.
         """
 
-        return 0
+        return self.routine_fps_listener.calculate_median_fps(routine_name)
 
     def join(self):
         """Join the event listening process.
