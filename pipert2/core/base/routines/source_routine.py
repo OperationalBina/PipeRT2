@@ -21,7 +21,7 @@ class SourceRoutine(Routine, metaclass=ABCMeta):
         """
 
         try:
-            output_data = self.main_logic()
+            output_data = self.run_main_logic_with_fps_mechanism(self.main_logic)
         except Exception as error:
             self._logger.exception(f"The routine has crashed: {error}")
         else:

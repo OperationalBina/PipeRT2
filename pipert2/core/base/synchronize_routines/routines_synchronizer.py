@@ -1,8 +1,7 @@
+import time
 from logging import Logger
 import multiprocessing as mp
 from typing import List, Dict
-
-from pipert2.core.base.synchronize_routines.routine_fps_listener import RoutineFPSListener
 from pipert2.core.base.wire import Wire
 from pipert2.utils.method_data import Method
 from pipert2.utils.interfaces import EventExecutorInterface
@@ -10,29 +9,29 @@ from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME
 from pipert2.core.base.routines.source_routine import SourceRoutine
 from pipert2.core.base.synchronize_routines.synchronizer_node import SynchronizerNode
+from pipert2.core.base.synchronize_routines.routine_fps_listener import RoutineFpsListener
 
 
 class RoutinesSynchronizer(EventExecutorInterface):
 
     events = class_functions_dictionary()
 
-    def __init__(self, updating_interval: int,
+    def __init__(self, updating_interval: float,
                  event_board: any,
                  logger: Logger,
-                 wires: List[Wire],
-                 routine_fps_listener: RoutineFPSListener,
-                 notify: callable):
+                 wires: Dict,
+                 routine_fps_listener: RoutineFpsListener,
+                 notify_callback: callable):
 
         self.wires = wires
         self._logger = logger
-        self.notify_callback = notify
+        self.notify_callback = notify_callback
         self.updating_interval = updating_interval
-        self.routine_fps_listener: RoutineFPSListener = routine_fps_listener
+        self.routine_fps_listener: RoutineFpsListener = routine_fps_listener
 
         self.stop_event = mp.Event()
 
         self.event_listening_process: mp.Process = mp.Process(target=self.listen_events)
-        self.update_delay_process: mp.Process = mp.Process(target=self.update_delay)
 
         synchronizer_events_to_listen = set(self.get_events().keys())
         self.event_handler = event_board.get_event_handler(synchronizer_events_to_listen)
@@ -42,6 +41,8 @@ class RoutinesSynchronizer(EventExecutorInterface):
 
         self.mp_manager = mp_manager
         self.routines_graph: Dict[str, SynchronizerNode] = mp_manager.dict()
+
+        self.update_delay_process = None
 
     def execute_event(self, event: Method) -> None:
         """Execute the event that notified.
@@ -59,6 +60,7 @@ class RoutinesSynchronizer(EventExecutorInterface):
 
         self.routines_graph = self.create_routines_graph()
         self.event_listening_process.start()
+        self.routine_fps_listener.build()
 
     def create_routines_graph(self) -> 'DictProxy':
         """Build the routine's graph.
@@ -70,14 +72,14 @@ class RoutinesSynchronizer(EventExecutorInterface):
         synchronize_graph = {}
         synchronizer_nodes = {}
 
-        for wire in self.wires:
+        for wire in self.wires.values():
             for wire_destination_routine in wire.destinations:
                 if wire_destination_routine.name not in synchronizer_nodes:
                     synchronizer_nodes[wire_destination_routine.name] = SynchronizerNode(
                         wire_destination_routine.name,
-                        self.get_routine_fps(wire_destination_routine.name),
+                        wire_destination_routine.flow_name,
                         [],
-                        self.notify_callback
+                        self.mp_manager
                     )
 
             destinations_synchronizer_nodes = [synchronizer_nodes[wire_destination_routine.name]
@@ -89,9 +91,9 @@ class RoutinesSynchronizer(EventExecutorInterface):
             else:
                 source_node = SynchronizerNode(
                     wire.source.name,
-                    self.get_routine_fps(wire.source.name),
+                    wire.source.flow_name,
                     destinations_synchronizer_nodes,
-                    self.notify_callback
+                    self.mp_manager
                 )
 
                 if isinstance(wire.source, SourceRoutine):
@@ -146,16 +148,19 @@ class RoutinesSynchronizer(EventExecutorInterface):
         """
 
         while not self.stop_event.is_set():
+            # self.routines_graph = self.create_routines_graph()
             self.update_delay_iteration()
+            time.sleep(self.updating_interval)
 
     def update_delay_iteration(self):
         """One iteration of updating fps for all graph's routines.
 
         """
 
+        self._execute_function_for_sources(SynchronizerNode.update_original_fps_by_real_time.__name__, self.routine_fps_listener.calculate_median_fps)
         self._execute_function_for_sources(SynchronizerNode.update_fps_by_nodes.__name__)
         self._execute_function_for_sources(SynchronizerNode.update_fps_by_fathers.__name__)
-        self._execute_function_for_sources(SynchronizerNode.notify_fps.__name__)
+        self._execute_function_for_sources(SynchronizerNode.notify_fps.__name__, self.notify_callback)
         self._execute_function_for_sources(SynchronizerNode.reset.__name__)
 
     @events(START_EVENT_NAME)
@@ -165,6 +170,8 @@ class RoutinesSynchronizer(EventExecutorInterface):
         """
 
         self.stop_event.clear()
+
+        self.update_delay_process: mp.Process = mp.Process(target=self.update_delay)
         self.update_delay_process.start()
 
     @events(KILL_EVENT_NAME)
@@ -178,7 +185,7 @@ class RoutinesSynchronizer(EventExecutorInterface):
 
         self.update_delay_process.terminate()
 
-    def _execute_function_for_sources(self, callback: callable):
+    def _execute_function_for_sources(self, callback: callable, param=None):
         """Execute the callback function for all the graph's sources.
 
         Args:
@@ -187,4 +194,7 @@ class RoutinesSynchronizer(EventExecutorInterface):
         """
 
         for value in self.routines_graph.values():
-            value.__getattribute__(callback)()
+            if param is not None:
+                value.__getattribute__(callback)(param)
+            else:
+                value.__getattribute__(callback)()

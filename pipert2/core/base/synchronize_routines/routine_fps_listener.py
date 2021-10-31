@@ -1,4 +1,5 @@
 import time
+from logging import Logger
 from typing import Dict
 import multiprocessing as mp
 from statistics import median
@@ -8,13 +9,12 @@ from pipert2.utils.interfaces import EventExecutorInterface
 from pipert2.utils.consts import KILL_EVENT_NAME, START_ROUTINE_LOGIC_NAME, FINISH_ROUTINE_LOGIC_NAME
 
 
-class RoutineFPSListener(EventExecutorInterface):
+class RoutineFpsListener(EventExecutorInterface):
 
     events = class_functions_dictionary()
 
-    def __init__(self, event_board, max_queue_size=100):
+    def __init__(self, event_board, logger: Logger, max_queue_size=100):
         self.max_queue_size = max_queue_size
-        self.event_listening_process: mp.Process = mp.Process(target=self.listen_events)
 
         events_to_listen = set(self.get_events().keys())
         self.event_handler = event_board.get_event_handler(events_to_listen)
@@ -24,6 +24,11 @@ class RoutineFPSListener(EventExecutorInterface):
 
         # Use list as a queue, because mp source code has a bug that can't use queue in manager dict.
         self.routines_measurements: Dict[str, list] = self.mp_manager.dict()
+
+        self._logger = logger
+
+    def build(self):
+        mp.Process(target=self.listen_events).start()
 
     def listen_events(self):
         """The synchronize process, executing the pipe events that occur.
@@ -47,12 +52,13 @@ class RoutineFPSListener(EventExecutorInterface):
             The median fps for the required fps.
         """
 
-        routine_fps_list = self.routines_measurements[routine_name]
+        if routine_name in self.routines_measurements:
+            routine_fps_list = self.routines_measurements[routine_name]
 
-        if len(routine_fps_list):
-            return 1 / median(routine_fps_list)
-        else:
-            return 0
+            if len(routine_fps_list):
+                return 1 / median(routine_fps_list)
+
+        return 0
 
     def execute_event(self, event: Method) -> None:
         """Execute the event that notified.
@@ -81,8 +87,8 @@ class RoutineFPSListener(EventExecutorInterface):
             **params: Dictionary contained the routine name.
         """
 
-        routine_name = params["routine_name"]
-        self.latest_routines_start_time[routine_name] = time.time()
+        routine_name = params['routine_name']
+        self.latest_routines_start_time[routine_name] = params['start_time']
 
     @events(FINISH_ROUTINE_LOGIC_NAME)
     def update_finish_routine_logic_time(self, **params):
@@ -92,9 +98,9 @@ class RoutineFPSListener(EventExecutorInterface):
             **params: Dictionary contained the routine name.
         """
 
-        routine_name = params["routine_name"]
+        routine_name = params['routine_name']
         routine_start_time = self.latest_routines_start_time[routine_name]
-        duration = time.time() - routine_start_time
+        duration = params['end_time'] - routine_start_time
 
         if routine_name not in self.routines_measurements:
             self.routines_measurements[routine_name] = self.mp_manager.list()

@@ -11,6 +11,8 @@ from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
+from pipert2.core.base.synchronize_routines.routine_fps_listener import RoutineFpsListener
+from pipert2.core.base.synchronize_routines.routines_synchronizer import RoutinesSynchronizer
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 
 add_pipe_log_level()
@@ -26,7 +28,8 @@ class Pipe:
 
     def __init__(self, network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
-                 data_transmitter: DataTransmitter = BasicTransmitter()):
+                 data_transmitter: DataTransmitter = BasicTransmitter(),
+                 auto_pacing_mechanism: bool = False):
         """
         Args:
             network: Network object responsible for the routine's communication.
@@ -48,6 +51,17 @@ class Pipe:
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
         self.wires: Dict[tuple, Wire] = {}
+
+        if auto_pacing_mechanism:
+            self.routine_synchronizer = RoutinesSynchronizer(event_board=self.event_board,
+                                                             logger=self.logger,
+                                                             updating_interval=0.25,
+                                                             wires=self.wires,
+                                                             routine_fps_listener=RoutineFpsListener(
+                                                                 self.event_board, logger),
+                                                             notify_callback=self.notify_event)
+        else:
+            self.routine_synchronizer: RoutinesSynchronizer = None
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -73,7 +87,8 @@ class Pipe:
 
         if auto_wire:
             for first_routine, second_routine in zip(routines, routines[1:]):
-                wire = Wire(source=first_routine, destinations=(second_routine,), data_transmitter=flow_data_transmitter)
+                wire = Wire(source=first_routine, destinations=(second_routine,),
+                            data_transmitter=flow_data_transmitter)
                 self.wires[(wire.source.flow_name, wire.source.name)] = wire
 
     def link(self, *wires):
@@ -102,9 +117,14 @@ class Pipe:
         for flow in self.flows.values():
             flow.build()
 
+        if self.routine_synchronizer is not None:
+            self.routine_synchronizer.wires = self.wires
+            self.routine_synchronizer.build()
+
         self.event_board.build()
 
-    def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list), **event_parameters) -> None:
+    def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list),
+                     **event_parameters) -> None:
         """Notify an event has started
 
         Args:
@@ -128,6 +148,9 @@ class Pipe:
 
         for flow in self.flows.values():
             flow.join()
+
+        if self.routine_synchronizer is not None:
+            self.routine_synchronizer.join()
 
         self.logger.plog(f"Joined all flows")
 

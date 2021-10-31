@@ -1,5 +1,6 @@
 import threading
 import multiprocessing as mp
+import time
 from collections import defaultdict
 from logging import Logger
 from typing import Callable
@@ -9,7 +10,8 @@ from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
+from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, UPDATE_FPS_NAME, \
+    START_ROUTINE_LOGIC_NAME, FINISH_ROUTINE_LOGIC_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
@@ -55,6 +57,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
+
+        self.fps = None
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -141,6 +145,25 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         self._base_cleanup()
 
+    def run_main_logic_with_fps_mechanism(self, main_logic: callable, params=None):
+        start_time = time.time()
+        self.notify_event(START_ROUTINE_LOGIC_NAME, **{'routine_name': self.name, 'start_time': start_time})
+
+        if params is None:
+            result = main_logic()
+        else:
+            result = main_logic(params)
+
+        end_time = time.time()
+        self.notify_event(FINISH_ROUTINE_LOGIC_NAME, **{'routine_name': self.name, 'end_time': end_time})
+
+        duration: float = end_time - start_time
+
+        if self.fps is not None and self.fps > 0 and duration < 1 / self.fps:
+            time.sleep((1 / self.fps) - duration)
+
+        return result
+
     @runners("thread")
     def set_runner_as_thread(self):
         self.runner_creator = partial(threading.Thread, target=self._start_routine_logic)
@@ -171,6 +194,17 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self._logger.plog("Stopping")
             self.stop_event.set()
             self.runner.join()
+
+    @events(UPDATE_FPS_NAME)
+    def update_delay_time(self, **params) -> None:
+        """Update the routine's fps.
+
+        """
+
+        delay_time = params['delay_time']
+
+        if delay_time > 0:
+            self.fps = delay_time
 
     def execute_event(self, event: Method) -> None:
         """Execute an event to start
