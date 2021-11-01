@@ -58,7 +58,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event.set()
         self.runner = Dummy()
 
-        self.fps = None
+        self._fps = None
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -159,8 +159,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         duration: float = end_time - start_time
 
-        if self.fps is not None and self.fps > 0 and duration < 1 / self.fps:
-            time.sleep((1 / self.fps) - duration)
+        if self._fps is not None and self._fps > 0 and duration < 1 / self._fps:
+            time.sleep((1 / self._fps) - duration)
 
         return result
 
@@ -201,10 +201,10 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        delay_time = params['delay_time']
+        fps = params['delay_time']
 
-        if delay_time > 0:
-            self.fps = delay_time
+        if fps > 0:
+            self._fps = fps
 
     def execute_event(self, event: Method) -> None:
         """Execute an event to start

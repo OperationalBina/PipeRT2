@@ -9,6 +9,12 @@ class DestinationCounterRoutine(DestinationRoutine):
         self.routine_fps = fps
         self.counter = mp.Value('i', 0)
 
+        self.prev_run_time = None
+        self.estimate_fps = mp.Value('f', 0.0)
+
     def main_logic(self, data) -> None:
+        if self._fps is not None:
+            self.estimate_fps.value = self._fps
+
         self.counter.value = self.counter.value + 1
         time.sleep(1 / self.routine_fps)

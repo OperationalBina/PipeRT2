@@ -1,10 +1,11 @@
 import time
-
 from pipert2 import Pipe, START_EVENT_NAME, KILL_EVENT_NAME, Wire
 from tests.end_to_end.utils.routines.middle_counter_routine import MiddleCounterRoutine
-
 from tests.end_to_end.utils.routines.source_counter_routine import SourceCounterRoutine
 from tests.end_to_end.utils.routines.destination_counter_routine import DestinationCounterRoutine
+
+
+TEST_TIME = 2
 
 
 def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one():
@@ -19,16 +20,13 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one():
 
     pipe.notify_event(START_EVENT_NAME)
 
-    time.sleep(0.9)
+    time.sleep(TEST_TIME)
 
     pipe.notify_event(KILL_EVENT_NAME)
     pipe.join()
 
-    # For 0.25 seconds it runs in 20 fps, so source count will be ~= 5, and destination will be ~= 3
-    # For 0.75 seconds it runs in 12 fps, so source count will be ~= 5 + 9, and destination will be ~= 3 + 9
-
-    # assert 13 <= source_counter_routine.counter.value <= 15
-    # assert 10 <= destination_counter_routine.counter.value <= 12
+    assert round(source_counter_routine.estimate_fps.value) <= 12
+    assert round(destination_counter_routine.estimate_fps.value) <= 12
 
 
 def test_number_of_executions_of_main_logic_slow_routine_in_the_first_one():
@@ -43,15 +41,13 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_first_one():
 
     pipe.notify_event(START_EVENT_NAME)
 
-    time.sleep(0.9)
+    time.sleep(TEST_TIME)
 
     pipe.notify_event(KILL_EVENT_NAME)
     pipe.join()
 
-    # For 1 second it runs in 12 fps, so source count will be ~= 12, and destination will be less by one, then ~= 11
-
-    # assert 10 <= source_counter_routine.counter.value <= 12
-    # assert 10 <= destination_counter_routine.counter.value <= 12
+    assert round(source_counter_routine.estimate_fps.value) <= 12
+    assert round(destination_counter_routine.estimate_fps.value) <= 12
 
 
 def test_complex_pipe():
@@ -79,15 +75,12 @@ def test_complex_pipe():
 
     pipe.notify_event(START_EVENT_NAME)
 
-    time.sleep(1)
+    time.sleep(TEST_TIME)
 
     pipe.notify_event(KILL_EVENT_NAME)
     pipe.join()
 
-    # For 0.25 seconds source runs in 20 fps, middle and the dest1 run in 12 fps, dest2 runs in 5
-    # For 0.75 seconds source runs in 12 fps, middle and the dest1 run in 12 fps, dest2 runs in 5
-
-    assert 14 <= source_counter_routine.counter.value <= 15
-    assert 11 <= middle_counter_routine.counter.value <= 13
-    assert 11 <= destination1_counter_routine.counter.value <= 13
-    assert 7 <= destination2_counter_routine.counter.value <= 9
+    assert round(source_counter_routine.estimate_fps.value) <= 12
+    assert round(middle_counter_routine.estimate_fps.value) <= 12
+    assert round(destination1_counter_routine.estimate_fps.value) <= 12
+    assert round(destination2_counter_routine.estimate_fps.value) <= 8
