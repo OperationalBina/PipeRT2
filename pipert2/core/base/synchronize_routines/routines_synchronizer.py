@@ -1,8 +1,7 @@
 import time
+from typing import Dict
 from logging import Logger
 import multiprocessing as mp
-from typing import List, Dict
-from pipert2.core.base.wire import Wire
 from pipert2.utils.method_data import Method
 from pipert2.utils.interfaces import EventExecutorInterface
 from pipert2.utils.annotations import class_functions_dictionary
@@ -31,8 +30,6 @@ class RoutinesSynchronizer(EventExecutorInterface):
 
         self.stop_event = mp.Event()
 
-        self.event_listening_process: mp.Process = mp.Process(target=self.listen_events)
-
         synchronizer_events_to_listen = set(self.get_events().keys())
         self.event_handler = event_board.get_event_handler(synchronizer_events_to_listen)
 
@@ -59,7 +56,7 @@ class RoutinesSynchronizer(EventExecutorInterface):
         """
 
         self.routines_graph = self.create_routines_graph()
-        self.event_listening_process.start()
+        mp.Process(target=self.base_listen_to_events).start()
         self.routine_fps_listener.build()
 
     def create_routines_graph(self) -> 'DictProxy':
@@ -120,18 +117,6 @@ class RoutinesSynchronizer(EventExecutorInterface):
 
         self.event_listening_process.join()
 
-    def listen_events(self) -> None:
-        """The synchronize process, executing the pipe events that occur.
-
-        """
-
-        event = self.event_handler.wait()
-        while not event.event_name == KILL_EVENT_NAME:
-            self.execute_event(event)
-            event = self.event_handler.wait()
-
-        self.execute_event(Method(KILL_EVENT_NAME))
-
     @classmethod
     def get_events(cls):
         """Get the events of the synchronize_routines.
@@ -148,7 +133,6 @@ class RoutinesSynchronizer(EventExecutorInterface):
         """
 
         while not self.stop_event.is_set():
-            # self.routines_graph = self.create_routines_graph()
             self.update_delay_iteration()
             time.sleep(self.updating_interval)
 

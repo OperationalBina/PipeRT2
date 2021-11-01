@@ -201,7 +201,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        fps = params['delay_time']
+        fps = params['fps']
 
         if fps > 0:
             self._fps = fps

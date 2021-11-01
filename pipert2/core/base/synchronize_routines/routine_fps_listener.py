@@ -14,6 +14,7 @@ class RoutineFpsListener(EventExecutorInterface):
     events = class_functions_dictionary()
 
     def __init__(self, event_board, logger: Logger, max_queue_size=100):
+        self._logger = logger
         self.max_queue_size = max_queue_size
 
         events_to_listen = set(self.get_events().keys())
@@ -25,22 +26,12 @@ class RoutineFpsListener(EventExecutorInterface):
         # Use list as a queue, because mp source code has a bug that can't use queue in manager dict.
         self.routines_measurements: Dict[str, list] = self.mp_manager.dict()
 
-        self._logger = logger
-
     def build(self):
-        mp.Process(target=self.listen_events).start()
+        """Start the event listening.
 
-    def listen_events(self):
-        """The synchronize process, executing the pipe events that occur.
+        """
 
-                """
-
-        event = self.event_handler.wait()
-        while not event.event_name == KILL_EVENT_NAME:
-            self.execute_event(event)
-            event = self.event_handler.wait()
-
-        self.execute_event(Method(KILL_EVENT_NAME))
+        mp.Process(target=self.base_listen_to_events).start()
 
     def calculate_median_fps(self, routine_name):
         """Get the median fps by routine name.

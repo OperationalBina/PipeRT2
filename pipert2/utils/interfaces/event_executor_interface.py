@@ -1,4 +1,9 @@
 from abc import ABC, abstractmethod
+
+from pipert2.utils.annotations import class_functions_dictionary
+
+from pipert2.utils.consts import KILL_EVENT_NAME
+
 from pipert2.utils.method_data import Method
 
 
@@ -17,3 +22,11 @@ class EventExecutorInterface(ABC):  # TODO - Maybe add a logger abstract class f
     @abstractmethod
     def get_events(cls):
         raise NotImplementedError
+
+    def base_listen_to_events(self):
+        event = self.event_handler.wait()
+        while not event.event_name == KILL_EVENT_NAME:
+            self.execute_event(event)
+            event = self.event_handler.wait()
+
+        self.execute_event(Method(KILL_EVENT_NAME))
