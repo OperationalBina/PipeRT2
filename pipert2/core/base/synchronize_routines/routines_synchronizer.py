@@ -110,13 +110,6 @@ class RoutinesSynchronizer(EventExecutorInterface):
 
         return self.routine_fps_listener.calculate_median_fps(routine_name)
 
-    def join(self):
-        """Join the event listening process.
-
-        """
-
-        self.event_listening_process.join()
-
     @classmethod
     def get_events(cls):
         """Get the events of the synchronize_routines.

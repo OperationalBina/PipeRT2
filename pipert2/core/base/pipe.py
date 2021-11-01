@@ -149,9 +149,6 @@ class Pipe:
         for flow in self.flows.values():
             flow.join()
 
-        if self.routine_synchronizer is not None:
-            self.routine_synchronizer.join()
-
         self.logger.plog(f"Joined all flows")
 
         self.event_board.join()

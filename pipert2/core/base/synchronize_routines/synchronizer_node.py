@@ -4,6 +4,24 @@ from pipert2.utils.consts import UPDATE_FPS_NAME
 
 
 class SynchronizerNode:
+    """ The synchronize node steps -
+    For synchronize the fps through the graph, we need to synchronize each sub logic with each other.
+
+    - The first step is updating the real fps of the current node.
+    - The second step is calculating the minimum fps between {all the sub logics, take their max value}.
+        When taking the max value of the sub logics, we handle the max fps that necessary.
+    - The third step is calculating the minimum fps between {all the node owners, take their max value}.
+        When taking the max value of the node owner, we handle the max fps that necessary from the owners.
+    - The forth step is notifying the fps.
+    - The fifth step is reset the flags. Because some node can be shared between two owners, and it already notified or
+        updated with the realtime fps, then raise a flag for not notifying or updating twice.
+
+    Simple Examples -
+    Let's say A -> B -> C. A = 15, B = 10, C = 6. So the second step set the A,B = 6.
+    Let's say A -> B -> C. A = 2, B = 5, C = 10. So the second step doesn't change a thing,
+        and the third step set B,C = 2.
+    """
+
     def __init__(self,
                  routine_name: str,
                  flow_name: str,
