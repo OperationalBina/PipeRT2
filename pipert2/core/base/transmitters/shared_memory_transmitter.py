@@ -82,7 +82,7 @@ class SharedMemoryTransmitter(DataTransmitter):
             """
 
             for field in fields(data.__class__):
-                if field.type == dict and "address" not in getattr(data, field.name):  # Check for nested dicts
+                if field.type == dict and "address" not in getattr(data, field.name):  # Check for dict values
                     for outer_key, outer_value in getattr(data, field.name).items():
                         if type(outer_value) == dict:
 
