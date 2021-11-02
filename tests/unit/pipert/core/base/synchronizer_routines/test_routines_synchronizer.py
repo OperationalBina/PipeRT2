@@ -1,11 +1,14 @@
+import time
+
 import pytest
+import multiprocessing as mp
 from pytest_mock import MockerFixture
 from pipert2 import SourceRoutine, DestinationRoutine, MiddleRoutine, Wire
 from pipert2.core.base.synchronize_routines.routines_synchronizer import RoutinesSynchronizer
 
 
 @pytest.fixture
-def base_synchronizer(mocker: MockerFixture):
+def complex_synchronizer(mocker: MockerFixture):
     source1_routine = mocker.MagicMock(spec=SourceRoutine)
     source1_routine.name = "source1"
     source1_routine.flow_name = "f1"
@@ -40,16 +43,24 @@ def base_synchronizer(mocker: MockerFixture):
                                 mocker.MagicMock(),
                                 mocker.MagicMock(),
                                 wires,
-                                routine_fps_listener,
                                 dummy_callback)
+
+
+@pytest.fixture
+def base_synchronizer(mocker: MockerFixture):
+    return RoutinesSynchronizer(mocker.MagicMock(),
+                                mocker.MagicMock(),
+                                mocker.MagicMock(),
+                                mocker.MagicMock(),
+                                mocker.MagicMock())
 
 
 def dummy_callback():
     pass
 
 
-def test_build_routines_graph(base_synchronizer, mocker: MockerFixture):
-    routine_graphs = base_synchronizer.create_routines_graph()
+def test_build_routines_graph(complex_synchronizer, mocker: MockerFixture):
+    routine_graphs = complex_synchronizer.create_routines_graph()
 
     synchronize1_source = routine_graphs['source1']
 
@@ -62,3 +73,44 @@ def test_build_routines_graph(base_synchronizer, mocker: MockerFixture):
     assert len(synchronize1_source.nodes) == 1
     assert [node.name for node in synchronize1_source.nodes] == ["m1"]
     assert [node.nodes[0].name for node in synchronize1_source.nodes] == ["destination"]
+
+
+def test_update_finish_routine_logic_time_empty_queue(base_synchronizer: RoutinesSynchronizer):
+
+    base_synchronizer.update_finish_routine_logic_time(**{'routine_name': 'r2', 'durations': [5, 10]})
+
+    assert 'r2' in base_synchronizer.routines_measurements
+    assert list(base_synchronizer.routines_measurements['r2']) == list([5, 10])
+
+
+def test_update_finish_routine_logic_time_not_empty_queue(base_synchronizer: RoutinesSynchronizer):
+
+    base_synchronizer.routines_measurements = {
+        'r2': mp.Manager().list([5, 10])
+    }
+
+    base_synchronizer.update_finish_routine_logic_time(**{'routine_name': 'r2', 'durations': [12, 14]})
+
+    assert 'r2' in base_synchronizer.routines_measurements
+    assert list(base_synchronizer.routines_measurements['r2']) == list([5, 10, 12, 14])
+
+
+def test_calculate_median_not_empty_list(base_synchronizer: RoutinesSynchronizer):
+    base_synchronizer.routines_measurements = {
+        'r3': mp.Manager().list()
+    }
+
+    base_synchronizer.routines_measurements['r3'].append(0.001)
+    base_synchronizer.routines_measurements['r3'].append(0.002)
+    base_synchronizer.routines_measurements['r3'].append(0.002)
+    base_synchronizer.routines_measurements['r3'].append(0.004)
+
+    assert base_synchronizer.get_routine_fps('r3') == 1/0.002
+
+
+def test_calculate_median_empty_list(base_synchronizer):
+    base_synchronizer.routines_measurements = {
+        'r3': mp.Manager().list()
+    }
+
+    assert base_synchronizer.get_routine_fps('r3') == 0

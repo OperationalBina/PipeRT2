@@ -11,7 +11,6 @@ from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
-from pipert2.core.base.synchronize_routines.routine_fps_listener import RoutineFpsListener
 from pipert2.core.base.synchronize_routines.routines_synchronizer import RoutinesSynchronizer
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 
@@ -55,10 +54,8 @@ class Pipe:
         if auto_pacing_mechanism:
             self.routine_synchronizer = RoutinesSynchronizer(event_board=self.event_board,
                                                              logger=self.logger,
-                                                             updating_interval=0.25,
+                                                             updating_interval=5,
                                                              wires=self.wires,
-                                                             routine_fps_listener=RoutineFpsListener(
-                                                                 self.event_board, logger),
                                                              notify_callback=self.notify_event)
         else:
             self.routine_synchronizer: RoutinesSynchronizer = None

@@ -76,6 +76,7 @@ class Flow(EventExecutorInterface):
 
     @events(START_EVENT_NAME)
     def start(self):
+        print("start flow")
         self._logger.plog("Starting")
 
     @events(STOP_EVENT_NAME)

@@ -1,3 +1,4 @@
+import time
 from abc import ABC, abstractmethod
 
 from pipert2.utils.annotations import class_functions_dictionary

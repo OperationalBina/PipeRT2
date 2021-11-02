@@ -1,3 +1,4 @@
+import time
 from abc import ABCMeta, abstractmethod
 from pipert2.core.base.message import Message
 from pipert2.core.base.routine import Routine
@@ -20,11 +21,15 @@ class SourceRoutine(Routine, metaclass=ABCMeta):
 
         """
 
+        duration = None
+
         try:
-            output_data = self.run_main_logic_with_fps_mechanism(self.main_logic)
+            output_data, duration = self.run_main_logic_with_fps_mechanism(self.main_logic)
         except Exception as error:
             self._logger.exception(f"The routine has crashed: {error}")
         else:
             if output_data is not None:
                 message = Message(output_data, source_address=self.name)
                 self.message_handler.put(message)
+        finally:
+            return duration

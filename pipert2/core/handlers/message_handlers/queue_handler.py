@@ -34,7 +34,7 @@ class QueueHandler(MessageHandler):
         message = None
 
         try:
-            message = self.input_queue.get(block=self.block, timeout=self.timeout)
+            message = self.input_queue.get(block=True, timeout=self.timeout)
         except Empty:
             pass
 

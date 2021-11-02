@@ -1,14 +1,16 @@
+import threading
 import time
+from statistics import median
+from threading import Thread
 from typing import Dict
 from logging import Logger
 import multiprocessing as mp
 from pipert2.utils.method_data import Method
 from pipert2.utils.interfaces import EventExecutorInterface
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME
+from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, FINISH_ROUTINE_LOGIC_NAME, START_ROUTINE_LOGIC_NAME
 from pipert2.core.base.routines.source_routine import SourceRoutine
 from pipert2.core.base.synchronize_routines.synchronizer_node import SynchronizerNode
-from pipert2.core.base.synchronize_routines.routine_fps_listener import RoutineFpsListener
 
 
 class RoutinesSynchronizer(EventExecutorInterface):
@@ -19,14 +21,13 @@ class RoutinesSynchronizer(EventExecutorInterface):
                  event_board: any,
                  logger: Logger,
                  wires: Dict,
-                 routine_fps_listener: RoutineFpsListener,
                  notify_callback: callable):
 
+        self.max_queue_size = 50
         self.wires = wires
         self._logger = logger
         self.notify_callback = notify_callback
         self.updating_interval = updating_interval
-        self.routine_fps_listener: RoutineFpsListener = routine_fps_listener
 
         self.stop_event = mp.Event()
 
@@ -39,7 +40,10 @@ class RoutinesSynchronizer(EventExecutorInterface):
         self.mp_manager = mp_manager
         self.routines_graph: Dict[str, SynchronizerNode] = mp_manager.dict()
 
-        self.update_delay_process = None
+        # self.update_delay_process: mp.Process = None
+        self.notify_delay_thread = threading.Thread(target=self.update_delay_iteration)
+
+        self.routines_measurements: Dict[str, list] = self.mp_manager.dict()
 
     def execute_event(self, event: Method) -> None:
         """Execute the event that notified.
@@ -57,7 +61,10 @@ class RoutinesSynchronizer(EventExecutorInterface):
 
         self.routines_graph = self.create_routines_graph()
         mp.Process(target=self.base_listen_to_events).start()
-        self.routine_fps_listener.build()
+
+        self.stop_event.clear()
+
+        self.notify_delay_thread.start()
 
     def create_routines_graph(self) -> 'DictProxy':
         """Build the routine's graph.
@@ -98,17 +105,23 @@ class RoutinesSynchronizer(EventExecutorInterface):
 
         return self.mp_manager.dict(synchronize_graph)
 
-    def get_routine_fps(self, routine_name: str):
-        """Calculate the fps for a specific routine.
+    def get_routine_fps(self, routine_name):
+        """Get the median fps by routine name.
 
         Args:
             routine_name: The routine name.
 
         Returns:
-            The routine's rps.
+            The median fps for the required fps.
         """
 
-        return self.routine_fps_listener.calculate_median_fps(routine_name)
+        if routine_name in self.routines_measurements:
+            routine_fps_list = self.routines_measurements[routine_name]
+
+            if len(routine_fps_list) > 0:
+                return 1 / median(routine_fps_list)
+
+        return 0
 
     @classmethod
     def get_events(cls):
@@ -120,25 +133,19 @@ class RoutinesSynchronizer(EventExecutorInterface):
 
         return cls.events.all[cls.__name__]
 
-    def update_delay(self):
-        """Notify the calculated delay time to all routines.
-
-        """
-
-        while not self.stop_event.is_set():
-            self.update_delay_iteration()
-            time.sleep(self.updating_interval)
-
     def update_delay_iteration(self):
         """One iteration of updating fps for all graph's routines.
 
         """
 
-        self._execute_function_for_sources(SynchronizerNode.update_original_fps_by_real_time.__name__, self.routine_fps_listener.calculate_median_fps)
-        self._execute_function_for_sources(SynchronizerNode.update_fps_by_nodes.__name__)
-        self._execute_function_for_sources(SynchronizerNode.update_fps_by_fathers.__name__)
-        self._execute_function_for_sources(SynchronizerNode.notify_fps.__name__, self.notify_callback)
-        self._execute_function_for_sources(SynchronizerNode.reset.__name__)
+        while not self.stop_event.set():
+            self._execute_function_for_sources(SynchronizerNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
+            self._execute_function_for_sources(SynchronizerNode.update_fps_by_nodes.__name__)
+            self._execute_function_for_sources(SynchronizerNode.update_fps_by_fathers.__name__)
+            self._execute_function_for_sources(SynchronizerNode.notify_fps.__name__, self.notify_callback)
+            self._execute_function_for_sources(SynchronizerNode.reset.__name__)
+
+            time.sleep(self.updating_interval)
 
     @events(START_EVENT_NAME)
     def start_notify_process(self):
@@ -147,9 +154,6 @@ class RoutinesSynchronizer(EventExecutorInterface):
         """
 
         self.stop_event.clear()
-
-        self.update_delay_process: mp.Process = mp.Process(target=self.update_delay)
-        self.update_delay_process.start()
 
     @events(KILL_EVENT_NAME)
     def kill_synchronized_process(self):
@@ -160,7 +164,30 @@ class RoutinesSynchronizer(EventExecutorInterface):
         if not self.stop_event.is_set():
             self.stop_event.set()
 
-        self.update_delay_process.terminate()
+        self.notify_delay_thread.cancel()
+
+    @events(FINISH_ROUTINE_LOGIC_NAME)
+    def update_finish_routine_logic_time(self, **params):
+        """Updating the duration of routine.
+
+        Args:
+            **params: Dictionary contained the routine name.
+        """
+
+        routine_name = params['routine_name']
+        durations: [] = params['durations']
+
+        if routine_name not in self.routines_measurements:
+            self.routines_measurements[routine_name] = self.mp_manager.list()
+
+        if len(self.routines_measurements[routine_name]) >= self.max_queue_size:
+            # TODO - pop the diff number of elements between the self routine measurements.
+            self.routines_measurements[routine_name].pop()
+
+        [self.routines_measurements[routine_name].append(duration) for duration in durations]
+
+        print(self.routines_measurements[routine_name])
+        print(durations)
 
     def _execute_function_for_sources(self, callback: callable, param=None):
         """Execute the callback function for all the graph's sources.
