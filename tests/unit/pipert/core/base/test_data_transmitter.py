@@ -23,7 +23,7 @@ def dummy_basic_data_transmitter():
 
 
 def test_shared_memory_transmit_receive(dummy_shared_memory_transmitter):
-    if sys.version_info.minor <= 8:  # TODO: Add multiprocessing test
+    if sys.version_info.minor <= 7:  # TODO: Add multiprocessing test
         transmit_func = dummy_shared_memory_transmitter.transmit()
         receive_func = dummy_shared_memory_transmitter.receive()
 
