@@ -106,7 +106,7 @@ def get_data_in_shared_memory(data_dict: dict):
     mem_name = data_dict.get("address", None)
     bytes_to_read = data_dict.get("size", None)
 
-    if (mem_name is None) and (bytes_to_read is None):
+    if (mem_name is None) or (bytes_to_read is None):
         returned_value = None
     else:
         returned_value = SharedMemoryManager().read_from_mem(mem_name=mem_name,
