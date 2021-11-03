@@ -23,7 +23,7 @@ def dummy_basic_data_transmitter():
 
 
 def test_shared_memory_transmit_receive(dummy_shared_memory_transmitter):
-    if sys.version_info.minor <= 7:  # TODO: Add multiprocessing test
+    if sys.version_info.minor <= 8:  # TODO: Add multiprocessing test
         transmit_func = dummy_shared_memory_transmitter.transmit()
         receive_func = dummy_shared_memory_transmitter.receive()
 
@@ -36,6 +36,10 @@ def test_shared_memory_transmit_receive(dummy_shared_memory_transmitter):
         data_to_transmit = np.ones((dummy_shared_memory_transmitter.data_size_threshold,), dtype=np.uint8)
         data.additional_data = {"test": data_to_transmit}
 
+        return_data = transmit_func(data)
+        assert data == receive_func(return_data)
+
+        data.additional_data = {"data": b"AAA" * 100, "short_data": b"AAA", "address": "Makabim"}
         return_data = transmit_func(data)
         assert data == receive_func(return_data)
 
