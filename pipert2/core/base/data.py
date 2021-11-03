@@ -1,9 +1,4 @@
-import sys
-
-if sys.version_info.minor >= 7:
-    from dataclasses import dataclass, field
-else:
-    from pipert2.utils.data_class.dataclasses import dataclass, field
+from pipert2 import dataclass, field
 
 
 @dataclass
