@@ -1,7 +1,6 @@
 import sys
-
-import numpy as np
 import pytest
+import numpy as np
 from pipert2.core.base.data import Data
 from pipert2.core.base.transmitters import BasicTransmitter
 
