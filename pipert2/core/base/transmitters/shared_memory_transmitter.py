@@ -1,13 +1,8 @@
-import sys
 import numpy as np
+from pipert2 import fields
 from pipert2.core.base.data import Data
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.utils.shared_memory_manager import SharedMemoryManager
-
-if sys.version_info.minor >= 7:
-    from dataclasses import fields
-else:
-    from pipert2.utils.data_class.dataclasses import fields
 
 
 class SharedMemoryTransmitter(DataTransmitter):
