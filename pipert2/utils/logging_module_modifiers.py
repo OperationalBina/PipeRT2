@@ -11,7 +11,7 @@ def add_pipe_log_level():
     The level of PIPE_INFRASTRUCTURE is smaller than DEBUG level (10).
 
 
-    Examples:
+    Example usage:
         >>> import sys
         >>> add_pipe_log_level()
         >>> logger = logging.getLogger()
