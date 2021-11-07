@@ -69,14 +69,19 @@ class Flow(EventExecutorInterface):
             self.execute_event(event)
             event = self.event_handler.wait()
 
+        # print("In flow finish exit flow")
         self.execute_event(Method(STOP_EVENT_NAME))
 
+        # print("In flow start join")
+
         for routine in self.routines.values():
+            # print(f"Start join routine {routine.name}")
             routine.join()
+            # print(f"Finish join routine {routine.name}")
 
     @events(START_EVENT_NAME)
     def start(self):
-        print("start flow")
+        # print("start flow")
         self._logger.plog("Starting")
 
     @events(STOP_EVENT_NAME)
@@ -109,6 +114,7 @@ class Flow(EventExecutorInterface):
         """
 
         self.flow_process.join()
+        print("IN flow, finish join")
 
     @classmethod
     def get_events(cls):

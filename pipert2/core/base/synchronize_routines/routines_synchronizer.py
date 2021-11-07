@@ -23,7 +23,7 @@ class RoutinesSynchronizer(EventExecutorInterface):
                  wires: Dict,
                  notify_callback: callable):
 
-        self.max_queue_size = 50
+        self.max_queue_size = 200
         self.wires = wires
         self._logger = logger
         self.notify_callback = notify_callback
@@ -45,6 +45,8 @@ class RoutinesSynchronizer(EventExecutorInterface):
 
         self.routines_measurements: Dict[str, list] = self.mp_manager.dict()
 
+        self.event_procss: mp.Process = None
+
     def execute_event(self, event: Method) -> None:
         """Execute the event that notified.
 
@@ -60,7 +62,7 @@ class RoutinesSynchronizer(EventExecutorInterface):
         """
 
         self.routines_graph = self.create_routines_graph()
-        mp.Process(target=self.base_listen_to_events).start()
+        self.event_procss = mp.Process(target=self.base_listen_to_events).start()
 
         self.stop_event.clear()
 
@@ -164,8 +166,6 @@ class RoutinesSynchronizer(EventExecutorInterface):
         if not self.stop_event.is_set():
             self.stop_event.set()
 
-        self.notify_delay_thread.cancel()
-
     @events(FINISH_ROUTINE_LOGIC_NAME)
     def update_finish_routine_logic_time(self, **params):
         """Updating the duration of routine.
@@ -180,14 +180,13 @@ class RoutinesSynchronizer(EventExecutorInterface):
         if routine_name not in self.routines_measurements:
             self.routines_measurements[routine_name] = self.mp_manager.list()
 
-        if len(self.routines_measurements[routine_name]) >= self.max_queue_size:
-            # TODO - pop the diff number of elements between the self routine measurements.
-            self.routines_measurements[routine_name].pop()
+        expected_length = len(durations) + len(self.routines_measurements[routine_name])
+
+        if expected_length >= self.max_queue_size:
+            for _ in range(self.max_queue_size - expected_length):
+                self.routines_measurements[routine_name].pop(0)
 
         [self.routines_measurements[routine_name].append(duration) for duration in durations]
-
-        print(self.routines_measurements[routine_name])
-        print(durations)
 
     def _execute_function_for_sources(self, callback: callable, param=None):
         """Execute the callback function for all the graph's sources.

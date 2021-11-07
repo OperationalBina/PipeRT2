@@ -1,6 +1,7 @@
 from threading import Thread
 from multiprocessing import Queue as mpQueue
 from queue import Queue as thQueue, Full, Empty
+from pipert2.utils.dummy_object import Dummy
 
 
 class QueueWrapper:
@@ -17,10 +18,11 @@ class QueueWrapper:
     """
 
     def __init__(self, max_queue_size=1):
-        self.mp_queue = None
+        self.mp_queue: mpQueue = None
         self.max_queue_size = max_queue_size
         self.out_queue = thQueue(maxsize=max_queue_size)
-        self.multiprocess_thread = Thread()
+        self.multiprocess_thread = Thread(target=self.queue_worker)
+        self.logger: Logger = Dummy()
 
     def get(self, block: bool, timeout: int):
         """Return whatever is in the out_queue.
@@ -82,9 +84,26 @@ class QueueWrapper:
 
         """
 
+        # item = self.mp_queue.get()
+        # try:
+        #     while item != None:
+        #         try:
+        #             self.logger.info(f"item in thread: {item}")
+        #             self.logger.info("in thread before put")
+        #             self.out_queue.put(item, block=True, timeout=1)
+        #             self.logger.info("in thread after put")
+        #         except Full:
+        #             self.logger.info("in thread Full")
+        #         self.logger.info("in thread before get")
+        #         item = self.mp_queue.get()
+        #         self.logger.info("in thread after get")
+        #     self.logger.info("Ending !!!!!!!!!!!!!!!!!! YES")
+        # except Exception as err:
+        #     self.logger.exception(f"in thread crashed: {error}")
+
         for item in iter(self.mp_queue.get, None):
             try:
-                self.out_queue.put(item)
+                self.out_queue.put(item, block=True, timeout=1)
             except Full:
                 pass
 
@@ -103,5 +122,12 @@ class QueueWrapper:
 
         if self.mp_queue is not None:
             while self.multiprocess_thread.is_alive():
+                # self.out_queue.
+                # self.logger.info(f"out_queue size: {self.out_queue.qsize()}")
+                # self.logger.info(f"out_queue empty: {self.out_queue.empty()}")
+                # self.logger.info(f"mp_queue size: {self.mp_queue.qsize()}")
+                # self.logger.info(f"mp_queue empty: {self.mp_queue.empty()}")
+                # self.logger.info("before Put None !!")
                 self.mp_queue.put(None)
+                # self.logger.info("Put None !!")
                 self.multiprocess_thread.join(timeout=0.1)

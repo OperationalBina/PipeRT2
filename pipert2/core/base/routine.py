@@ -44,7 +44,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """
 
         self.duration_notify_thread = threading.Thread(target=self.notify_durations)
-
         if name is not None:
             self.name = name
         else:
@@ -59,6 +58,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
+        self.double_fps = False
 
         self.durations = []
 
@@ -123,7 +123,10 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        pass
+        if self.name == "register_frames":
+            self._logger.info("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+            self.message_handler.logger = self._logger
+            self.message_handler.input_queue.logger = self._logger
 
     def cleanup(self) -> None:
         """The final method that ends the routine execution
@@ -138,8 +141,13 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        self.message_handler.teardown()
         self.cleanup()
+        if self.name == "register_frames":
+            self._logger.info("before message handler")
+            self.message_handler.logger = self._logger
+        self.message_handler.teardown()
+        if self.name == "register_frames":
+            self._logger.info("after message handler")
 
     def _start_routine_logic(self) -> None:
         """Start the routine main logic wrapped by setup and cleanup functions.
@@ -215,7 +223,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self._logger.plog("Stopping")
             self.stop_event.set()
             self.runner.join()
-            self.duration_notify_thread.join()
+            # self.duration_notify_threads.join()
 
     @events(UPDATE_FPS_NAME)
     def update_delay_time(self, **params) -> None:
@@ -226,6 +234,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         fps = params['fps']
 
         if fps > 0:
+            fps = (fps * 2) if self.double_fps else fps
             self._fps.value = fps
 
     def execute_event(self, event: Method) -> None:
@@ -256,8 +265,13 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
+        # print(f"Start join to {self.name}")
+
         if self.stop_event.is_set():
             self.runner.join()
+            self.duration_notify_thread.join()
+
+        # print(f"Finish join to {self.name}")
 
     def set_const_fps(self, fps):
         self.cosnt_fps.value = fps

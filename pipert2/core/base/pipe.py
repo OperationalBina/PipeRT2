@@ -28,7 +28,8 @@ class Pipe:
     def __init__(self, network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
                  data_transmitter: DataTransmitter = BasicTransmitter(),
-                 auto_pacing_mechanism: bool = False):
+                 auto_pacing_mechanism: bool = False,
+                 double_fps = False):
         """
         Args:
             network: Network object responsible for the routine's communication.
@@ -50,6 +51,7 @@ class Pipe:
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
         self.wires: Dict[tuple, Wire] = {}
+        self.double_fps = double_fps
 
         if auto_pacing_mechanism:
             self.routine_synchronizer = RoutinesSynchronizer(event_board=self.event_board,
@@ -74,6 +76,7 @@ class Pipe:
         """
 
         for routine in routines:
+            routine.double_fps = self.double_fps
             routine.initialize(message_handler=self.network.get_message_handler(routine.name),
                                event_notifier=self.event_board.get_event_notifier())
 
@@ -140,13 +143,15 @@ class Pipe:
 
         """
 
+        print("pipe join")
+
         if to_kill:
             self.notify_event(KILL_EVENT_NAME)
 
         for flow in self.flows.values():
+            print(f"Start join flow {flow.name}")
             flow.join()
-
-        self.logger.plog(f"Joined all flows")
+            print(f"Finish join flow {flow.name}")
 
         self.event_board.join()
         self.logger.plog(f"Joined event board")
