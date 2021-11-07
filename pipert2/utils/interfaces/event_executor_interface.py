@@ -31,3 +31,5 @@ class EventExecutorInterface(ABC):  # TODO - Maybe add a logger abstract class f
             event = self.event_handler.wait()
 
         self.execute_event(Method(KILL_EVENT_NAME))
+
+        print("base listing finishs")
