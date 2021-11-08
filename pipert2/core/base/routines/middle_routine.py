@@ -25,7 +25,7 @@ class MiddleRoutine(Routine, metaclass=ABCMeta):
             duration = None
 
             try:
-                output_data, duration = self.run_main_logic_with_fps_mechanism(self.main_logic, message.get_data())
+                output_data, duration = self.run_main_logic_with_time_measurement(self.main_logic, message.get_data())
             except Exception as error:
                 self._logger.exception(f"The routine has crashed: {error}")
             else:

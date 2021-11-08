@@ -40,12 +40,9 @@ class RoutinesSynchronizer(EventExecutorInterface):
         self.mp_manager = mp_manager
         self.routines_graph: Dict[str, SynchronizerNode] = mp_manager.dict()
 
-        # self.update_delay_process: mp.Process = None
         self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_delay_iteration)
 
         self.routines_measurements: Dict[str, list] = self.mp_manager.dict()
-
-        self.event_process: mp.Process = None
 
     def execute_event(self, event: Method) -> None:
         """Execute the event that notified.

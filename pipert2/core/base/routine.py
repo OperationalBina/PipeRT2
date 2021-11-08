@@ -62,11 +62,10 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         self.durations = []
 
-        self._fps = mp.Value('f', 0.0)
-        self._fps.value = 25
-
-        self.cosnt_fps = mp.Value('f', 0.0)
-        self.cosnt_fps.value = -1
+        self._fps = mp.Value('f', -1)
+        self._const_fps = mp.Value('f', -1)
+        self.fps_multiplier = 2
+        self.notify_durations_interval = 4
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -123,10 +122,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        if self.name == "register_frames":
-            self._logger.info("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-            self.message_handler.logger = self._logger
-            self.message_handler.input_queue.logger = self._logger
+        pass
 
     def cleanup(self) -> None:
         """The final method that ends the routine execution
@@ -142,12 +138,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """
 
         self.cleanup()
-        if self.name == "register_frames":
-            self._logger.info("before message handler")
-            self.message_handler.logger = self._logger
         self.message_handler.teardown()
-        if self.name == "register_frames":
-            self._logger.info("after message handler")
 
     def _start_routine_logic(self) -> None:
         """Start the routine main logic wrapped by setup and cleanup functions.
@@ -159,16 +150,16 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         while not self.stop_event.is_set():
             duration = self._extended_run()
 
-            if duration is not None:
+            if duration is not None and (self._fps.value > -1 or self._const_fps.value > -1):
 
-                required_fps = self.cosnt_fps.value if self.cosnt_fps.value > -1 else self._fps.value
+                required_fps = self._const_fps.value if self._const_fps.value > -1 else self._fps.value
 
                 if required_fps > 0 and duration < 1 / required_fps:
                     time.sleep((1 / required_fps) - duration)
 
         self._base_cleanup()
 
-    def run_main_logic_with_fps_mechanism(self, main_logic: callable, params=None):
+    def run_main_logic_with_time_measurement(self, main_logic: callable, params=None):
         start_time = time.time()
 
         if params is None:
@@ -188,9 +179,9 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     def notify_durations(self):
         while not self.stop_event.is_set():
-            durations = [1/self.cosnt_fps.value] if self.cosnt_fps.value > -1 else self.durations
+            durations = [1 / self._const_fps.value] if self._const_fps.value > -1 else self.durations
             self.notify_event(FINISH_ROUTINE_LOGIC_NAME, **{'routine_name': self.name, 'durations': durations})
-            time.sleep(4)
+            time.sleep(self.notify_durations_interval)
 
     @runners("thread")
     def set_runner_as_thread(self):
@@ -234,8 +225,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         fps = params['fps']
 
         if fps > 0:
-            fps = (fps * 2) if self.double_fps else fps
-            self._fps.value = fps
+            self._fps.value = fps * self.fps_multiplier
 
     def execute_event(self, event: Method) -> None:
         """Execute an event to start
@@ -274,4 +264,4 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         # print(f"Finish join to {self.name}")
 
     def set_const_fps(self, fps):
-        self.cosnt_fps.value = fps
+        self._const_fps.value = fps
