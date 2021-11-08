@@ -8,6 +8,8 @@ class src(SourceRoutine):
     def main_logic(self) -> dict:
         a = 5
 
+        # print(f"src fps: {self._fps.value}")
+
         return {
             'a': 5
         }
@@ -16,6 +18,8 @@ class src(SourceRoutine):
 class dst(DestinationRoutine):
     def main_logic(self, dict):
         a = 5
+
+        # print(f"dst fps: {self._fps.value}")
 
         time.sleep(1)
 
@@ -34,7 +38,7 @@ dst2.name = "ds1"
 dst3 = dst()
 dst3.name = "ds2"
 
-pipe = Pipe(auto_pacing_mechanism=True)
+pipe = Pipe(auto_pacing_mechanism=False)
 
 
 pipe.create_flow("f1", True, src_routine, dst1)
@@ -52,5 +56,14 @@ pipe.notify_event(START_EVENT_NAME)
 
 time.sleep(3)
 
+print("after sleep!")
+
 pipe.notify_event(KILL_EVENT_NAME)
+
+print("Kill")
+
 pipe.join()
+
+print("After join")
+
+

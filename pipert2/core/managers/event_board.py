@@ -1,11 +1,11 @@
-from typing import Callable
+from typing import Callable, Set
 from threading import Thread
 from functools import partial
 from collections import defaultdict
-from multiprocessing import Pipe, SimpleQueue
+from multiprocessing import Pipe, SimpleQueue, Event
 from pipert2.core.handlers.event_handler import EventHandler
 from pipert2.utils.method_data import Method
-from pipert2.utils.consts.event_names import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME
+from pipert2.utils.consts.event_names import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME, UPDATE_FPS_NAME
 
 DEFAULT_EVENT_HANDLER_EVENTS = [START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME]
 
@@ -19,7 +19,7 @@ class EventBoard:
         self.events_pipes = defaultdict(list)
         self.new_events_queue = SimpleQueue()
 
-    def get_event_handler(self, events_to_listen: list):
+    def get_event_handler(self, events_to_listen: Set[str]):
         """Return an event handler adjusted to the given events.
 
         Args:
@@ -31,12 +31,10 @@ class EventBoard:
         """
 
         pipe_output, pipe_input = Pipe(duplex=False)
+        events_to_listen.update(DEFAULT_EVENT_HANDLER_EVENTS)
 
         for event_name in events_to_listen:
             self.events_pipes[event_name].append(pipe_input)
-
-        for default_event_name in DEFAULT_EVENT_HANDLER_EVENTS:
-            self.events_pipes[default_event_name].append(pipe_input)
 
         return EventHandler(pipe_output)
 
@@ -70,7 +68,9 @@ class EventBoard:
         """
 
         def notify_event(output_event_queue, event_name, specific_flow_routines: dict = defaultdict(list), **params):
-            output_event_queue.put(Method(event_name, specific_flow_routines=specific_flow_routines, params=params))
+            output_event_queue.put(Method(event_name,
+                                          specific_flow_routines=specific_flow_routines,
+                                          params=params))
 
         return partial(notify_event, self.new_events_queue)
 

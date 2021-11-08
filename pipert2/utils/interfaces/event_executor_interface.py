@@ -17,19 +17,10 @@ class EventExecutorInterface(ABC):  # TODO - Maybe add a logger abstract class f
         if event.event_name in mapped_events:
             self._logger.plog(f"Running event '{event.event_name}'")
             for callback in mapped_events[event.event_name]:
+                print("The next event *** : " + event.event_name)
                 callback(self, **event.params)
 
     @classmethod
     @abstractmethod
     def get_events(cls):
         raise NotImplementedError
-
-    def base_listen_to_events(self):
-        event = self.event_handler.wait()
-        while not event.event_name == KILL_EVENT_NAME:
-            self.execute_event(event)
-            event = self.event_handler.wait()
-
-        self.execute_event(Method(KILL_EVENT_NAME))
-
-        print("base listing finishs")

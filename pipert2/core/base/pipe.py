@@ -143,8 +143,6 @@ class Pipe:
 
         """
 
-        print("pipe join")
-
         if to_kill:
             self.notify_event(KILL_EVENT_NAME)
 
@@ -153,8 +151,16 @@ class Pipe:
             flow.join()
             print(f"Finish join flow {flow.name}")
 
+        print("Joined all flows")
+
         self.event_board.join()
         self.logger.plog(f"Joined event board")
+
+        print("start join synchronizer")
+        if self.routine_synchronizer is not None:
+            self.routine_synchronizer.join()
+        print("joined synchronizer")
+        self.logger.plog("Joined synchronizer")
 
     def _validate_pipe(self):
         """Validate routines and wires in current pipeline.

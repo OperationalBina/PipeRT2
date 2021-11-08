@@ -43,7 +43,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        self.duration_notify_thread = threading.Thread(target=self.notify_durations)
         if name is not None:
             self.name = name
         else:
@@ -65,7 +64,9 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self._fps = mp.Value('f', -1)
         self._const_fps = mp.Value('f', -1)
         self.fps_multiplier = 2
-        self.notify_durations_interval = 4
+        self.notify_durations_interval = 1
+
+        self.duration_notify_thread: threading.Thread = None
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -174,14 +175,15 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         return result, duration
 
-    def run_notify_durations(self):
-        self.duration_notify_thread.start()
-
     def notify_durations(self):
         while not self.stop_event.is_set():
             durations = [1 / self._const_fps.value] if self._const_fps.value > -1 else self.durations
             self.notify_event(FINISH_ROUTINE_LOGIC_NAME, **{'routine_name': self.name, 'durations': durations})
             time.sleep(self.notify_durations_interval)
+
+            print(f"Routine while - the stop event: {self.stop_event.is_set()}")
+
+        print("Routine out")
 
     @runners("thread")
     def set_runner_as_thread(self):
@@ -200,6 +202,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.stop_event.clear()
             self.runner = self.runner_creator()
             self.runner.start()
+
+            self.duration_notify_thread = threading.Thread(target=self.notify_durations)
             self.duration_notify_thread.start()
 
     @events(STOP_EVENT_NAME)
@@ -209,6 +213,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         (This method will be called when the 'stop' event is triggered)
 
         """
+
+        print("Set to STOP EVENT")
 
         if not self.stop_event.is_set():
             self._logger.plog("Stopping")

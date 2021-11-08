@@ -1,3 +1,4 @@
+from logging import Logger
 from threading import Thread
 from multiprocessing import Queue as mpQueue
 from queue import Queue as thQueue, Full, Empty
