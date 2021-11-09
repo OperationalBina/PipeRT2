@@ -38,11 +38,11 @@ dst2.name = "ds1"
 dst3 = dst()
 dst3.name = "ds2"
 
-pipe = Pipe(auto_pacing_mechanism=False)
+pipe = Pipe(auto_pacing_mechanism=True)
 
 
 pipe.create_flow("f1", True, src_routine, dst1)
-# pipe.create_flow("f2", False, src1_routine, dst3)
+# pipe.create_flow("f2", True, src1_routine, dst3)
 #
 # pipe.link(
 #     Wire(source=src_routine, destinations=(dst1, dst2)),

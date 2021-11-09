@@ -96,7 +96,7 @@ def test_link_link_existing_wires_sources_should_override_existing_in_dictionary
 def test_build(dummy_pipe_with_flows):
     dummy_pipe_object, flow_names = dummy_pipe_with_flows
     dummy_pipe_object.build()
-    assert dummy_pipe_object.flows[flow_names[0]].build.call_count == 3
+    assert dummy_pipe_object.flows[flow_names[0]].base_build.call_count == 3
 
 
 def test_notify_event(dummy_pipe: Pipe):
