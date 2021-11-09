@@ -1,9 +1,9 @@
 import threading
 import multiprocessing as mp
-from collections import defaultdict
 from logging import Logger
 from typing import Callable
 from functools import partial
+from collections import defaultdict
 from abc import ABCMeta, abstractmethod
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
@@ -23,6 +23,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     events = class_functions_dictionary()
     runners = class_functions_dictionary()
+    main_logics = class_functions_dictionary()
     routines_created_counter = 0
 
     def __init__(self, name: str = None):
@@ -88,15 +89,15 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        routine_events = cls.events.all[Routine.__name__]
+        routine_events = cls.events.all(Routine)
         for event_name, events_functions in routine_events.items():
-            cls.events.all[cls.__name__][event_name].update(events_functions)
+            cls.events.all(cls)[event_name].update(events_functions)
 
-        return cls.events.all[cls.__name__]
+        return cls.events.all(cls)
 
     @classmethod
     def _get_runners(cls):
-        return cls.runners.all[cls.__name__]
+        return cls.runners.all(cls)
 
     @abstractmethod
     def _extended_run(self) -> None:

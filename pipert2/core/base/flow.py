@@ -118,4 +118,4 @@ class Flow(EventExecutorInterface):
 
         """
 
-        return cls.events.all[cls.__name__]
+        return cls.events.all(cls)

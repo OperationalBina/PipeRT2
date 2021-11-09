@@ -5,7 +5,6 @@ from pipert2.core.base.routine import Routine
 
 class MiddleRoutine(Routine, metaclass=ABCMeta):
 
-    @abstractmethod
     def main_logic(self, data) -> Data:
         """Process the given data to the routine.
 

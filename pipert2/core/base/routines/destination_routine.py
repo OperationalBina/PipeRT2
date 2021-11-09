@@ -5,7 +5,6 @@ from pipert2.core.base.routine import Routine
 
 class DestinationRoutine(Routine, metaclass=ABCMeta):
 
-    @abstractmethod
     def main_logic(self, data: Data) -> None:
         """Main logic of the routine.
 
@@ -13,7 +12,7 @@ class DestinationRoutine(Routine, metaclass=ABCMeta):
                 data: The main logic parameter.
         """
 
-        raise NotImplementedError
+        raise NotImplementedError("No logic for the Base Data class input was implemented")
 
     def _extended_run(self) -> None:
         message = self.message_handler.get()
