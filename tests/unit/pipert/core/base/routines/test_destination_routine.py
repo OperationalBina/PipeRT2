@@ -1,6 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 from pipert2.utils.dummy_object import Dummy
+from tests.unit.pipert.core.utils.functions_test_utils import message_generator
 from tests.unit.pipert.core.utils.dummy_routines.dummy_destination_routine import DummyDestinationRoutine
 
 MAX_TIMEOUT_WAITING = 3
@@ -10,6 +11,7 @@ MAX_TIMEOUT_WAITING = 3
 def dummy_routine(mocker: MockerFixture):
     dummy_routine = DummyDestinationRoutine()
     mock_message_handler = mocker.MagicMock()
+    mock_message_handler.get.side_effect = message_generator
     dummy_routine.initialize(mock_message_handler, event_notifier=Dummy())
     return dummy_routine
 

@@ -4,7 +4,7 @@ from pytest_mock import MockerFixture
 from pipert2.utils.dummy_object import Dummy
 from tests.unit.pipert.core.utils.dummy_routines.dummy_middle_routine import DummyMiddleRoutine, DUMMY_ROUTINE_EVENT, \
     DummyMiddleRoutineException
-from tests.unit.pipert.core.utils.functions_test_utils import timeout_wrapper
+from tests.unit.pipert.core.utils.functions_test_utils import timeout_wrapper, message_generator
 
 MAX_TIMEOUT_WAITING = 3
 
@@ -13,6 +13,7 @@ MAX_TIMEOUT_WAITING = 3
 def dummy_routine(mocker: MockerFixture):
     dummy_routine = DummyMiddleRoutine()
     mock_message_handler = mocker.MagicMock()
+    mock_message_handler.get.side_effect = message_generator
     dummy_routine.initialize(mock_message_handler, event_notifier=Dummy())
     return dummy_routine
 
@@ -26,12 +27,11 @@ def test_routine_has_registered_events(dummy_routine):
     assert DUMMY_ROUTINE_EVENT.event_name in dummy_routine.get_events()
 
 
-def test_routine_execution(mocker, dummy_routine):
-    main_logic_spy = mocker.spy(dummy_routine, "main_logic")
+def test_routine_execution(dummy_routine):
 
     does_routine_executed_enough_times_function = \
-        partial((lambda spy, expected_counter_value: spy.call_count >= expected_counter_value),
-                spy=main_logic_spy,
+        partial((lambda routine, expected_counter_value: routine.counter >= expected_counter_value),
+                routine=dummy_routine,
                 expected_counter_value=10)
 
     assert dummy_routine.stop_event.is_set()
