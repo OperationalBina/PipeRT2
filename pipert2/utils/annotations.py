@@ -1,4 +1,5 @@
 import re
+import types
 from functools import partial
 from collections import defaultdict
 
@@ -40,11 +41,11 @@ def class_functions_dictionary():
     def key_registrar(keys_or_function):
         if callable(keys_or_function):
             # No key was given to the function, setting a defualt key
-            return registrar(keys="default_key", function=keys_or_function)
+            return register(keys="default_key", function=keys_or_function)
         else:
-            return partial(registrar, keys=keys_or_function)
+            return partial(register, keys=keys_or_function)
 
-    def registrar(function, keys):
+    def register(function, keys):
         # Get the class name from the function __str__ attribute using regular expression
         class_name = re.search(' (.*)\\.', function.__str__()).group(1)
 
@@ -98,14 +99,13 @@ def main_logics_dictionary():
 
     registry = defaultdict(dict)
 
-    def key_registrar(keys_or_function):
-        if callable(keys_or_function):
-            # No key was given to the function, setting a defualt key
-            return registrar(keys=Data, function=keys_or_function)
+    def key_registrar(expected_input_type):
+        if isinstance(expected_input_type, types.FunctionType):
+            return register(keys=Data, function=expected_input_type)
         else:
-            return partial(registrar, keys=keys_or_function)
+            return partial(register, keys=expected_input_type)
 
-    def registrar(function, keys):
+    def register(function, keys):
         # Get the class name from the function __str__ attribute using regular expression
         class_name = re.search(' (.*)\\.', function.__str__()).group(1)
 
@@ -113,8 +113,7 @@ def main_logics_dictionary():
 
         for key in keys:
             if class_name in registry and key in registry[class_name]:
-                raise ReferenceError(f"The datatype {key} already have a main logic function")
-                pass
+                raise ReferenceError(f"The datatype {key} already have a main logic function in the {class_name} class")
             registry[class_name][key] = function
 
         return function
@@ -128,70 +127,3 @@ def main_logics_dictionary():
     key_registrar.all = get_functions
 
     return key_registrar
-
-# main_logics = class_functions_dictionary()
-
-#
-# class Bakery(metaclass=MainLogicValidation, routines_registry=main_logics, validate_main_logic=False):
-#     main_logics = main_logics
-#
-#     @main_logics("indian")
-#     def indian_backing(self):
-#         pass
-#
-#     @main_logics("asian")
-#     def asian_backing(self):
-#         pass
-#
-#     @classmethod
-#     def get_main_logics(cls):
-#         print(cls.__base__)
-#         return cls.main_logics.all(cls)
-#
-#
-# def stam(func):
-#     print(f"Calling stam on {func}")
-#     print(func)
-#     print(getfullargspec(func))
-#
-#
-# class OtherBakery(Bakery, metaclass=MainLogicValidation, validate_main_logic=stam):
-#     pass
-#
-#
-# class SonOtherBakery(OtherBakery):
-#
-#     @OtherBakery.main_logics("israel")
-#     def israeli_backing(self, data: str) -> int:
-#         pass
-#
-#
-# class SonSonOtherBakery(SonOtherBakery):
-#
-#     @SonOtherBakery.main_logics("china")
-#     def chinese_backing(self, data: int) -> tuple:
-#         pass
-#
-#     # print(Bakery.get_cooking_styles())
-#     # func = OtherBakery.get_cooking_styles()["israel"].pop()
-#     # stam.
-#     # print(func)
-#     # print(func.__dict__)
-#
-# if __name__ == '__main__':
-#     print(Bakery.main_logics)
-
-
-    # modified:   pipert2/core/base/flow.py
-    # modified:   pipert2/core/base/routine.py
-    # modified:   pipert2/core/base/routines/destination_routine.py
-    # modified:   pipert2/core/base/routines/middle_routine.py
-    # modified:   pipert2/utils/annotations.py
-    # modified:   pipert2/utils/data_class/dataclasses.py
-    # modified: pipert2 / core / base / message.py
-    # modified: pipert2 / core / base / routine.py
-    # modified: pipert2 / core / base / routines / destination_routine.py
-    # modified: pipert2 / utils / annotations.py
-    # pipert2 / utils / metaclasses /
-
-
