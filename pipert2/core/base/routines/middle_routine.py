@@ -1,27 +1,31 @@
-from abc import ABCMeta, abstractmethod
 from pipert2.core.base.data import Data
 from pipert2.core.base.routine import Routine
+from pipert2.utils.exceptions.main_logic_not_exist_error import MainLogicNotExistError
 
 
-class MiddleRoutine(Routine, metaclass=ABCMeta):
+class MiddleRoutine(Routine):
+    """Middle Routine is expecting messages processing them and sending them out to the next routine.
 
-    def main_logic(self, data) -> Data:
-        """Process the given data to the routine.
+    Implementation example:
 
-        Args:
-            data: The data that the routine processes and sends.
+    >>> class MyMiddleRoutine(MiddleRoutine):
+    ...
+    ...     @MiddleRoutine.main_logics(Data)
+    ...     def process_data(self, data: Data) -> Data:
+    ...         self._logger.info(f"Processing the data {data}")
+    ...         data.additional_data = {"Processed": True}
+    ...         return data
 
-        Returns:
-            The main logic result.
-        """
-
-        raise NotImplementedError
+    """
 
     def _extended_run(self) -> None:
         message = self.message_handler.get()
         if message is not None:
             try:
-                output_data = self.main_logic(message.get_data())
+                main_logic_callback = self._get_main_logic_callback(message.get_data_type())
+                output_data = main_logic_callback(self, message.get_data())
+            except MainLogicNotExistError as error:
+                self._logger.error(error)
             except Exception as error:
                 self._logger.exception(f"The routine has crashed: {error}")
             else:

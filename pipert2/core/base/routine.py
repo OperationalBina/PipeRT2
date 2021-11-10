@@ -3,21 +3,19 @@ import multiprocessing as mp
 from logging import Logger
 from typing import Callable
 from functools import partial
+from abc import abstractmethod, ABC
 from collections import defaultdict
-from abc import ABCMeta, abstractmethod, ABC
-from pipert2.utils.metaclasses.main_logic_validation import MainLogicValidation
+from pipert2.core.base.data import Data
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.handlers.message_handler import MessageHandler
-from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
-
-main_logics = class_functions_dictionary()
+from pipert2.utils.exceptions.main_logic_not_exist_error import MainLogicNotExistError
+from pipert2.utils.annotations import class_functions_dictionary, main_logics_dictionary
 
 
 class Routine(EventExecutorInterface, ABC):
-    __metaclass__ = MainLogicValidation
     """A routine is responsible for performing one of the flow’s main tasks.
     It can run as either a thread or a process.
     First it runs a setup function, then it runs its main logic function in a continuous loop, until it is told to terminate.
@@ -27,7 +25,7 @@ class Routine(EventExecutorInterface, ABC):
 
     events = class_functions_dictionary()
     runners = class_functions_dictionary()
-    main_logics = main_logics
+    main_logics = main_logics_dictionary()
     routines_created_counter = 0
 
     def __init__(self, name: str = None):
@@ -207,3 +205,10 @@ class Routine(EventExecutorInterface, ABC):
 
         if self.stop_event.is_set():
             self.runner.join()
+
+    def _get_main_logic_callback(self, input_data_type=Data):
+        try:
+            return self.main_logics.all(self.__class__)[input_data_type]
+        except KeyError:
+            raise MainLogicNotExistError(f"Got data type {input_data_type} but there is no main_logic function to "
+                                         f"handle it")

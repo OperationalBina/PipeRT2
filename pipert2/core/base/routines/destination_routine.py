@@ -1,25 +1,28 @@
-from abc import ABCMeta, abstractmethod
 from pipert2.core.base.data import Data
 from pipert2.core.base.routine import Routine
+from pipert2.utils.exceptions.main_logic_not_exist_error import MainLogicNotExistError
 
 
-class DestinationRoutine(Routine, metaclass=ABCMeta):
+class DestinationRoutine(Routine):
+    """Destination Routine is only expecting messages and doesn't send any of them out.
 
-    def main_logic(self, data: Data) -> None:
-        """Main logic of the routine.
+    Implementation example:
 
-            Args:
-                data: The main logic parameter.
-        """
+    >>> class MyDestinationRoutine(DestinationRoutine):
+    ...
+    ...     @DestinationRoutine.main_logics(expected_input_type=Data)
+    ...     def process_data(self, data: Data) -> None:
+    ...         self._logger.info(f"Processing the data {data}, and not sending anything")
 
-        raise NotImplementedError("No logic for the Base Data class input was implemented")
+    """
 
     def _extended_run(self) -> None:
         message = self.message_handler.get()
         if message is not None:
             try:
-                self.main_logic(message.get_data())
-                main_logic_callbacks = self.main_logics.all(self.__class__)[message.get_data_type()]
-                # for main_logic_callbacks
+                main_logic_callback = self._get_main_logic_callback(message.get_data_type())
+                main_logic_callback(self, message.get_data())
+            except MainLogicNotExistError as error:
+                self._logger.error(error)
             except Exception as error:
                 self._logger.exception(f"The routine has crashed: {error}")

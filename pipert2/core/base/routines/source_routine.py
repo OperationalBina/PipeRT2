@@ -1,20 +1,24 @@
-from abc import ABCMeta, abstractmethod
 from pipert2.core.base.data import Data
 from pipert2.core.base.message import Message
 from pipert2.core.base.routine import Routine
+from pipert2.utils.exceptions.main_logic_not_exist_error import MainLogicNotExistError
 
 
-class SourceRoutine(Routine, metaclass=ABCMeta):
+class SourceRoutine(Routine):
+    """Source Routine is generating messages and sending them out to the next routine.
 
-    @abstractmethod
-    def main_logic(self) -> Data:
-        """Routine that starts generate data.
+    Implementation example:
 
-            Returns:
-                The generated data.
-        """
+    >>> class MySourceRoutine(SourceRoutine):
+    ...
+    ...     @SourceRoutine.main_logics
+    ...     def generate_data(self) -> Data:
+    ...         self._logger.info("Creating new data")
+    ...         data = Data()
+    ...         data.additional_data = {"Created at": "Now"}
+    ...         return data
 
-        raise NotImplementedError
+    """
 
     def _extended_run(self) -> None:
         """Wrapper method for executing the entire routine logic
@@ -22,7 +26,10 @@ class SourceRoutine(Routine, metaclass=ABCMeta):
         """
 
         try:
-            output_data = self.main_logic()
+            main_logic_callback = self._get_main_logic_callback()
+            output_data = main_logic_callback(self)
+        except MainLogicNotExistError as error:
+            self._logger.error(error)
         except Exception as error:
             self._logger.exception(f"The routine has crashed: {error}")
         else:
