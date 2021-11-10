@@ -2,6 +2,7 @@ import time
 import pytest
 from multiprocessing import Manager
 from pipert2 import Pipe, QueueNetwork, Wire
+from pipert2.core.base.data import Data
 from tests.unit.pipert.core.utils.events_utils import START_EVENT
 from tests.end_to_end.utils.routines.user_input_source_routine import UserInputSourceRoutine
 from tests.end_to_end.utils.routines.data_assertion_destination_routine import DataAssertionDestinationRoutine
@@ -12,9 +13,9 @@ SECOND_ROUTINE_NAME = "R2"
 DATA_IN_PIPE = []
 
 for i in range(10):
-    DATA_IN_PIPE.append(
-        {"val": i}
-    )
+    data = Data()
+    data.additional_data = {"val": i}
+    DATA_IN_PIPE.append(data)
 
 
 @pytest.fixture()

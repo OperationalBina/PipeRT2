@@ -1,4 +1,5 @@
 from multiprocessing import Event
+from pipert2.core.base.data import Data
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.routines.destination_routine import DestinationRoutine
 
@@ -19,7 +20,8 @@ class DataAssertionDestinationRoutine(DestinationRoutine):
         self.error_dict = shared_process_dict
         self.error_dict[self.ERROR_KEY] = "No Error"
 
-    def main_logic(self, data) -> None:
+    @DestinationRoutine.main_logics(Data)
+    def main_logic(self, data: Data) -> None:
         if data not in self.data_to_expect:
             self._set_error(f"Got unexpected Data: {data}")
             self.is_data_equals_to_expected_data_flag.set()

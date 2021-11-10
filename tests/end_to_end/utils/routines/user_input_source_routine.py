@@ -11,6 +11,7 @@ class UserInputSourceRoutine(SourceRoutine):
         self.does_data_sent = Event()
         self.index = 0
 
+    @SourceRoutine.main_logics
     def main_logic(self) -> any:
         if self.index < len(self.data):
             self.index += 1
