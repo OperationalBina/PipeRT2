@@ -44,7 +44,6 @@ class EventBoard:
         """
 
         event: Method = self.new_events_queue.get()
-        print(self.events_pipes)
         while event.event_name != KILL_EVENT_NAME:
             for pipe in self.events_pipes[event.event_name]:
                 pipe.send(event)
