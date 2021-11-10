@@ -2,6 +2,9 @@ import time
 
 from typing import Callable, Any
 
+from pipert2.core import Message
+from pipert2.core.base.data import Data
+
 
 def timeout_wrapper(func: Callable, expected_value: Any, timeout_duration: int = 3):
     """Trigger given function until it returns the expected value during the timeout duration
@@ -22,3 +25,7 @@ def timeout_wrapper(func: Callable, expected_value: Any, timeout_duration: int =
             return True
 
     return False
+
+
+def message_generator():
+    return Message(Data(), __name__)
