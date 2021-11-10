@@ -1,5 +1,6 @@
 from pipert2.core.base.routines import MiddleRoutine
 from pipert2.utils.method_data import Method
+from pipert2.core.base.data import Data
 
 DUMMY_ROUTINE_EVENT = Method("Change")
 
@@ -11,13 +12,16 @@ class DummyMiddleRoutine(MiddleRoutine):
         self.counter = counter
         self.inc = True
 
-    def main_logic(self, data):
+    @MiddleRoutine.main_logics(Data)
+    def main_logic(self, data: Data):
+        # print(self.counter)
         if self.inc:
             self.counter += 1
         else:
             self.counter -= 1
 
-        return {"value": self.counter}
+        data.additional_data = {"value": self.counter}
+        return data
 
     def setup(self) -> None:
         self.counter = 0
@@ -37,7 +41,8 @@ class DummyMiddleRoutineException(MiddleRoutine):
         self.counter = counter
         self.inc = True
 
-    def main_logic(self, data):
+    @MiddleRoutine.main_logics(Data)
+    def main_logic(self, data: Data):
         raise Exception()
 
     def setup(self) -> None:

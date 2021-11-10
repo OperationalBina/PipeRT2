@@ -7,6 +7,7 @@ class DummyDestinationRoutine(DestinationRoutine):
         super(DummyDestinationRoutine, self).__init__(name=name)
         self.counter = 0
 
+    @DestinationRoutine.main_logics
     def main_logic(self, data) -> None:
         self.counter += 1
 
