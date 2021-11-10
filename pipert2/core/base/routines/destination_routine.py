@@ -19,5 +19,7 @@ class DestinationRoutine(Routine, metaclass=ABCMeta):
         if message is not None:
             try:
                 self.main_logic(message.get_data())
+                main_logic_callbacks = self.main_logics.all(self.__class__)[message.get_data_type()]
+                # for main_logic_callbacks
             except Exception as error:
                 self._logger.exception(f"The routine has crashed: {error}")

@@ -60,6 +60,12 @@ class Message:
 
         return self.payload.data
 
+    def get_data_type(self):
+        if self.payload.encoded:
+            self.payload.decode()
+
+        return type(self.payload.data)
+
     def record_entry(self, routine_name) -> None:
         """Records the timestamp of the message's entry into a routine.
 
