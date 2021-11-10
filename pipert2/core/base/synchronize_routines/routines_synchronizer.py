@@ -1,21 +1,17 @@
-import threading
 import time
-from statistics import median
-from threading import Thread
+import threading
 from typing import Dict
 from logging import Logger
 import multiprocessing as mp
-
-from pipert2.core.base.synchronize_routines.routine_synchronizer_new import EventExecutorImplementation
-from pipert2.utils.method_data import Method
-from pipert2.utils.interfaces import EventExecutorInterface
+from statistics import median
+from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, FINISH_ROUTINE_LOGIC_NAME, START_ROUTINE_LOGIC_NAME
+from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, FINISH_ROUTINE_LOGIC_NAME
 from pipert2.core.base.routines.source_routine import SourceRoutine
 from pipert2.core.base.synchronize_routines.synchronizer_node import SynchronizerNode
 
 
-class RoutinesSynchronizer(EventExecutorImplementation):
+class RoutinesSynchronizer(BaseEventExecutor):
 
     events = class_functions_dictionary()
 
@@ -23,7 +19,7 @@ class RoutinesSynchronizer(EventExecutorImplementation):
                  notify_callback: callable):
 
         super().__init__(event_board, logger)
-        self.max_queue_size = 5
+        self.max_queue_size = 200
         self.wires = wires
         self._logger = logger
         self.notify_callback = notify_callback
@@ -41,15 +37,15 @@ class RoutinesSynchronizer(EventExecutorImplementation):
 
         self.routines_measurements: Dict[str, list] = self.mp_manager.dict()
 
-    def build(self):
+    def before_build(self) -> None:
         """Start the queue listener process.
 
         """
 
-        self.base_build()
         self.routines_graph = self.create_routines_graph()
+        self._stop_event.set()
 
-    def create_routines_graph(self) -> 'DictProxy':
+    def create_routines_graph(self):
         """Build the routine's graph.
 
         Returns:
@@ -120,21 +116,20 @@ class RoutinesSynchronizer(EventExecutorImplementation):
 
             time.sleep(self.updating_interval)
 
-        print("Synchronizer Out")
+    def join_external(self) -> None:
+        """Block until the notify delay thread stops.
 
-    def join(self):
-        self.base_join()
-        print("after base join")
+        """
 
-        self.notify_delay_thread.join()
-        print("after notify delay thread")
+        if self.notify_delay_thread.is_alive():
+            self.notify_delay_thread.join(timeout=1)
 
     @events(START_EVENT_NAME)
     def start_notify_process(self):
         """Start the notify process.
 
         """
-        pass
+
         if self._stop_event.is_set():
             self._stop_event.clear()
             self.notify_delay_thread.start()
@@ -145,12 +140,8 @@ class RoutinesSynchronizer(EventExecutorImplementation):
 
         """
 
-        print("Kill event start")
-
         if not self._stop_event.is_set():
-            print("set stop event")
             self._stop_event.set()
-            self.notify_delay_thread.join(timeout=1)
 
     @events(FINISH_ROUTINE_LOGIC_NAME)
     def update_finish_routine_logic_time(self, **params):
@@ -166,13 +157,7 @@ class RoutinesSynchronizer(EventExecutorImplementation):
         if routine_name not in self.routines_measurements:
             self.routines_measurements[routine_name] = self.mp_manager.list()
 
-        expected_length = len(durations) + len(self.routines_measurements[routine_name])
-
-        if expected_length >= self.max_queue_size:
-            for _ in range(self.max_queue_size - expected_length):
-                self.routines_measurements[routine_name].pop(0)
-
-        self.routines_measurements[routine_name] += durations
+        self.routines_measurements[routine_name] = durations
 
     def _execute_function_for_sources(self, callback: callable, param=None):
         """Execute the callback function for all the graph's sources.
@@ -181,7 +166,6 @@ class RoutinesSynchronizer(EventExecutorImplementation):
             callback: Function in synchronize node to activate
 
         """
-        pass
 
         for value in self.routines_graph.values():
             if param is not None:

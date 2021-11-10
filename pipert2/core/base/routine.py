@@ -1,3 +1,4 @@
+import queue
 import threading
 import multiprocessing as mp
 import time
@@ -10,8 +11,7 @@ from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, UPDATE_FPS_NAME, \
-    START_ROUTINE_LOGIC_NAME, FINISH_ROUTINE_LOGIC_NAME
+from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, UPDATE_FPS_NAME, FINISH_ROUTINE_LOGIC_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
@@ -59,7 +59,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.runner = Dummy()
         self.double_fps = False
 
-        self.durations = []
+        self.durations = queue.Queue(maxsize=200)
 
         self._fps = mp.Value('f', -1)
         self._const_fps = mp.Value('f', -1)
@@ -152,7 +152,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             duration = self._extended_run()
 
             if duration is not None and (self._fps.value > -1 or self._const_fps.value > -1):
-
                 required_fps = self._const_fps.value if self._const_fps.value > -1 else self._fps.value
 
                 if required_fps > 0 and duration < 1 / required_fps:
@@ -169,21 +168,20 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             result = main_logic(params)
 
         end_time = time.time()
-
         duration: float = end_time - start_time
-        self.durations.append(duration)
+
+        try:
+            self.durations.put(duration, block=False, timeout=1)
+        except queue.Full:
+            pass
 
         return result, duration
 
     def notify_durations(self):
         while not self.stop_event.is_set():
             durations = [1 / self._const_fps.value] if self._const_fps.value > -1 else self.durations
-            self.notify_event(FINISH_ROUTINE_LOGIC_NAME, **{'routine_name': self.name, 'durations': durations})
+            self.notify_event(FINISH_ROUTINE_LOGIC_NAME, **{'routine_name': self.name, 'durations': list(durations.queue)})
             time.sleep(self.notify_durations_interval)
-
-            print(f"Routine while - the stop event: {self.stop_event.is_set()}")
-
-        print("Routine out")
 
     @runners("thread")
     def set_runner_as_thread(self):
@@ -261,13 +259,11 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        # print(f"Start join to {self.name}")
-
         if self.stop_event.is_set():
             self.runner.join()
-            self.duration_notify_thread.join()
 
-        # print(f"Finish join to {self.name}")
+            if self.duration_notify_thread is not None and self.duration_notify_thread.is_alive():
+                self.duration_notify_thread.join()
 
     def set_const_fps(self, fps):
         self._const_fps.value = fps

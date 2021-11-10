@@ -1,6 +1,6 @@
 from logging import Logger
 from multiprocessing import Process
-from pipert2.utils.consts import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME
+from pipert2.utils.consts import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME, FINISH_ROUTINE_LOGIC_NAME
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.managers.event_board import EventBoard, EventHandler
@@ -8,7 +8,7 @@ from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.interfaces import EventExecutorInterface
 
 
-class EventExecutorImplementation(EventExecutorInterface):
+class BaseEventExecutor(EventExecutorInterface):
     """Flow is an entity designed for running a group of routines in a single process.
     It is also responsible to notify his routines when an event is triggered.
 
@@ -19,14 +19,10 @@ class EventExecutorImplementation(EventExecutorInterface):
     def __init__(self, event_board: EventBoard, logger: Logger):
         """
         Args:
-            name (str): Name of the flow.
             event_board (EventBoard): The EventBoard of the pipe.
             logger (Logger): Logger object for logging the flow actions.
-            routines (Routine): The routines that will be in the flow.
 
         Attributes:
-            routines (dict[str, Routine]): Dictionary mapping the routines to their name.
-            name (str): Name of the flow.
             logger (Logger): Logger object for logging the flow actions.
             event_handler (EventHandler): EventHandler object for communicating with the
                 event system of the pipe.
@@ -37,16 +33,29 @@ class EventExecutorImplementation(EventExecutorInterface):
         self._logger = logger
         self.synchronizer_process = Dummy()
 
-        events_to_listen = set(self.get_events().keys())
-        self.event_handler: EventHandler = event_board.get_event_handler(events_to_listen)
+        self.events_to_listen = set(self.get_events().keys())
+        self.event_board = event_board
 
-    def base_build(self) -> None:
-        """Start the flow process.
+        self.event_handler: EventHandler = Dummy()
+
+    def build(self) -> None:
+        """Start the event loop process.
 
         """
 
+        self.before_build()
+
+        self.event_handler = self.event_board.get_event_handler(self.events_to_listen)
+
         self.synchronizer_process = Process(target=self.run)
         self.synchronizer_process.start()
+
+    def before_build(self) -> None:
+        """The implementation can implement this method and called in build.
+
+        """
+
+        pass
 
     def run(self) -> None:
         """The flow process, executing the pipe events that occur.
@@ -71,12 +80,20 @@ class EventExecutorImplementation(EventExecutorInterface):
 
         EventExecutorInterface.execute_event(self, event)
 
-    def base_join(self) -> None:
-        """Block until the flow process terminates
+    def join(self) -> None:
+        """Block until the event loop process terminates
 
         """
 
         self.synchronizer_process.join()
+        self.join_external()
+
+    def join_external(self) -> None:
+        """Let the user implement the join. Called after the base join.
+
+        """
+
+        pass
 
     @classmethod
     def get_events(cls):

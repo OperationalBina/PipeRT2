@@ -12,7 +12,7 @@ from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
-from pipert2.core.base.synchronize_routines.routine_synchronizer_new import EventExecutorImplementation
+from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 
 add_pipe_log_level()
@@ -61,7 +61,7 @@ class Pipe:
                                                              wires=self.wires,
                                                              notify_callback=self.event_board.get_event_notifier())
         else:
-            self.routine_synchronizer: EventExecutorImplementation = None
+            self.routine_synchronizer: BaseEventExecutor = None
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -120,7 +120,7 @@ class Pipe:
 
         if self.routine_synchronizer is not None:
             self.routine_synchronizer.wires = self.wires
-            self.routine_synchronizer.base_build()
+            self.routine_synchronizer.build()
 
         self.event_board.build()
 
@@ -158,8 +158,8 @@ class Pipe:
         self.logger.plog(f"Joined event board")
 
         print("start join synchronizer")
-        # if self.routine_synchronizer is not None:
-        #     self.routine_synchronizer.join()
+        if self.routine_synchronizer is not None:
+            self.routine_synchronizer.join()
 
         print("joined synchronizer")
         self.logger.plog("Joined synchronizer")

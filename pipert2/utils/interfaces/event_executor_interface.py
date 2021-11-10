@@ -17,7 +17,6 @@ class EventExecutorInterface(ABC):  # TODO - Maybe add a logger abstract class f
         if event.event_name in mapped_events:
             self._logger.plog(f"Running event '{event.event_name}'")
             for callback in mapped_events[event.event_name]:
-                print("The next event *** : " + event.event_name)
                 callback(self, **event.params)
 
     @classmethod

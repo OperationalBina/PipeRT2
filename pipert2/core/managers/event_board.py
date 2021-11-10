@@ -36,8 +36,6 @@ class EventBoard:
         for event_name in events_to_listen:
             self.events_pipes[event_name].append(pipe_input)
 
-        print(self.events_pipes)
-
         return EventHandler(pipe_output)
 
     def event_loop(self):
