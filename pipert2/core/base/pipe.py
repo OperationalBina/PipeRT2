@@ -29,13 +29,13 @@ class Pipe:
     def __init__(self, network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
                  data_transmitter: DataTransmitter = BasicTransmitter(),
-                 auto_pacing_mechanism: bool = False,
-                 double_fps = False):
+                 auto_pacing_mechanism: bool = False):
         """
         Args:
             network: Network object responsible for the routine's communication.
             logger: Logger object for logging the pipe actions.
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
+            auto_pacing_mechanism: True if the user want to use auto pacing mechanism.
 
         Attributes:
             network: Network object responsible for the routine's communication.
@@ -43,6 +43,7 @@ class Pipe:
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             flows (dict[str, Flow]): Dictionary mapping the pipe flows to their name.
             event_board (EventBoard): EventBoard object responsible for the pipe events.
+            routine_synchronizer (RoutinesSynchronizer): Routine synchronizer if auto_pacing_mechanism is true, else None.
 
         """
 
@@ -147,13 +148,14 @@ class Pipe:
         for flow in self.flows.values():
             flow.join()
 
+        self.logger.plog(f"Joined all flows")
+
         self.event_board.join()
         self.logger.plog(f"Joined event board")
 
         if self.routine_synchronizer is not None:
             self.routine_synchronizer.join()
-
-        self.logger.plog("Joined synchronizer")
+            self.logger.plog("Joined synchronizer")
 
     def _validate_pipe(self):
         """Validate routines and wires in current pipeline.

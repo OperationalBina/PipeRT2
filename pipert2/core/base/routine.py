@@ -1,18 +1,18 @@
+import time
 import queue
 import threading
-import multiprocessing as mp
-import time
-from collections import defaultdict
 from logging import Logger
-from typing import Callable, Optional
+import multiprocessing as mp
 from functools import partial
+from collections import defaultdict
+from typing import Callable, Optional
 from abc import ABCMeta, abstractmethod
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, UPDATE_FPS_NAME, NOTIFY_ROUTINE_DURATIONS_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
+from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, UPDATE_FPS_NAME, NOTIFY_ROUTINE_DURATIONS_NAME
 
 
 class Routine(EventExecutorInterface, metaclass=ABCMeta):
