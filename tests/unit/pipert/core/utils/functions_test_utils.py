@@ -1,7 +1,5 @@
 import time
-
 from typing import Callable, Any
-
 from pipert2.core import Message
 from pipert2.core.base.data import Data
 

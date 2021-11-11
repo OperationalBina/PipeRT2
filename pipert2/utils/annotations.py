@@ -2,7 +2,6 @@ import re
 import types
 from functools import partial
 from collections import defaultdict
-
 from pipert2.core.base.data import Data
 
 

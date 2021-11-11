@@ -1,6 +1,6 @@
-from pipert2.core.base.routines import MiddleRoutine
-from pipert2.utils.method_data import Method
 from pipert2.core.base.data import Data
+from pipert2.utils.method_data import Method
+from pipert2.core.base.routines import MiddleRoutine
 
 DUMMY_ROUTINE_EVENT = Method("Change")
 

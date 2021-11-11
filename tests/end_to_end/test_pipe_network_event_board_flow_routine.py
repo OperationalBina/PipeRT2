@@ -1,8 +1,8 @@
 import time
 import pytest
 from multiprocessing import Manager
-from pipert2 import Pipe, QueueNetwork, Wire
 from pipert2.core.base.data import Data
+from pipert2 import Pipe, QueueNetwork, Wire
 from tests.unit.pipert.core.utils.events_utils import START_EVENT
 from tests.end_to_end.utils.routines.user_input_source_routine import UserInputSourceRoutine
 from tests.end_to_end.utils.routines.data_assertion_destination_routine import DataAssertionDestinationRoutine
