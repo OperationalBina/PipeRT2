@@ -3,8 +3,8 @@ import multiprocessing as mp
 from logging import Logger
 from typing import Callable
 from functools import partial
-from abc import abstractmethod, ABC
 from collections import defaultdict
+from abc import ABCMeta, abstractmethod
 from pipert2.core.base.data import Data
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
@@ -15,7 +15,7 @@ from pipert2.utils.exceptions.main_logic_not_exist_error import MainLogicNotExis
 from pipert2.utils.annotations import class_functions_dictionary, main_logics_dictionary
 
 
-class Routine(EventExecutorInterface, ABC):
+class Routine(EventExecutorInterface, metaclass=ABCMeta):
     """A routine is responsible for performing one of the flow’s main tasks.
     It can run as either a thread or a process.
     First it runs a setup function, then it runs its main logic function in a continuous loop, until it is told to terminate.
