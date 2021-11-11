@@ -52,10 +52,8 @@ class Pipe:
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
         self.wires: Dict[tuple, Wire] = {}
-        self.double_fps = double_fps
 
         if auto_pacing_mechanism:
-            # self.routine_synchronizer = EventExecutorImplementation(event_board= self.event_board, logger=self.logger)
             self.routine_synchronizer = RoutinesSynchronizer(event_board=self.event_board,
                                                              logger=self.logger,
                                                              wires=self.wires,
@@ -77,7 +75,6 @@ class Pipe:
         """
 
         for routine in routines:
-            routine.double_fps = self.double_fps
             routine.initialize(message_handler=self.network.get_message_handler(routine.name),
                                event_notifier=self.event_board.get_event_notifier())
 

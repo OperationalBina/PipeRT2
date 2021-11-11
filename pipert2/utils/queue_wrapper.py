@@ -85,23 +85,6 @@ class QueueWrapper:
 
         """
 
-        # item = self.mp_queue.get()
-        # try:
-        #     while item != None:
-        #         try:
-        #             self.logger.info(f"item in thread: {item}")
-        #             self.logger.info("in thread before put")
-        #             self.out_queue.put(item, block=True, timeout=1)
-        #             self.logger.info("in thread after put")
-        #         except Full:
-        #             self.logger.info("in thread Full")
-        #         self.logger.info("in thread before get")
-        #         item = self.mp_queue.get()
-        #         self.logger.info("in thread after get")
-        #     self.logger.info("Ending !!!!!!!!!!!!!!!!!! YES")
-        # except Exception as err:
-        #     self.logger.exception(f"in thread crashed: {error}")
-
         for item in iter(self.mp_queue.get, None):
             try:
                 self.out_queue.put(item, block=True, timeout=1)
@@ -123,12 +106,5 @@ class QueueWrapper:
 
         if self.mp_queue is not None:
             while self.multiprocess_thread.is_alive():
-                # self.out_queue.
-                # self.logger.info(f"out_queue size: {self.out_queue.qsize()}")
-                # self.logger.info(f"out_queue empty: {self.out_queue.empty()}")
-                # self.logger.info(f"mp_queue size: {self.mp_queue.qsize()}")
-                # self.logger.info(f"mp_queue empty: {self.mp_queue.empty()}")
-                # self.logger.info("before Put None !!")
                 self.mp_queue.put(None)
-                # self.logger.info("Put None !!")
                 self.multiprocess_thread.join(timeout=0.1)

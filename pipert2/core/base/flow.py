@@ -41,7 +41,6 @@ class Flow(BaseEventExecutor):
         for routine in routines:
             routine.set_logger(logger=logger.getChild(routine.name))
             routine.flow_name = self.name
-            routine_events = routine.get_events().keys()
             flow_events_to_listen.update(routine.get_events().keys())
             self.routines[routine.name] = routine
 
@@ -49,7 +48,6 @@ class Flow(BaseEventExecutor):
 
     @events(START_EVENT_NAME)
     def start(self):
-        # print("start flow")
         self._logger.plog("Starting")
 
     @events(STOP_EVENT_NAME)
@@ -76,7 +74,7 @@ class Flow(BaseEventExecutor):
 
             EventExecutorInterface.execute_event(self, event)
 
-    def join_external(self) -> None:
+    def after_join(self) -> None:
         """Block until the flow process terminates
 
         """

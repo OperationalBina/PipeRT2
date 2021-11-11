@@ -1,6 +1,6 @@
 from logging import Logger
 from multiprocessing import Process
-from pipert2.utils.consts import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME, FINISH_ROUTINE_LOGIC_NAME
+from pipert2.utils.consts import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME, NOTIFY_ROUTINE_DURATIONS_NAME
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.managers.event_board import EventBoard, EventHandler
@@ -86,9 +86,9 @@ class BaseEventExecutor(EventExecutorInterface):
         """
 
         self.event_loop_process.join()
-        self.join_external()
+        self.after_join()
 
-    def join_external(self) -> None:
+    def after_join(self) -> None:
         """Let the user implement the join. Called after the base join.
 
         """

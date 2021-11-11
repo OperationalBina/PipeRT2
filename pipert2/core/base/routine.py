@@ -11,7 +11,7 @@ from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, UPDATE_FPS_NAME, FINISH_ROUTINE_LOGIC_NAME
+from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, UPDATE_FPS_NAME, NOTIFY_ROUTINE_DURATIONS_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
@@ -49,6 +49,9 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.name = f"{self.__class__.__name__}-{self.routines_created_counter}"
             self.routines_created_counter += 1
 
+        self.fps_multiplier = 2
+        self.notify_durations_interval = 1
+
         self.flow_name = None
         self.message_handler: MessageHandler = None
         self.runner_creator = None
@@ -57,16 +60,13 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
-        self.double_fps = False
 
         self.durations = queue.Queue(maxsize=200)
 
+        self.duration_notify_thread: threading.Thread = None
+
         self._fps = mp.Value('f', -1)
         self._const_fps = mp.Value('f', -1)
-        self.fps_multiplier = 2
-        self.notify_durations_interval = 1
-
-        self.duration_notify_thread: threading.Thread = None
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -180,7 +180,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     def notify_durations(self):
         while not self.stop_event.is_set():
             durations = [1 / self._const_fps.value] if self._const_fps.value > -1 else self.durations
-            self.notify_event(FINISH_ROUTINE_LOGIC_NAME,
+            self.notify_event(NOTIFY_ROUTINE_DURATIONS_NAME,
                               **{'routine_name': self.name,
                                  'durations': list(durations.queue)}
                               )

@@ -6,7 +6,7 @@ import multiprocessing as mp
 from statistics import median
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, FINISH_ROUTINE_LOGIC_NAME
+from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTINE_DURATIONS_NAME
 from pipert2.core.base.routines.source_routine import SourceRoutine
 from pipert2.core.base.synchronize_routines.synchronizer_node import SynchronizerNode
 
@@ -116,7 +116,7 @@ class RoutinesSynchronizer(BaseEventExecutor):
 
             time.sleep(self.updating_interval)
 
-    def join_external(self) -> None:
+    def after_join(self) -> None:
         """Block until the notify delay thread stops.
 
         """
@@ -143,7 +143,7 @@ class RoutinesSynchronizer(BaseEventExecutor):
         if not self._stop_event.is_set():
             self._stop_event.set()
 
-    @events(FINISH_ROUTINE_LOGIC_NAME)
+    @events(NOTIFY_ROUTINE_DURATIONS_NAME)
     def update_finish_routine_logic_time(self, **params):
         """Updating the duration of routine.
 
