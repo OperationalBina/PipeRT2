@@ -1,11 +1,12 @@
 from abc import ABCMeta, abstractmethod
+from pipert2.core.base.data import Data
 from pipert2.core.base.routine import Routine
 
 
 class MiddleRoutine(Routine, metaclass=ABCMeta):
 
     @abstractmethod
-    def main_logic(self, data) -> dict:
+    def main_logic(self, data) -> Data:
         """Process the given data to the routine.
 
         Args:

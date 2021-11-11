@@ -21,6 +21,7 @@ ignore:
   - "tests/"
   - "docs/"
   - "pipert2/utils/data_class/"
+  - "pipert2/core/base/data_transmitter.py"
 
 flags:
   # filter the folder(s) you wish to measure by that flag

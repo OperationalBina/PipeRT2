@@ -40,7 +40,7 @@ def test_build_join(dummy_event_board: EventBoard):
 
 
 def test_event_loop(dummy_event_board: EventBoard):
-    event_handler = dummy_event_board.get_event_handler([EVENT1.event_name])
+    event_handler = dummy_event_board.get_event_handler({EVENT1.event_name})
 
     dummy_event_board.build()
 

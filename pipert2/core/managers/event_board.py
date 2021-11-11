@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Set
 from threading import Thread
 from functools import partial
 from collections import defaultdict
@@ -19,7 +19,7 @@ class EventBoard:
         self.events_pipes = defaultdict(list)
         self.new_events_queue = SimpleQueue()
 
-    def get_event_handler(self, events_to_listen: list):
+    def get_event_handler(self, events_to_listen: Set[str]):
         """Return an event handler adjusted to the given events.
 
         Args:
@@ -31,12 +31,10 @@ class EventBoard:
         """
 
         pipe_output, pipe_input = Pipe(duplex=False)
+        events_to_listen.update(DEFAULT_EVENT_HANDLER_EVENTS)
 
         for event_name in events_to_listen:
             self.events_pipes[event_name].append(pipe_input)
-
-        for default_event_name in DEFAULT_EVENT_HANDLER_EVENTS:
-            self.events_pipes[default_event_name].append(pipe_input)
 
         return EventHandler(pipe_output)
 
