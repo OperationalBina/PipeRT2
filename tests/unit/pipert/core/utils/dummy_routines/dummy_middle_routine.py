@@ -14,7 +14,6 @@ class DummyMiddleRoutine(MiddleRoutine):
 
     @MiddleRoutine.main_logics(Data)
     def main_logic(self, data: Data):
-        # print(self.counter)
         if self.inc:
             self.counter += 1
         else:
