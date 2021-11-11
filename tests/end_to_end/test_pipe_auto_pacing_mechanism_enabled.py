@@ -1,4 +1,5 @@
 import time
+import pytest
 from pipert2 import Pipe, START_EVENT_NAME, KILL_EVENT_NAME, Wire
 from tests.end_to_end.utils.routines.middle_counter_routine import MiddleCounterRoutine
 from tests.end_to_end.utils.routines.source_counter_routine import SourceCounterRoutine
@@ -32,6 +33,7 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one():
     assert round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
 
 
+@pytest.mark.timeout(15)
 def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one_consts_fps():
     source_counter_routine = SourceCounterRoutine(40, "src")
     source_counter_routine.set_const_fps(20)
@@ -57,6 +59,7 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one_consts_
     assert round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
 
 
+@pytest.mark.timeout(15)
 def test_number_of_executions_of_main_logic_slow_routine_in_the_first_one():
     source_counter_routine = SourceCounterRoutine(12, "src")
     source_counter_routine.notify_durations_interval = 0.25
@@ -81,6 +84,7 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_first_one():
     assert round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
 
 
+@pytest.mark.timeout(15)
 def test_complex_pipe():
     source_counter_routine = SourceCounterRoutine(20, "src")
     source_counter_routine.notify_durations_interval = 0.25
