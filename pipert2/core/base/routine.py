@@ -138,8 +138,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        self.cleanup()
         self.message_handler.teardown()
+        self.cleanup()
 
     def _start_routine_logic(self) -> None:
         """Start the routine main logic wrapped by setup and cleanup functions.

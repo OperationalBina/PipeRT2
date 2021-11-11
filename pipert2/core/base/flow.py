@@ -46,14 +46,6 @@ class Flow(BaseEventExecutor):
 
         self.events_to_listen.update(flow_events_to_listen)
 
-    @events(START_EVENT_NAME)
-    def start(self):
-        self._logger.plog("Starting")
-
-    @events(STOP_EVENT_NAME)
-    def stop(self):
-        self._logger.plog("Stopping")
-
     def execute_event(self, event: Method) -> None:
         """Execute the event callbacks in the flow and its routines.
 
