@@ -1,6 +1,7 @@
-import collections
 import time
 import pickle
+import collections
+from pipert2.core.base.data import Data
 from pipert2.core.base.payload import Payload
 
 
@@ -14,7 +15,7 @@ class Message:
 
     counter = 0
 
-    def __init__(self, data: collections.Mapping, source_address: str):
+    def __init__(self, data: Data, source_address: str):
         """
         Args:
             data: Data that the message will hold.
@@ -36,17 +37,17 @@ class Message:
 
         Message.counter += 1
 
-    def update_data(self, data: collections.Mapping):
+    def update_data(self, data: Data):
         """Update the data the message contains.
 
         Args:
-            data (collections.Mapping): dictionary containing the data.
+            data (Data): dictionary containing the data.
 
         """
 
         self.payload.data = data
 
-    def get_data(self) -> collections.Mapping:
+    def get_data(self) -> Data:
         """Get the data from the message.
 
         Returns:
@@ -118,8 +119,11 @@ class Message:
         Raises:
             TypeError: if encoded_msg is None or not bytes.
         """
-
-        msg = pickle.loads(encoded_msg)
+        
+        try:
+            msg = pickle.loads(encoded_msg)
+        except TypeError:
+            msg = encoded_msg
 
         if not lazy:
             msg.payload.decode()

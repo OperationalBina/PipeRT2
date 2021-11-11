@@ -1,4 +1,10 @@
-__version__ = "2.1.1"
+__version__ = "2.1.2"
+
+try:
+    from dataclasses import dataclass, field, fields
+except ImportError:
+    from .utils.data_class.dataclasses import dataclass, field, fields
+
 
 # User interaction classes
 from .core import Pipe, Wire

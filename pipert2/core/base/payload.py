@@ -1,16 +1,19 @@
+from pipert2.core.base.data import Data
+
+
 class Payload:
     """The payload object is what actually stores the data.
     It is responsible for encoding and decoding the data itself.
 
     """
 
-    def __init__(self, data: dict):
+    def __init__(self, data: Data):
         """
         Args:
             data: Data that the payload will hold.
 
         Attributes:
-            data (dict): The data that the payload will hold.
+            data (Data): The data that the payload will hold.
             encoded (bool): Whether the data is encoded or not.
 
         """
@@ -19,7 +22,7 @@ class Payload:
         self.data = data
 
     @property
-    def data(self) -> dict:
+    def data(self) -> Data:
         return self._data
 
     @data.setter

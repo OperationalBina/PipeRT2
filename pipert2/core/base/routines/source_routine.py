@@ -1,5 +1,6 @@
 import time
 from abc import ABCMeta, abstractmethod
+from pipert2.core.base.data import Data
 from pipert2.core.base.message import Message
 from pipert2.core.base.routine import Routine
 
@@ -7,7 +8,7 @@ from pipert2.core.base.routine import Routine
 class SourceRoutine(Routine, metaclass=ABCMeta):
 
     @abstractmethod
-    def main_logic(self) -> dict:
+    def main_logic(self) -> Data:
         """Routine that starts generate data.
 
             Returns:

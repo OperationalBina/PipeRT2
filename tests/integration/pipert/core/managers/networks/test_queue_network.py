@@ -2,6 +2,7 @@ import numpy as np
 from pytest_mock import MockerFixture
 from pipert2 import SharedMemoryTransmitter
 from pipert2 import QueueNetwork, QueueHandler
+from pipert2.core.base.data import Data
 from pipert2.utils.shared_memory_manager import SharedMemoryManager
 
 
@@ -26,14 +27,16 @@ def test_link_shared_memory_transmitter_to_destination_routines_message_handlers
 
     address = SharedMemoryManager().write_to_mem(input_sentence_in_bytes)
 
-    requested_data = {
+    requested_data = Data()
+    requested_data.additional_data = {
         "test": {
             "address": address,
             "size": len(input_sentence_in_bytes)
         }
     }
 
-    expected_value = {"test": input_sentence_in_bytes}
+    expected_value = Data()
+    expected_value.additional_data = {"test": input_sentence_in_bytes}
 
     assert first_destination_routine.message_handler.receive(requested_data) == expected_value
     assert second_destination_routine.message_handler.receive(requested_data) == expected_value
@@ -51,10 +54,14 @@ def test_link_shared_memory_transmitter_to_source_routine_message_handlers(mocke
                        destinations=(mocker.MagicMock(),),
                        data_transmitter=shared_memory_transmitter)
 
+    expected_value = Data()
     data_to_transmit = np.ones((shared_memory_transmitter.data_size_threshold,), dtype=np.uint8)
-    memory_name = source_routine.message_handler.transmit({"test": data_to_transmit})
+
+    expected_value.additional_data = {"test": data_to_transmit}
+
+    memory_name = source_routine.message_handler.transmit(expected_value)
 
     expected_data_in_memory = bytes(data_to_transmit)
 
-    assert SharedMemoryManager().read_from_mem(memory_name["test"]["address"],
-                                               memory_name["test"]["size"]) == expected_data_in_memory
+    assert SharedMemoryManager().read_from_mem(memory_name.additional_data["test"]["address"],
+                                               memory_name.additional_data["test"]["size"]) == expected_data_in_memory

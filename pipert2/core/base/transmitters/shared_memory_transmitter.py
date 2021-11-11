@@ -1,4 +1,6 @@
 import numpy as np
+from pipert2 import fields
+from pipert2.core.base.data import Data
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.utils.shared_memory_manager import SharedMemoryManager
 
@@ -24,7 +26,7 @@ class SharedMemoryTransmitter(DataTransmitter):
             A function that parses the payload data and saves necessary values in shared memory.
         """
 
-        def func(data: dict) -> dict:
+        def func(data: Data) -> Data:
             """Parse a given dict and if necessary save a value in shared memory.
 
             Args:
@@ -38,27 +40,20 @@ class SharedMemoryTransmitter(DataTransmitter):
 
             """
 
-            return_dict = {}
+            for field in fields(data.__class__):
+                if field.type == dict:
+                    modified_dict = {}
 
-            if data is not None:
-                for key, value in data.items():
-                    try:
-                        new_val = bytes(value)
-                    except TypeError:
-                        return_dict[key] = value
-                    else:
-                        if len(new_val) >= self.data_size_threshold:
-                            address = SharedMemoryManager().write_to_mem(new_val)
+                    for key, value in getattr(data, field.name).items():
+                        modified_dict[key] = save_value_in_shared_memory(value, self.data_size_threshold)
 
-                            if type(value) == np.ndarray:
-                                return_dict[key] = {"address": address, "size": len(new_val), "shape": value.shape,
-                                                    "dtype": value.dtype}
-                            else:
-                                return_dict[key] = {"address": address, "size": len(new_val)}
-                        else:
-                            return_dict[key] = value
+                    setattr(data, field.name, modified_dict)
 
-            return return_dict
+                else:
+                    value = getattr(data, field.name)
+                    setattr(data, field.name, save_value_in_shared_memory(value, self.data_size_threshold))
+
+            return data
 
         return func
 
@@ -70,7 +65,7 @@ class SharedMemoryTransmitter(DataTransmitter):
 
         """
 
-        def func(data: dict) -> dict:
+        def func(data: Data) -> Data:
             """Parses a given dict and tries to read data from shared memory if a value is a dictionary.
 
             Args:
@@ -81,30 +76,70 @@ class SharedMemoryTransmitter(DataTransmitter):
 
             """
 
-            return_dict = {}
+            for field in fields(data.__class__):
+                if field.type == dict and "address" not in getattr(data, field.name):  # Check for dict values
+                    for outer_key, outer_value in getattr(data, field.name).items():
+                        if type(outer_value) == dict:
 
-            for key, value in data.items():
-                if type(value) == dict:
-                    mem_name = value.get("address", None)
-                    bytes_to_read = value.get("size", None)
+                            value_from_shared_memory = get_data_in_shared_memory(outer_value)
 
-                    if (mem_name is None) and (bytes_to_read is None):
-                        returned_value = None
-                    else:
-                        returned_value = SharedMemoryManager().read_from_mem(mem_name=mem_name,
-                                                                             bytes_to_read=bytes_to_read)
+                            if value_from_shared_memory is not None:
+                                getattr(data, field.name)[outer_key] = value_from_shared_memory
 
-                        if "shape" in value:
-                            returned_value = np.frombuffer(returned_value, dtype=value["dtype"])
-                            returned_value = returned_value.reshape(value["shape"])
+                elif field.type == dict:  # The field is saved in shared memory
+                    value_from_shared_memory = get_data_in_shared_memory(getattr(data, field.name))
 
-                    if returned_value is not None:
-                        return_dict[key] = returned_value
-                    else:
-                        return_dict[key] = value
-                else:
-                    return_dict[key] = value
+                    if value_from_shared_memory is not None:
+                        setattr(data, field.name, value_from_shared_memory)
 
-            return return_dict
+            return data
 
         return func
+
+
+def get_data_in_shared_memory(data_dict: dict):
+    """Expects dictionary and returns its value if it stored in the shared memory
+    If its not stored in the shared memory returns None
+
+    """
+
+    mem_name = data_dict.get("address", None)
+    bytes_to_read = data_dict.get("size", None)
+
+    if (mem_name is None) or (bytes_to_read is None):
+        returned_value = None
+    else:
+        returned_value = SharedMemoryManager().read_from_mem(mem_name=mem_name,
+                                                             bytes_to_read=bytes_to_read)
+
+        if "shape" in data_dict:
+            returned_value = np.frombuffer(returned_value, dtype=data_dict["dtype"])
+            returned_value = returned_value.reshape(data_dict["shape"])
+
+    return returned_value
+
+
+def save_value_in_shared_memory(value, threshold_for_saving_in_shared_memory):
+    """Save given value in shared memory.
+    If the value size is not over the threshold it will not be saved.
+    Returns the value address metadata if it saved, otherwise returns the value itself.
+
+    """
+
+    try:
+        new_val = bytes(value)
+    except TypeError:
+        value_address_metadata = value
+    else:
+        if len(new_val) >= threshold_for_saving_in_shared_memory:
+            address = SharedMemoryManager().write_to_mem(new_val)
+
+            if type(value) == np.ndarray:
+                value_address_metadata = {"address": address, "size": len(new_val),
+                                          "shape": value.shape, "dtype": value.dtype}
+            else:
+                value_address_metadata = {"address": address, "size": len(new_val)}
+        else:
+            value_address_metadata = value
+
+    return value_address_metadata

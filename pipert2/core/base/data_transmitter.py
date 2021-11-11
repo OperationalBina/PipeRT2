@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from pipert2.core.base.data import Data
 
 
 class DataTransmitter(ABC):
@@ -15,7 +16,7 @@ class DataTransmitter(ABC):
 
         """
 
-        def func(data: dict):
+        def func(data: Data):
             raise NotImplementedError
 
         return func
@@ -30,7 +31,7 @@ class DataTransmitter(ABC):
 
         """
 
-        def func(data: dict):
+        def func(data: Data):
             raise NotImplementedError
 
         return func
