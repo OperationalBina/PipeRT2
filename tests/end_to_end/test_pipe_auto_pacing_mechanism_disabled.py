@@ -61,7 +61,7 @@ def multiple_flows_pipe_with_input_output_validations_routines(pipe_and_validati
     return pipe, input_data_routine, data_validation_routine
 
 
-@pytest.mark.timeout(15)
+@pytest.mark.timeout(10)
 def test_pipe_start_flow_using_events_expecting_the_validation_routine_to_get_all_of_the_given_data(
         single_flow_pipe_with_input_output_validations_routines):
     pipe, input_routine, validation_routine = single_flow_pipe_with_input_output_validations_routines
@@ -78,7 +78,7 @@ def test_pipe_start_flow_using_events_expecting_the_validation_routine_to_get_al
         assert not validation_routine.is_data_equals_to_expected_data_flag.is_set(), validation_routine.get_error()
 
 
-@pytest.mark.timeout(15)
+@pytest.mark.timeout(10)
 def test_pipe_start_multiple_flows_using_events_expecting_the_validation_routine_to_get_all_of_the_given_data(
         multiple_flows_pipe_with_input_output_validations_routines):
     pipe, input_routine, validation_routine = multiple_flows_pipe_with_input_output_validations_routines
