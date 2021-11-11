@@ -59,7 +59,6 @@ def test_routine_execution(dummy_routine):
 
 
 def test_routine_execution_catch_exception(mocker, dummy_routine):
-
     dummy_routine = DummyMiddleRoutineException()
     mock_message_handler = mocker.MagicMock()
     dummy_routine.initialize(mock_message_handler, event_notifier=Dummy())
