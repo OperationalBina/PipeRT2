@@ -28,8 +28,8 @@ class SourceRoutine(Routine):
         try:
             main_logic_callback = self._get_main_logic_callback()
             output_data = main_logic_callback(self)
-        except MainLogicNotExistError as error:
-            self._logger.error(error)
+        except MainLogicNotExistError:
+            self._logger.error("No method was marked as main logic !!")
         except Exception as error:
             self._logger.exception(f"The routine has crashed: {error}")
         else:
