@@ -45,7 +45,7 @@ def test_destination_routine_receive_unexpected_data_type_expects_error_log(mock
     dummy_routine.set_logger(logger_mock)
 
     does_routine_executed_enough_times_function = \
-        partial((lambda mock: mock.error.call_count >= 0),
+        partial((lambda mock: mock.error.call_count > 0),
                 mock=logger_mock)
 
     dummy_routine.start()
