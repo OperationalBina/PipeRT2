@@ -41,15 +41,13 @@ def complex_synchronizer(mocker: MockerFixture):
 
     return RoutinesSynchronizer(mocker.MagicMock(),
                                 mocker.MagicMock(),
-                                mocker.MagicMock(),
                                 wires,
-                                dummy_callback)
+                                mocker.MagicMock())
 
 
 @pytest.fixture
 def base_synchronizer(mocker: MockerFixture):
     return RoutinesSynchronizer(mocker.MagicMock(),
-                                mocker.MagicMock(),
                                 mocker.MagicMock(),
                                 mocker.MagicMock(),
                                 mocker.MagicMock())
@@ -92,7 +90,7 @@ def test_update_finish_routine_logic_time_not_empty_queue(base_synchronizer: Rou
     base_synchronizer.update_finish_routine_logic_time(**{'routine_name': 'r2', 'durations': [12, 14]})
 
     assert 'r2' in base_synchronizer.routines_measurements
-    assert list(base_synchronizer.routines_measurements['r2']) == list([5, 10, 12, 14])
+    assert list(base_synchronizer.routines_measurements['r2']) == list([12, 14])
 
 
 def test_calculate_median_not_empty_list(base_synchronizer: RoutinesSynchronizer):

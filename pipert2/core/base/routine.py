@@ -180,7 +180,11 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     def notify_durations(self):
         while not self.stop_event.is_set():
             durations = [1 / self._const_fps.value] if self._const_fps.value > -1 else self.durations
-            self.notify_event(FINISH_ROUTINE_LOGIC_NAME, **{'routine_name': self.name, 'durations': list(durations.queue)})
+            self.notify_event(FINISH_ROUTINE_LOGIC_NAME,
+                              **{'routine_name': self.name,
+                                 'durations': list(durations.queue)}
+                              )
+
             time.sleep(self.notify_durations_interval)
 
     @runners("thread")
@@ -212,13 +216,10 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        print("Set to STOP EVENT")
-
         if not self.stop_event.is_set():
             self._logger.plog("Stopping")
             self.stop_event.set()
             self.runner.join()
-            # self.duration_notify_threads.join()
 
     @events(UPDATE_FPS_NAME)
     def update_delay_time(self, **params) -> None:

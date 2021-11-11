@@ -1,5 +1,11 @@
+import queue
+
 import pytest
 from functools import partial
+
+from pipert2.utils.method_data import Method
+
+from pipert2 import MiddleRoutine
 from pytest_mock import MockerFixture
 from pipert2.utils.dummy_object import Dummy
 from tests.unit.pipert.core.utils.dummy_routines.dummy_middle_routine import DummyMiddleRoutine, DUMMY_ROUTINE_EVENT, \
@@ -74,3 +80,22 @@ def test_routine_execution_catch_exception(mocker, dummy_routine):
     message_handler = dummy_routine.message_handler
 
     assert message_handler.put.call_count == 0
+
+
+def test_run_main_logic_with_time_measurement_full_duration_queue(mocker: MockerFixture, dummy_routine: MiddleRoutine):
+
+    dummy_routine.durations = queue.Queue(maxsize=1)
+    dummy_routine.durations.put(1)
+
+    callback = mocker.MagicMock()
+
+    dummy_routine.run_main_logic_with_time_measurement(callback)
+
+
+def test_update_delay_time(dummy_routine: MiddleRoutine):
+
+    dummy_routine.fps_multiplier = 2
+
+    dummy_routine.update_delay_time(**{"fps": 10})
+
+    assert dummy_routine._fps.value == 20

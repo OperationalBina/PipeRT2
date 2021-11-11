@@ -31,7 +31,7 @@ class BaseEventExecutor(EventExecutorInterface):
 
         self.routines = {}
         self._logger = logger
-        self.synchronizer_process = Dummy()
+        self.event_loop_process = Dummy()
 
         self.events_to_listen = set(self.get_events().keys())
         self.event_board = event_board
@@ -47,8 +47,8 @@ class BaseEventExecutor(EventExecutorInterface):
 
         self.event_handler = self.event_board.get_event_handler(self.events_to_listen)
 
-        self.synchronizer_process = Process(target=self.run)
-        self.synchronizer_process.start()
+        self.event_loop_process = Process(target=self.run)
+        self.event_loop_process.start()
 
     def before_build(self) -> None:
         """The implementation can implement this method and called in build.
@@ -85,7 +85,7 @@ class BaseEventExecutor(EventExecutorInterface):
 
         """
 
-        self.synchronizer_process.join()
+        self.event_loop_process.join()
         self.join_external()
 
     def join_external(self) -> None:
