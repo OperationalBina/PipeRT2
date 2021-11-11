@@ -179,7 +179,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     def notify_durations(self):
         while not self.stop_event.is_set():
-            durations = [1 / self._const_fps.value] if self._const_fps.value > -1 else self.durations
+            durations = queue.Queue(1 / self._const_fps.value) if self._const_fps.value > -1 else self.durations
             self.notify_event(NOTIFY_ROUTINE_DURATIONS_NAME,
                               **{'routine_name': self.name,
                                  'durations': list(durations.queue)}
@@ -262,9 +262,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         if self.stop_event.is_set():
             self.runner.join()
-
-            if self.duration_notify_thread is not None and self.duration_notify_thread.is_alive():
-                self.duration_notify_thread.join()
 
     def set_const_fps(self, fps):
         self._const_fps.value = fps

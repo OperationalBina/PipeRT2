@@ -32,7 +32,8 @@ jobs:
         pip install mock
         pip install coverage
         pip install posix-ipc
-        coverage run -m pytest
+        coverage run --concurrency=multiprocessing -m pytest
+        coverage combine
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
