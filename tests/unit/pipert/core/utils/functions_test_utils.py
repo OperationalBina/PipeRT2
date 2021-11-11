@@ -25,5 +25,5 @@ def timeout_wrapper(func: Callable, expected_value: Any, timeout_duration: int =
     return False
 
 
-def message_generator():
-    return Message(Data(), __name__)
+def message_generator(data_class):
+    return lambda: Message(data_class(), __name__)
