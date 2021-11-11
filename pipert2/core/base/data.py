@@ -3,8 +3,8 @@ from pipert2 import dataclass, field
 
 @dataclass
 class Data:
-    """Base class for the data moving in the pipeline.
-    User can implement Data classes for his data types.
+    """ase class for transportation of data within the pipeline.
+    User can implement Data classes for customizing types.
 
     Example usage:
     >>> import numpy as np
