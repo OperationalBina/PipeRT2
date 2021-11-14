@@ -13,7 +13,7 @@ from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
-from pipert2.core.base.synchronise_routines.routines_synchroniser import Routinessynchroniser
+from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
 
 add_pipe_log_level()
 
@@ -43,7 +43,7 @@ class Pipe:
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             flows (dict[str, Flow]): Dictionary mapping the pipe flows to their name.
             event_board (EventBoard): EventBoard object responsible for the pipe events.
-            routine_synchroniser (Routinessynchroniser): Routine synchroniser if auto_pacing_mechanism is true, else None.
+            routine_synchroniser (RoutinesSynchroniser): Routine synchroniser if auto_pacing_mechanism is true, else None.
 
         """
 
@@ -55,7 +55,7 @@ class Pipe:
         self.wires: Dict[tuple, Wire] = {}
 
         if auto_pacing_mechanism:
-            self.routine_synchroniser = Routinessynchroniser(event_board=self.event_board,
+            self.routine_synchroniser = RoutinesSynchroniser(event_board=self.event_board,
                                                              logger=self.logger,
                                                              notify_callback=self.event_board.get_event_notifier())
         else:

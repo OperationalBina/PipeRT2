@@ -12,7 +12,7 @@ from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTI
     SYNCHRONISER_UPDATE_INTERVAL
 
 
-class Routinessynchroniser(BaseEventExecutor):
+class RoutinesSynchroniser(BaseEventExecutor):
 
     events = class_functions_dictionary()
 
