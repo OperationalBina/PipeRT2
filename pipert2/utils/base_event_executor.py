@@ -85,7 +85,6 @@ class BaseEventExecutor(EventExecutorInterface):
 
         """
 
-        self.event_loop_process.join()
         self.after_join()
 
     def after_join(self) -> None:
