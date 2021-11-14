@@ -62,6 +62,3 @@ def test_join_multiple_flows_should_join_processes(pipe_with_multiple_flows: Pip
         flow_processes.append(flow.event_loop_process)
 
     pipe_with_multiple_flows.join()
-
-    # for flow_process in flow_processes:
-    #     flow_process.join.assert_called()
