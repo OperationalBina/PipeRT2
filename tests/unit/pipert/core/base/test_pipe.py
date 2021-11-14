@@ -35,7 +35,7 @@ def dummy_pipe_with_flows(dummy_pipe: Pipe, mocker: MockerFixture):
     for flow_name in FLOW_NAMES:
         dummy_pipe.create_flow(flow_name, True, source_routine, middle_routine, destination_routine)
 
-    dummy_pipe.routine_synchronizer = mocker.MagicMock()
+    dummy_pipe.routine_synchroniser = mocker.MagicMock()
 
     return dummy_pipe, FLOW_NAMES
 

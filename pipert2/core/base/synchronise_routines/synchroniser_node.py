@@ -3,16 +3,20 @@ import multiprocessing as mp
 from pipert2.utils.consts import UPDATE_FPS_NAME
 
 
-class SynchronizerNode:
-    """ The synchronize node steps -
-    For synchronize the fps through the graph, we need to synchronize each sub logic with each other.
+class synchroniserNode:
+    """The SynchroniserNode is used in order to synchronise the fps throughout  the pipe.
+     To achieve that, we need to synchronise each sub logic with each other.
 
     - The first step is updating the real fps of the current node.
+
     - The second step is calculating the minimum fps between {all the sub logics, take their max value}.
         When taking the max value of the sub logics, we handle the max fps that necessary.
+
     - The third step is calculating the minimum fps between {all the node owners, take their max value}.
         When taking the max value of the node owner, we handle the max fps that necessary from the owners.
+
     - The forth step is notifying the fps.
+
     - The fifth step is reset the flags. Because some node can be shared between two owners, and it already notified or
         updated with the realtime fps, then raise a flag for not notifying or updating twice.
 
@@ -25,7 +29,7 @@ class SynchronizerNode:
     def __init__(self,
                  routine_name: str,
                  flow_name: str,
-                 nodes: List['SynchronizerNode'],
+                 nodes: List['synchroniserNode'],
                  manager):
 
         self.name = routine_name
@@ -45,6 +49,7 @@ class SynchronizerNode:
 
         Args:
             calculate_realtime_fps: The calculate function.
+
         """
 
         if not self.update_fps:
@@ -59,14 +64,14 @@ class SynchronizerNode:
 
     def update_fps_by_nodes(self):
         """Update the fps by all nodes.
-        If the max fps of sub logic has lower value then my fps, then change the fps value to the lower.
+        If the max fps of sub logic has lower value then the current fps, then change the fps value to the lower.
 
         Returns:
             The current fps.
 
         """
 
-        if len(self.nodes) > 0 and not self.calculated_fps:
+        if (len(self.nodes) > 0) and (not self.calculated_fps):
             max_nodes_fps = max(self.nodes, key=lambda node: node.update_fps_by_nodes()).fps.value
             self.fps.value = min(self.fps.value, max_nodes_fps)
 
@@ -80,6 +85,7 @@ class SynchronizerNode:
         Args:
             father_name: The name of the father node.
             father_fps: The father's fps.
+
         """
 
         if father_name is not None and father_fps is not None:
@@ -101,6 +107,7 @@ class SynchronizerNode:
 
         Args:
             notify_event: The callback for notifying event.
+
         """
 
         for node in self.nodes:
@@ -109,7 +116,7 @@ class SynchronizerNode:
         if not self.notified_delay_time:
             notify_event(UPDATE_FPS_NAME,
                          {self.flow_name: [self.name]},
-                         **{'fps': self.fps.value})
+                         fps=self.fps.value)
 
             self.notified_delay_time = True
 

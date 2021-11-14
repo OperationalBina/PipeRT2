@@ -1,6 +1,7 @@
 import time
 import multiprocessing as mp
 from pipert2 import SourceRoutine
+from pipert2.utils.consts import NULL_FPS
 
 
 class SourceCounterRoutine(SourceRoutine):
@@ -13,8 +14,11 @@ class SourceCounterRoutine(SourceRoutine):
         self.estimate_fps = mp.Value('f', 0.0)
 
     def main_logic(self) -> dict:
-        if self._fps.value is not None:
-            self.estimate_fps.value = self._fps.value
+
+        fps = self._const_fps.value if not self._const_fps.value == NULL_FPS else self._fps.value
+
+        if fps is not None:
+            self.estimate_fps.value = fps
 
         self.counter.value = self.counter.value + 1
         time.sleep(1 / self.routine_fps)

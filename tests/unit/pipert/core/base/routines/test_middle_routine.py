@@ -89,7 +89,7 @@ def test_run_main_logic_with_time_measurement_full_duration_queue(mocker: Mocker
 
     callback = mocker.MagicMock()
 
-    dummy_routine.run_main_logic_with_time_measurement(callback)
+    dummy_routine.run_main_logic_with_durations_updating(callback)
 
 
 def test_update_delay_time(dummy_routine: MiddleRoutine):

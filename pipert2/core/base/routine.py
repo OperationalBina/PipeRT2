@@ -12,6 +12,8 @@ from pipert2.utils.dummy_object import Dummy
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
+from pipert2.utils.consts.synchronise_routines import FPS_MULTIPLIER, ROUTINE_NOTIFY_DURATIONS_INTERVAL, \
+    DURATIONS_MAX_SIZE, NULL_FPS
 from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, UPDATE_FPS_NAME, NOTIFY_ROUTINE_DURATIONS_NAME
 
 
@@ -49,8 +51,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.name = f"{self.__class__.__name__}-{self.routines_created_counter}"
             self.routines_created_counter += 1
 
-        self.fps_multiplier = 2
-        self.notify_durations_interval = 1
+        self.notify_durations_interval = ROUTINE_NOTIFY_DURATIONS_INTERVAL
+        self.fps_multiplier = FPS_MULTIPLIER
 
         self.flow_name = None
         self.message_handler: MessageHandler = None
@@ -61,12 +63,12 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event.set()
         self.runner = Dummy()
 
-        self.durations = queue.Queue(maxsize=200)
+        self.durations = queue.Queue(maxsize=DURATIONS_MAX_SIZE)
 
         self.duration_notify_thread: threading.Thread = None
 
-        self._fps = mp.Value('f', -1)
-        self._const_fps = mp.Value('f', -1)
+        self._fps = mp.Value('f', NULL_FPS)
+        self._const_fps = mp.Value('f', NULL_FPS)
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -151,15 +153,25 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         while not self.stop_event.is_set():
             duration = self._extended_run()
 
-            if duration is not None and (self._fps.value > -1 or self._const_fps.value > -1):
-                required_fps = self._const_fps.value if self._const_fps.value > -1 else self._fps.value
+            if duration is not None and (self._fps.value > NULL_FPS or self._const_fps.value > NULL_FPS):
+                required_fps = self._const_fps.value if self._const_fps.value > NULL_FPS else self._fps.value
 
-                if required_fps > 0 and duration < 1 / required_fps:
+                if (required_fps > 0) and duration < (1 / required_fps):
                     time.sleep((1 / required_fps) - duration)
 
         self._base_cleanup()
 
-    def run_main_logic_with_time_measurement(self, main_logic: callable, params=None):
+    def run_main_logic_with_durations_updating(self, main_logic: callable, params=None):
+        """Run main logic with updating durations queue.
+
+        Args:
+            main_logic: Main logic to run.
+            params: Additional params.
+
+        Returns:
+            (main logic result, the duration time of main logic)
+        """
+
         start_time = time.time()
 
         if params is None:
@@ -173,16 +185,17 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         try:
             self.durations.put(duration, block=False, timeout=1)
         except queue.Full:
-            pass
+            self.durations.get(block=False)
+            self.durations.put(duration, block=False, timeout=1)
 
         return result, duration
 
     def notify_durations(self):
         while not self.stop_event.is_set():
-            durations = queue.Queue(1 / self._const_fps.value) if self._const_fps.value > -1 else self.durations
+            durations = [1 / self._const_fps.value] if (self._const_fps.value > NULL_FPS) else self.durations.queue
             self.notify_event(NOTIFY_ROUTINE_DURATIONS_NAME,
                               **{'routine_name': self.name,
-                                 'durations': list(durations.queue)}
+                                 'durations': list(durations)}
                               )
 
             time.sleep(self.notify_durations_interval)
@@ -227,7 +240,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        fps = params['fps']
+        fps = params.get('fps', NULL_FPS)
 
         if fps > 0:
             self._fps.value = fps * self.fps_multiplier

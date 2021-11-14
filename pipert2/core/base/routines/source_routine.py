@@ -25,7 +25,7 @@ class SourceRoutine(Routine, metaclass=ABCMeta):
         duration = None
 
         try:
-            output_data, duration = self.run_main_logic_with_time_measurement(self.main_logic)
+            output_data, duration = self.run_main_logic_with_durations_updating(self.main_logic)
         except Exception as error:
             self._logger.exception(f"The routine has crashed: {error}")
         else:
