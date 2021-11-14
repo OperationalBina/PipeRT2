@@ -10,7 +10,7 @@ except ImportError:
 from .core import Pipe, Wire
 
 # Interfaces for user implementations
-from .core import SourceRoutine, MiddleRoutine, DestinationRoutine, Network, MessageHandler, DataTransmitter
+from .core import SourceRoutine, MiddleRoutine, DestinationRoutine, Network, MessageHandler, DataTransmitter, Data
 
 # Given implementations
 from .core import QueueNetwork, QueueHandler, SharedMemoryTransmitter, BasicTransmitter

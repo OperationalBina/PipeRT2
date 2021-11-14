@@ -30,7 +30,8 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 
 **Routine** - The smallest component in the pipe.
 
-Each routine has to implement a `main_logic` function that contains the business logic of the routine.
+Each routine has to implement a function that contains the business logic of the routine and mark it 
+with the `main_logics` annotation.
 
 There are three types of routines - 
 
@@ -57,25 +58,29 @@ The First step is to create a 'SourceRoutine', which will be responsible for gen
     We create the source class that generates data:
 
 ```Python
+from pipert2 import Data
 from pipert2 import SourceRoutine
 
 class GenerateData(SourceRoutine):
-
-    def main_logic(self) -> dict:
-        return {
-            "value": "example"
-        }
+    
+    @SourceRoutine.main_logics
+    def generate_example_data(self) -> Data:
+        example_data = Data()  # Create the data object 
+        example_data.additional_data = {"value": "example"}  # Store some data in it 
+        return example_data  # Send it to the next routine
 ```
 
 Then we create the destination routine to store (in our case print) the pipeline's result:
 
 ```Python
+from pipert2 import Data
 from pipert2 import DestinationRoutine
 
 class PrintResult(DestinationRoutine):
-
-    def main_logic(self, data: dict) -> None:
-        print(data["value"])
+    
+    @DestinationRoutine.main_logics(Data)  # Specify which data class to expect 
+    def data_handling(self, data: Data) -> None:
+        print(data.additional_data["value"])
 ```
 
 Now we create new pipe that contains a flow made by those two routines:
@@ -98,11 +103,11 @@ example_pipe.create_flow("example_flow", True, generate_data_routine, print_resu
 # Build the pipe.
 example_pipe.build()
 
-# Run the pipe.
+# Start the pipeline.
 example_pipe.notify_event(START_EVENT_NAME)
 
-# Force all the pipe's routines stop.
-example_pipe.notify_event(KILL_EVENT_NAME)
+# Force all the pipe's routines stop and wait for them to join.
+example_pipe.join(to_kill=True)
 ```
 
 For connecting routines in a different order we use `example_pipe.link` function, for example:
