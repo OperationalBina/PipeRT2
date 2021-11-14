@@ -9,6 +9,7 @@ from tests.end_to_end.utils.routines.destination_counter_routine import Destinat
 TEST_TIME = 2
 
 
+@pytest.mark.timeout(15)
 def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one():
     source_counter_routine = SourceCounterRoutine(20, "src")
     source_counter_routine.notify_durations_interval = 0.25
