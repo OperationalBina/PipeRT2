@@ -49,9 +49,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.name = f"{self.__class__.__name__}-{self.routines_created_counter}"
             self.routines_created_counter += 1
 
-        self.fps_multiplier = FPS_MULTIPLIER
-        self.routine_notify_durations_interval = ROUTINE_NOTIFY_DURATIONS_INTERVAL
-
         self.flow_name = None
         self.message_handler: MessageHandler = None
         self.runner_creator = None
