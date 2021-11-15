@@ -106,7 +106,6 @@ class Pipe:
 
         for wire in self.wires.values():
             data_transmitter = wire.data_transmitter if wire.data_transmitter is not None else self.default_data_transmitter
-
             self.network.link(source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
 
         for flow in self.flows.values():
