@@ -1,11 +1,10 @@
 from typing import List
 from logging import Logger
+from pipert2.utils.method_data import Method
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.base_event_executor import BaseEventExecutor
-from pipert2.utils.method_data import Method
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 

@@ -77,7 +77,7 @@ def test_build_routines_graph(complex_synchroniser):
 
 
 def test_update_finish_routine_logic_time_empty_queue(base_synchroniser: RoutinesSynchroniser):
-    base_synchroniser.update_finish_routine_logic_time(**{'routine_name': 'r2', 'durations': [5, 10]})
+    base_synchroniser.update_finish_routine_logic_time(source_name='r2', data=[5, 10])
 
     assert 'r2' in base_synchroniser.routines_measurements
     assert list(base_synchroniser.routines_measurements['r2']) == list([5, 10])
@@ -88,7 +88,7 @@ def test_update_finish_routine_logic_time_not_empty_queue(base_synchroniser: Rou
         'r2': mp.Manager().list([5, 10])
     }
 
-    base_synchroniser.update_finish_routine_logic_time(**{'routine_name': 'r2', 'durations': [12, 14]})
+    base_synchroniser.update_finish_routine_logic_time(source_name='r2', data=[12, 14])
 
     assert 'r2' in base_synchroniser.routines_measurements
     assert list(base_synchroniser.routines_measurements['r2']) == list([12, 14])

@@ -148,17 +148,15 @@ class RoutinesSynchroniser(BaseEventExecutor):
             self._stop_event.set()
 
     @events(NOTIFY_ROUTINE_DURATIONS_NAME)
-    def update_finish_routine_logic_time(self, **params):
+    def update_finish_routine_logic_time(self, source_name: str, data: []):
         """Updating the duration of routine.
 
         Args:
-            **params: Dictionary contained the routine name.
+            source_name: The source routine name.
+            data: The durations time.
         """
 
-        routine_name: str = params['routine_name']
-        durations: [] = params['durations']
-
-        self.routines_measurements[routine_name] = durations
+        self.routines_measurements[source_name] = list(data)
 
     def _execute_function_for_sources(self, name: str, param=None):
         """Execute the callback function for all the graph's sources.

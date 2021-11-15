@@ -9,8 +9,7 @@ from pipert2.core.managers.event_board import EventBoard, EventHandler
 
 
 class BaseEventExecutor(EventExecutorInterface):
-    """Flow is an entity designed for running a group of routines in a single process.
-    It is also responsible to notify his routines when an event is triggered.
+    """BaseEventExecutor is an base implementation for event loop listener.
 
     """
 

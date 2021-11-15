@@ -1,8 +1,6 @@
-from logging import Logger
 from threading import Thread
 from multiprocessing import Queue as mpQueue
 from queue import Queue as thQueue, Full, Empty
-from pipert2.utils.dummy_object import Dummy
 
 
 class QueueWrapper:
@@ -23,7 +21,6 @@ class QueueWrapper:
         self.max_queue_size = max_queue_size
         self.out_queue = thQueue(maxsize=max_queue_size)
         self.multiprocess_thread = Thread(target=self.queue_worker)
-        self.logger: Logger = Dummy()
 
     def get(self, block: bool, timeout: int):
         """Return whatever is in the out_queue.

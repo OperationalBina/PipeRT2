@@ -1,5 +1,3 @@
-
-
 class EventHandler:
 
     def __init__(self, input_event_pipe):

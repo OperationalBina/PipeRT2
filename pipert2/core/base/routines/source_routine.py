@@ -1,11 +1,12 @@
-import time
 from abc import ABCMeta, abstractmethod
+from functools import partial
+
 from pipert2.core.base.data import Data
+from pipert2.core.base.routines.fps_routine import FPSRoutine
 from pipert2.core.base.message import Message
-from pipert2.core.base.routine import Routine
 
 
-class SourceRoutine(Routine, metaclass=ABCMeta):
+class SourceRoutine(FPSRoutine, metaclass=ABCMeta):
 
     @abstractmethod
     def main_logic(self) -> Data:
@@ -25,7 +26,8 @@ class SourceRoutine(Routine, metaclass=ABCMeta):
         duration = None
 
         try:
-            output_data, duration = self.run_main_logic_with_durations_updating(self.main_logic)
+            main_logic_callable = partial(self.main_logic)
+            output_data, duration = self._run_main_logic_with_durations_updating(main_logic_callable)
         except Exception as error:
             self._logger.exception(f"The routine has crashed: {error}")
         else:

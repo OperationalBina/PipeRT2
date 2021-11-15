@@ -12,10 +12,10 @@ TEST_TIME = 2
 @pytest.mark.timeout(15)
 def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one():
     source_counter_routine = SourceCounterRoutine(20, "src")
-    source_counter_routine.notify_durations_interval = 0.25
+    source_counter_routine.routine_notify_durations_interval = 0.25
 
     destination_counter_routine = DestinationCounterRoutine(12, "dst")
-    destination_counter_routine.notify_durations_interval = 0.25
+    destination_counter_routine.routine_notify_durations_interval = 0.25
 
     pipe = Pipe(auto_pacing_mechanism=True)
     pipe.routine_synchroniser.updating_interval = 0.25
@@ -30,18 +30,18 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one():
     pipe.notify_event(KILL_EVENT_NAME)
     pipe.join()
 
-    assert 0 <= round(source_counter_routine.estimate_fps.value) <= 12 * source_counter_routine.fps_multiplier
-    assert 0 <= round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
+    assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * source_counter_routine.fps_multiplier
+    assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
 
 
 @pytest.mark.timeout(15)
 def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one_consts_fps():
     source_counter_routine = SourceCounterRoutine(40, "src")
     source_counter_routine.set_const_fps(20)
-    source_counter_routine.notify_durations_interval = 0.25
+    source_counter_routine.routine_notify_durations_interval = 0.25
 
     destination_counter_routine = DestinationCounterRoutine(12, "dst")
-    destination_counter_routine.notify_durations_interval = 0.25
+    destination_counter_routine.routine_notify_durations_interval = 0.25
 
     pipe = Pipe(auto_pacing_mechanism=True)
     pipe.routine_synchroniser.updating_interval = 0.25
@@ -56,17 +56,17 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one_consts_
     pipe.notify_event(KILL_EVENT_NAME)
     pipe.join()
 
-    assert 0 <= round(source_counter_routine.estimate_fps.value) <= 20
-    assert 0 <= round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
+    assert source_counter_routine.estimate_fps.value == 20
+    assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
 
 
 @pytest.mark.timeout(15)
 def test_number_of_executions_of_main_logic_slow_routine_in_the_first_one():
     source_counter_routine = SourceCounterRoutine(12, "src")
-    source_counter_routine.notify_durations_interval = 0.25
+    source_counter_routine.routine_notify_durations_interval = 0.25
 
     destination_counter_routine = DestinationCounterRoutine(20, "dst")
-    destination_counter_routine.notify_durations_interval = 0.25
+    destination_counter_routine.routine_notify_durations_interval = 0.25
 
     pipe = Pipe(auto_pacing_mechanism=True)
     pipe.routine_synchroniser.updating_interval = 0.25
@@ -81,23 +81,23 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_first_one():
     pipe.notify_event(KILL_EVENT_NAME)
     pipe.join()
 
-    assert 0 <= round(source_counter_routine.estimate_fps.value) <= 12 * source_counter_routine.fps_multiplier
-    assert 0 <= round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
+    assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * source_counter_routine.fps_multiplier
+    assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
 
 
 @pytest.mark.timeout(15)
 def test_complex_pipe():
     source_counter_routine = SourceCounterRoutine(20, "src")
-    source_counter_routine.notify_durations_interval = 0.25
+    source_counter_routine.routine_notify_durations_interval = 0.25
 
     middle_counter_routine = MiddleCounterRoutine(12, "mid")
-    middle_counter_routine.notify_durations_interval = 0.25
+    middle_counter_routine.routine_notify_durations_interval = 0.25
 
     destination1_counter_routine = DestinationCounterRoutine(30, "d1")
-    destination1_counter_routine.notify_durations_interval = 0.25
+    destination1_counter_routine.routine_notify_durations_interval = 0.25
 
     destination2_counter_routine = DestinationCounterRoutine(8, "d2")
-    destination2_counter_routine.notify_durations_interval = 0.25
+    destination2_counter_routine.routine_notify_durations_interval = 0.25
 
     pipe = Pipe(auto_pacing_mechanism=True)
     pipe.routine_synchroniser.updating_interval = 0.25
@@ -123,7 +123,7 @@ def test_complex_pipe():
     pipe.notify_event(KILL_EVENT_NAME)
     pipe.join()
 
-    assert 0 <= round(source_counter_routine.estimate_fps.value) <= 12 * source_counter_routine.fps_multiplier
-    assert 0 <= round(middle_counter_routine.estimate_fps.value) <= 12 * middle_counter_routine.fps_multiplier
-    assert 0 <= round(destination1_counter_routine.estimate_fps.value) <= 12 * destination1_counter_routine.fps_multiplier
-    assert 0 <= round(destination2_counter_routine.estimate_fps.value) <= 8 * destination2_counter_routine.fps_multiplier
+    assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * source_counter_routine.fps_multiplier
+    assert 0 < round(middle_counter_routine.estimate_fps.value) <= 12 * middle_counter_routine.fps_multiplier
+    assert 0 < round(destination1_counter_routine.estimate_fps.value) <= 12 * destination1_counter_routine.fps_multiplier
+    assert 0 < round(destination2_counter_routine.estimate_fps.value) <= 8 * destination2_counter_routine.fps_multiplier
