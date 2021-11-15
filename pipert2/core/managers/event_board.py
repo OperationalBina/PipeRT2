@@ -3,7 +3,7 @@ from functools import partial
 from typing import Callable, Set
 from collections import defaultdict
 from pipert2.utils.method_data import Method
-from multiprocessing import Pipe, SimpleQueue
+from multiprocessing import Pipe, SimpleQueue, Event
 from pipert2.core.handlers.event_handler import EventHandler
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME
 
@@ -18,6 +18,8 @@ class EventBoard:
     def __init__(self):
         self.events_pipes = defaultdict(list)
         self.new_events_queue = SimpleQueue()
+        self.kill_event_called = Event()
+        self.kill_event_called.clear()
 
     def get_event_handler(self, events_to_listen: Set[str]):
         """Return an event handler adjusted to the given events.
@@ -68,9 +70,12 @@ class EventBoard:
         """
 
         def notify_event(output_event_queue, event_name, specific_flow_routines: dict = defaultdict(list), **params):
-            output_event_queue.put(Method(event_name,
-                                          specific_flow_routines=specific_flow_routines,
-                                          params=params))
+            if not self.kill_event_called.is_set():
+                output_event_queue.put(Method(event_name,
+                                              specific_flow_routines=specific_flow_routines,
+                                              params=params))
+            if event_name == KILL_EVENT_NAME:
+                self.kill_event_called.set()
 
         return partial(notify_event, self.new_events_queue)
 
@@ -78,6 +83,9 @@ class EventBoard:
         self.new_events_queue.put(Method(event_name=event_name,
                                          specific_flow_routines=specific_flow_routines,
                                          params=params))
+
+        if event_name == KILL_EVENT_NAME:
+            self.kill_event_called.set()
 
     def join(self):
         self.event_board_thread.join()
