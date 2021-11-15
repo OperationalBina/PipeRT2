@@ -1,5 +1,5 @@
-import threading
 import time
+import threading
 from collections import deque
 from typing import Callable, Deque
 
@@ -18,15 +18,10 @@ class BatchNotifier:
         self.stop_notify.clear()
         threading.Thread(target=self._run).start()
 
+    def stop(self):
+        self.stop_notify.set()
+
     def _run(self):
         while not self.stop_notify.is_set():
             self.callable(event_name=self.event_name, source_name=self.source, data=self.data)
             time.sleep(self.interval)
-
-    def stop(self):
-        self.stop_notify.set()
-
-    def add(self, var):
-        print(f"add var {var}")
-        self.data.append(var)
-        print(self.data)
