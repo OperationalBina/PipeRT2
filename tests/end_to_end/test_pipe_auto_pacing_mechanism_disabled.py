@@ -38,9 +38,9 @@ def pipe_and_validations_routines():
 def single_flow_pipe_with_input_output_validations_routines(pipe_and_validations_routines):
     pipe, input_data_routine, data_validation_routine = pipe_and_validations_routines
 
-    pipe.create_flow("Flow1", False, input_data_routine, data_validation_routine)
+    pipe.create_flow("Flow1", True, input_data_routine, data_validation_routine)
 
-    pipe.link(Wire(source=input_data_routine, destinations=(data_validation_routine, )))
+    # pipe.link(Wire(source=input_data_routine, destinations=(data_validation_routine, )))
 
     pipe.build()
 
