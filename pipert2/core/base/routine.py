@@ -1,4 +1,3 @@
-import time
 import threading
 from logging import Logger
 import multiprocessing as mp
@@ -10,9 +9,8 @@ from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
-from pipert2.utils.consts.synchronise_routines import FPS_MULTIPLIER, ROUTINE_NOTIFY_DURATIONS_INTERVAL, NULL_FPS
 from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
+from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
 class Routine(EventExecutorInterface, metaclass=ABCMeta):
