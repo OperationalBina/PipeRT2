@@ -12,7 +12,7 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
 
     events = class_functions_dictionary()
 
-    def __init__(self, name):
+    def __init__(self, name: str = None):
         super().__init__(name)
 
         self.fps_multiplier = FPS_MULTIPLIER
@@ -40,9 +40,22 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
                                       event_notifier, self.name, DURATIONS_MAX_SIZE)
 
     def set_const_fps(self, fps):
+        """Set const fps for routine.
+
+        Args:
+            fps: The require fps.
+
+        """
+
         self._const_fps = fps
 
     def _run(self):
+        """Run the routine logic with delaying by required fps.
+
+        Returns:
+
+        """
+
         duration = self._extended_run()
         self._delay_routine(duration)
 
@@ -95,10 +108,18 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
 
     @events(START_EVENT_NAME)
     def start_notifier(self) -> None:
+        """Start the batch notifier.
+
+        """
+
         self.notifier.start()
 
     @events(STOP_EVENT_NAME)
     def stop_notifier(self) -> None:
+        """Stop the batch notifier.
+
+        """
+
         self.notifier.stop()
 
     @classmethod
@@ -114,8 +135,6 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
         for event_name, events_functions in routine_fps_events.items():
             cls.events.all[cls.__name__][event_name].update(events_functions)
 
-        routine_events = Routine.events.all[Routine.__name__]
-        for event_name, events_functions in routine_events.items():
-            cls.events.all[cls.__name__][event_name].update(events_functions)
+        cls.events.all[cls.__name__].update(Routine.get_events())
 
         return cls.events.all[cls.__name__]
