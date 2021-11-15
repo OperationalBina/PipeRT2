@@ -81,13 +81,9 @@ class Pipe:
         flow = Flow(flow_name, self.event_board, self.logger.getChild(flow_name), routines=list(routines))
         self.flows[flow_name] = flow
 
-        flow_data_transmitter = data_transmitter if data_transmitter is not None else self.default_data_transmitter
-
         if auto_wire:
             for first_routine, second_routine in zip(routines, routines[1:]):
-                # wire = Wire(source=first_routine, destinations=(second_routine,),
-                #             data_transmitter=flow_data_transmitter)
-                wire = Wire(source=first_routine, destinations=(second_routine,))
+                wire = Wire(source=first_routine, destinations=(second_routine,), data_transmitter=data_transmitter)
                 self.wires[(wire.source.flow_name, wire.source.name)] = wire
 
     def link(self, *wires):
