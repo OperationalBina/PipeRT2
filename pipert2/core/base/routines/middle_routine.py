@@ -1,6 +1,5 @@
-from abc import ABCMeta, abstractmethod
 from functools import partial
-
+from abc import ABCMeta, abstractmethod
 from pipert2.core.base.data import Data
 from pipert2.core.base.routines.fps_routine import FPSRoutine
 

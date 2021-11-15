@@ -1,9 +1,8 @@
-from abc import ABCMeta, abstractmethod
 from functools import partial
-
+from abc import ABCMeta, abstractmethod
 from pipert2.core.base.data import Data
-from pipert2.core.base.routines.fps_routine import FPSRoutine
 from pipert2.core.base.message import Message
+from pipert2.core.base.routines.fps_routine import FPSRoutine
 
 
 class SourceRoutine(FPSRoutine, metaclass=ABCMeta):
