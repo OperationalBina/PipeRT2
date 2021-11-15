@@ -84,13 +84,6 @@ class BaseEventExecutor(EventExecutorInterface):
 
         """
 
-        self.after_join()
-
-    def after_join(self) -> None:
-        """Let the user implement the join. Called after the base join.
-
-        """
-
         pass
 
     @classmethod

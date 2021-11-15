@@ -120,7 +120,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
             time.sleep(self.updating_interval)
 
-    def after_join(self) -> None:
+    def join(self) -> None:
         """Block until the notify delay thread stops.
 
         """
