@@ -38,7 +38,9 @@ def pipe_and_validations_routines():
 def single_flow_pipe_with_input_output_validations_routines(pipe_and_validations_routines):
     pipe, input_data_routine, data_validation_routine = pipe_and_validations_routines
 
-    pipe.create_flow("Flow1", True, input_data_routine, data_validation_routine)
+    pipe.create_flow("Flow1", False, input_data_routine, data_validation_routine)
+
+    pipe.link(Wire(source=input_data_routine, destinations=(data_validation_routine, )))
 
     pipe.build()
 
@@ -62,6 +64,7 @@ def multiple_flows_pipe_with_input_output_validations_routines(pipe_and_validati
 @pytest.mark.timeout(10)
 def test_pipe_start_flow_using_events_expecting_the_validation_routine_to_get_all_of_the_given_data(
         single_flow_pipe_with_input_output_validations_routines):
+
     pipe, input_routine, validation_routine = single_flow_pipe_with_input_output_validations_routines
     pipe.notify_event(START_EVENT.event_name)
 
@@ -79,6 +82,7 @@ def test_pipe_start_flow_using_events_expecting_the_validation_routine_to_get_al
 @pytest.mark.timeout(10)
 def test_pipe_start_multiple_flows_using_events_expecting_the_validation_routine_to_get_all_of_the_given_data(
         multiple_flows_pipe_with_input_output_validations_routines):
+
     pipe, input_routine, validation_routine = multiple_flows_pipe_with_input_output_validations_routines
     pipe.notify_event(START_EVENT.event_name)
 
