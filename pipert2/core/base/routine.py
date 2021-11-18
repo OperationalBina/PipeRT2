@@ -25,7 +25,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     runners = class_functions_dictionary()
     routines_created_counter = 0
 
-    def __init__(self, name: str = None):
+    def __init__(self, name: str = None, thread_number=1):
         """
         Args:
             name: Name of the routine.
@@ -47,6 +47,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.name = f"{self.__class__.__name__}-{self.routines_created_counter}"
             self.routines_created_counter += 1
 
+        self.thread_number = thread_number
+
         self.flow_name = None
         self.message_handler: MessageHandler = None
         self.runner_creator = None
@@ -54,7 +56,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self._logger: Logger = Dummy()
         self.stop_event = mp.Event()
         self.stop_event.set()
-        self.runner = Dummy()
+        self.runners = []
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -156,8 +158,11 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         if self.stop_event.is_set():
             self._logger.plog("Starting")
             self.stop_event.clear()
-            self.runner = self.runner_creator()
-            self.runner.start()
+
+            for _ in range(self.thread_number):
+                runner = self.runner_creator()
+                runner.start()
+                self.runners.append(runner)
 
     @events(STOP_EVENT_NAME)
     def stop(self) -> None:
@@ -170,7 +175,9 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         if not self.stop_event.is_set():
             self._logger.plog("Stopping")
             self.stop_event.set()
-            self.runner.join()
+
+            for runner in self.runners:
+                runner.join()
 
     def execute_event(self, event: Method) -> None:
         """Execute an event to start
@@ -201,4 +208,5 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """
 
         if self.stop_event.is_set():
-            self.runner.join()
+            for runner in self.runners:
+                runner.join()
