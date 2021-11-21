@@ -15,9 +15,6 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
     def __init__(self, name: str = None):
         super().__init__(name)
 
-        self.fps_multiplier = FPS_MULTIPLIER
-        self.routine_notify_durations_interval = ROUTINE_NOTIFY_DURATIONS_INTERVAL
-
         self._fps = NULL_FPS
         self._const_fps = NULL_FPS
 
@@ -35,7 +32,7 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
 
         super(FPSRoutine, self).initialize(message_handler, event_notifier)
 
-        self.notifier = BatchNotifier(self.routine_notify_durations_interval,
+        self.notifier = BatchNotifier(ROUTINE_NOTIFY_DURATIONS_INTERVAL,
                                       NOTIFY_ROUTINE_DURATIONS_NAME,
                                       event_notifier, self.name, DURATIONS_MAX_SIZE)
 
@@ -104,7 +101,7 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
         """
 
         if fps > 0:
-            self._fps = fps * self.fps_multiplier
+            self._fps = fps * FPS_MULTIPLIER
 
     @events(START_EVENT_NAME)
     def start_notifier(self) -> None:
