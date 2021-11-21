@@ -1,6 +1,6 @@
 from typing import List
 import multiprocessing as mp
-from pipert2.utils.consts import UPDATE_FPS_NAME
+from pipert2.utils.consts import UPDATE_FPS_NAME, NULL_FPS
 
 
 class synchroniserNode:
@@ -29,8 +29,7 @@ class synchroniserNode:
     def __init__(self,
                  routine_name: str,
                  flow_name: str,
-                 nodes: List['synchroniserNode'],
-                 manager):
+                 nodes: List['synchroniserNode'] = []):
 
         self.name = routine_name
         self.flow_name = flow_name
@@ -41,8 +40,8 @@ class synchroniserNode:
         self.notified_delay_time = False
         self.update_fps = False
 
-        self.fps = manager.Value('f', 0.0)
-        self.original_fps: mp.Value = manager.Value('f', 0.0)
+        self.fps = NULL_FPS
+        self.original_fps: mp.Value = NULL_FPS
 
     def update_original_fps_by_real_time(self, calculate_realtime_fps: callable):
         """Update the original fps by callback.
@@ -54,8 +53,8 @@ class synchroniserNode:
 
         if not self.update_fps:
 
-            self.original_fps.value = calculate_realtime_fps(self.name)
-            self.fps.value = self.original_fps.value
+            self.original_fps = calculate_realtime_fps(self.name)
+            self.fps = self.original_fps
 
             for node in self.nodes:
                 node.update_original_fps_by_real_time(calculate_realtime_fps)
@@ -72,12 +71,12 @@ class synchroniserNode:
         """
 
         if (len(self.nodes) > 0) and (not self.calculated_fps):
-            max_nodes_fps = max(self.nodes, key=lambda node: node.update_fps_by_nodes()).fps.value
-            self.fps.value = min(self.fps.value, max_nodes_fps)
+            max_nodes_fps = max(self.nodes, key=lambda node: node.update_fps_by_nodes()).fps
+            self.fps = min(self.fps, max_nodes_fps)
 
             self.calculated_fps = True
 
-        return self.fps.value
+        return self.fps
 
     def update_fps_by_fathers(self, father_name: str = None, father_fps: int = None):
         """Update the current fps by the fathers of the current nodes.
@@ -94,13 +93,13 @@ class synchroniserNode:
             max_fathers_name = max(self.father_nodes_fps, key=self.father_nodes_fps.get)
             max_fathers_fps = self.father_nodes_fps[max_fathers_name]
 
-            if max_fathers_fps < self.original_fps.value:
-                self.fps.value = max_fathers_fps
+            if max_fathers_fps < self.original_fps:
+                self.fps = max_fathers_fps
             else:
-                self.fps.value = self.original_fps.value
+                self.fps = self.original_fps
 
         for node in self.nodes:
-            node.update_fps_by_fathers(self.name, self.fps.value)
+            node.update_fps_by_fathers(self.name, self.fps)
 
     def notify_fps(self, notify_event: callable):
         """Notify the current fps with the callback function.
@@ -116,7 +115,7 @@ class synchroniserNode:
         if not self.notified_delay_time:
             notify_event(UPDATE_FPS_NAME,
                          {self.flow_name: [self.name]},
-                         fps=self.fps.value)
+                         fps=self.fps)
 
             self.notified_delay_time = True
 

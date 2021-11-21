@@ -42,14 +42,12 @@ class BaseEventExecutor(EventExecutorInterface):
 
         """
 
-        # self.before_build()
-
         self.event_handler = self.event_board.get_event_handler(self.events_to_listen)
 
         self.event_loop_process = Process(target=self.run)
         self.event_loop_process.start()
 
-    def before_build(self) -> None:
+    def before_event_listening(self) -> None:
         """The implementation can implement this method and called in build.
 
         """
@@ -61,7 +59,7 @@ class BaseEventExecutor(EventExecutorInterface):
 
         """
 
-        self.before_build()
+        self.before_event_listening()
 
         event: Method = self.event_handler.wait()
 

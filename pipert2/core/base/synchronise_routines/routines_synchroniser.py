@@ -27,17 +27,12 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self._stop_event = mp.Event()
 
-        mp_manager = mp.Manager()
-        mp_manager.register('synchroniserNode', synchroniserNode)
-
-        self.mp_manager = mp_manager
         self.routines_graph: Dict[str, synchroniserNode] = {}
+        self.routines_measurements: Dict[str, list] = {}
 
         self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_delay_iteration)
 
-        self.routines_measurements: Dict[str, list] = {}
-
-    def before_build(self) -> None:
+    def before_event_listening(self) -> None:
         """Start the queue listener process.
 
         """
@@ -62,8 +57,6 @@ class RoutinesSynchroniser(BaseEventExecutor):
                     synchroniser_nodes[wire_destination_routine.name] = synchroniserNode(
                         wire_destination_routine.name,
                         wire_destination_routine.flow_name,
-                        [],
-                        self.mp_manager
                     )
 
             destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
@@ -76,8 +69,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
                 source_node = synchroniserNode(
                     wire.source.name,
                     wire.source.flow_name,
-                    destinations_synchroniser_nodes,
-                    self.mp_manager
+                    destinations_synchroniser_nodes
                 )
 
                 if isinstance(wire.source, SourceRoutine):
@@ -111,7 +103,6 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         while not self._stop_event.is_set():
             # Run each function of the algorithm for all roots, and then continue to the next functions.
-
             self._execute_function_for_sources(synchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
             self._execute_function_for_sources(synchroniserNode.update_fps_by_nodes.__name__)
             self._execute_function_for_sources(synchroniserNode.update_fps_by_fathers.__name__)
