@@ -148,8 +148,6 @@ class RoutinesSynchroniser(BaseEventExecutor):
             data: The durations time.
         """
 
-        # valid
-
         self.routines_measurements[source_name] = list(data)
 
     def _execute_function_for_sources(self, name: str, param=None):

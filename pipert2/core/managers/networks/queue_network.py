@@ -11,7 +11,7 @@ class QueueNetwork(Network):
 
     """
 
-    def __init__(self, max_queue_sizes=1, put_block=False, get_block=True, timeout=1):
+    def __init__(self, max_queue_sizes=1, put_block=False, get_block=False, timeout=1):
         super().__init__()
         self.max_queue_sizes = max_queue_sizes
         self.put_block = put_block
