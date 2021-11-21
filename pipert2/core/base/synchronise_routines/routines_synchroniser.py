@@ -37,7 +37,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         """
 
-        self.routines_graph = self.create_routines_graph()
+        # self.routines_graph = self.create_routines_graph()
         self._stop_event.set()
 
     def create_routines_graph(self):
@@ -56,7 +56,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
                 if wire_destination_routine.name not in synchroniser_nodes:
                     synchroniser_nodes[wire_destination_routine.name] = SynchroniserNode(
                         wire_destination_routine.name,
-                        wire_destination_routine.flow_name,
+                        wire_destination_routine.flow_name
                     )
 
             destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
@@ -100,6 +100,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
         """One iteration of updating fps for all graph's routines.
 
         """
+
+        self.routines_graph = self.create_routines_graph()
 
         while not self._stop_event.is_set():
             # Run each function of the algorithm for all roots, and then continue to the next functions.
