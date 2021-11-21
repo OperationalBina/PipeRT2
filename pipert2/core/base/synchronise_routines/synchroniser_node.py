@@ -40,7 +40,7 @@ class SynchroniserNode:
         self.notified_delay_time = False
         self.update_fps = False
 
-        self.curr_fps = NULL_FPS
+        self.curr_fps = mp.Manager().Value('f', -1.0)
         self.original_fps = NULL_FPS
 
     def update_original_fps_by_real_time(self, calculate_realtime_fps: callable):
@@ -54,7 +54,7 @@ class SynchroniserNode:
         if not self.update_fps:
 
             self.original_fps = calculate_realtime_fps(self.name)
-            self.curr_fps = self.original_fps
+            self.curr_fps.value = self.original_fps
 
             for node in self.nodes:
                 node.update_original_fps_by_real_time(calculate_realtime_fps)
@@ -73,16 +73,16 @@ class SynchroniserNode:
         min_fps_of_nodes = None
 
         if (len(self.nodes) > 0) and (not self.calculated_fps):
-            max_nodes_fps = max(self.nodes, key=lambda node: node.update_fps_by_nodes()).curr_fps
-            min_fps_of_nodes = min(self.curr_fps, max_nodes_fps)
+            max_nodes_fps = max(self.nodes, key=lambda node: node.update_fps_by_nodes()).curr_fps.value
+            min_fps_of_nodes = min(self.curr_fps.value, max_nodes_fps)
 
-            self.curr_fps = min_fps_of_nodes
+            self.curr_fps.value = min_fps_of_nodes
             self.calculated_fps = True
 
         if min_fps_of_nodes is not None:
             return min_fps_of_nodes
         else:
-            return float(self.curr_fps)
+            return float(self.curr_fps.value)
 
     def update_fps_by_fathers(self, father_name: str = None, father_fps: int = None):
         """Update the current fps by the fathers of the current nodes.
@@ -100,12 +100,12 @@ class SynchroniserNode:
             max_fathers_fps = self.father_nodes_fps[max_fathers_name]
 
             if max_fathers_fps < self.original_fps:
-                self.curr_fps = max_fathers_fps
+                self.curr_fps.value = max_fathers_fps
             else:
-                self.curr_fps = self.original_fps
+                self.curr_fps.value = self.original_fps
 
         for node in self.nodes:
-            node.update_fps_by_fathers(self.name, self.curr_fps)
+            node.update_fps_by_fathers(self.name, self.curr_fps.value)
 
     def notify_fps(self, notify_event: callable):
         """Notify the current fps with the callback function.
@@ -121,7 +121,7 @@ class SynchroniserNode:
         if not self.notified_delay_time:
             notify_event(UPDATE_FPS_NAME,
                          {self.flow_name: [self.name]},
-                         fps=float(self.curr_fps))
+                         fps=float(self.curr_fps.value))
 
             self.notified_delay_time = True
 
