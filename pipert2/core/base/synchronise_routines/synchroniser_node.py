@@ -72,19 +72,12 @@ class SynchroniserNode:
 
         """
 
-        min_fps_of_nodes = None
-
         if (len(self.nodes) > 0) and (not self.calculated_fps):
             max_nodes_fps = max(self.nodes, key=lambda node: node.update_fps_by_nodes()).curr_fps
-            min_fps_of_nodes = min(self.curr_fps, max_nodes_fps)
-
-            self.curr_fps = min_fps_of_nodes
+            self.curr_fps = min(self.curr_fps, max_nodes_fps)
             self.calculated_fps = True
 
-        if min_fps_of_nodes is not None:
-            return min_fps_of_nodes
-        else:
-            return float(self.curr_fps)
+        return self.curr_fps
 
     def update_fps_by_fathers(self, father_name: str = None, father_fps: int = None):
         """Update the current fps by the fathers of the current nodes.
@@ -123,7 +116,7 @@ class SynchroniserNode:
         if not self.notified_delay_time:
             notify_event(UPDATE_FPS_NAME,
                          {self.flow_name: [self.name]},
-                         fps=float(self.curr_fps))
+                         fps=self.curr_fps)
 
             self.notified_delay_time = True
 
@@ -138,3 +131,6 @@ class SynchroniserNode:
         self.notified_delay_time = False
         self.calculated_fps = False
         self.update_fps = False
+
+        self.curr_fps = NULL_FPS
+        self.original_fps = NULL_FPS
