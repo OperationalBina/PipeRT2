@@ -10,7 +10,7 @@ from pipert2.utils.dummy_object import Dummy
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.core.base.routines.source_routine import SourceRoutine
-from pipert2.core.base.synchronise_routines.synchroniser_node import synchroniserNode
+from pipert2.core.base.synchronise_routines.synchroniser_node import SynchroniserNode
 from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTINE_DURATIONS_NAME, NULL_FPS, \
     SYNCHRONISER_UPDATE_INTERVAL
 
@@ -31,7 +31,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self.notify_delay_thread: threading.Thread = Dummy()
 
-        self.routines_graph: Dict[str, synchroniserNode] = {}
+        self.routines_graph: Dict[str, SynchroniserNode] = {}
         self.routines_measurements: Dict[str, list] = {}
 
     def before_build(self) -> None:
@@ -56,7 +56,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
         for wire in self.wires.values():
             for wire_destination_routine in wire.destinations:
                 if wire_destination_routine.name not in synchroniser_nodes:
-                    synchroniser_nodes[wire_destination_routine.name] = synchroniserNode(
+                    synchroniser_nodes[wire_destination_routine.name] = SynchroniserNode(
                         wire_destination_routine.name,
                         wire_destination_routine.flow_name
                     )
@@ -68,7 +68,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
             if wire.source.name in synchroniser_nodes:
                 synchroniser_nodes[wire.source.name].nodes = destinations_synchroniser_nodes
             else:
-                source_node = synchroniserNode(
+                source_node = SynchroniserNode(
                     wire.source.name,
                     wire.source.flow_name,
                     destinations_synchroniser_nodes
@@ -105,11 +105,11 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         while not self._stop_event.is_set():
             # Run each function of the algorithm for all roots, and then continue to the next functions.
-            self._execute_function_for_sources(synchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
-            self._execute_function_for_sources(synchroniserNode.update_fps_by_nodes.__name__)
-            self._execute_function_for_sources(synchroniserNode.update_fps_by_fathers.__name__)
-            self._execute_function_for_sources(synchroniserNode.notify_fps.__name__, self.notify_callback)
-            self._execute_function_for_sources(synchroniserNode.reset.__name__)
+            self._execute_function_for_sources(SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
+            self._execute_function_for_sources(SynchroniserNode.update_fps_by_nodes.__name__)
+            self._execute_function_for_sources(SynchroniserNode.update_fps_by_fathers.__name__)
+            self._execute_function_for_sources(SynchroniserNode.notify_fps.__name__, self.notify_callback)
+            self._execute_function_for_sources(SynchroniserNode.reset.__name__)
 
             time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
 
@@ -118,8 +118,10 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         """
 
-        if self.notify_delay_thread.is_alive():
+        try:
             self.notify_delay_thread.join(timeout=1)
+        except Exception:
+            pass
 
         self.event_loop_process.join(timeout=1)
 

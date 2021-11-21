@@ -2,7 +2,7 @@ from typing import List
 from pipert2.utils.consts import UPDATE_FPS_NAME, NULL_FPS
 
 
-class synchroniserNode:
+class SynchroniserNode:
     """The SynchroniserNode is used in order to synchronise the fps throughout  the pipe.
      To achieve that, we need to synchronise each sub logic with each other.
 
