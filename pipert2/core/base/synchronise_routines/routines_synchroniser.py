@@ -4,9 +4,7 @@ from typing import Dict
 from logging import Logger
 import multiprocessing as mp
 from statistics import median
-
 from pipert2.utils.dummy_object import Dummy
-
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.core.base.routines.source_routine import SourceRoutine
@@ -118,10 +116,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         """
 
-        try:
+        if self.notify_delay_thread.is_alive():
             self.notify_delay_thread.join(timeout=1)
-        except Exception:
-            pass
 
         self.event_loop_process.join(timeout=1)
 
