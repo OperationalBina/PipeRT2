@@ -4,10 +4,11 @@ from typing import Dict
 from logging import Logger
 import multiprocessing as mp
 from statistics import median
+from pipert2.utils.dummy_object import Dummy
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.core.base.routines.source_routine import SourceRoutine
-from pipert2.core.base.synchronise_routines.synchroniser_node import synchroniserNode
+from pipert2.core.base.synchronise_routines.synchroniser_node import SynchroniserNode
 from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTINE_DURATIONS_NAME, NULL_FPS, \
     SYNCHRONISER_UPDATE_INTERVAL
 
@@ -16,26 +17,20 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
     events = class_functions_dictionary()
 
-    def __init__(self, event_board: any, logger: Logger,
-                 notify_callback: callable):
-
+    def __init__(self, event_board: any, logger: Logger, notify_callback: callable):
         super().__init__(event_board, logger)
+
         self._logger = logger
         self.notify_callback = notify_callback
-        self.updating_interval = SYNCHRONISER_UPDATE_INTERVAL
+
         self.wires = {}
 
         self._stop_event = mp.Event()
 
-        mp_manager = mp.Manager()
-        mp_manager.register('synchroniserNode', synchroniserNode)
+        self.notify_delay_thread: threading.Thread = Dummy()
 
-        self.mp_manager = mp_manager
-        self.routines_graph: Dict[str, synchroniserNode] = mp_manager.dict()
-
-        self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_delay_iteration)
-
-        self.routines_measurements: Dict[str, list] = self.mp_manager.dict()
+        self.routines_graph: Dict[str, SynchroniserNode] = {}
+        self.routines_measurements: Dict[str, list] = {}
 
     def before_build(self) -> None:
         """Start the queue listener process.
@@ -59,11 +54,9 @@ class RoutinesSynchroniser(BaseEventExecutor):
         for wire in self.wires.values():
             for wire_destination_routine in wire.destinations:
                 if wire_destination_routine.name not in synchroniser_nodes:
-                    synchroniser_nodes[wire_destination_routine.name] = synchroniserNode(
+                    synchroniser_nodes[wire_destination_routine.name] = SynchroniserNode(
                         wire_destination_routine.name,
-                        wire_destination_routine.flow_name,
-                        [],
-                        self.mp_manager
+                        wire_destination_routine.flow_name
                     )
 
             destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
@@ -73,17 +66,16 @@ class RoutinesSynchroniser(BaseEventExecutor):
             if wire.source.name in synchroniser_nodes:
                 synchroniser_nodes[wire.source.name].nodes = destinations_synchroniser_nodes
             else:
-                source_node = synchroniserNode(
+                source_node = SynchroniserNode(
                     wire.source.name,
                     wire.source.flow_name,
-                    destinations_synchroniser_nodes,
-                    self.mp_manager
+                    destinations_synchroniser_nodes
                 )
 
                 if isinstance(wire.source, SourceRoutine):
                     synchronise_graph[source_node.name] = source_node
 
-        return self.mp_manager.dict(synchronise_graph)
+        return synchronise_graph
 
     def get_routine_fps(self, routine_name):
         """Get the median fps by routine name.
@@ -111,14 +103,13 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         while not self._stop_event.is_set():
             # Run each function of the algorithm for all roots, and then continue to the next functions.
+            self._execute_function_for_sources(SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
+            self._execute_function_for_sources(SynchroniserNode.update_fps_by_nodes.__name__)
+            self._execute_function_for_sources(SynchroniserNode.update_fps_by_fathers.__name__)
+            self._execute_function_for_sources(SynchroniserNode.notify_fps.__name__, self.notify_callback)
+            self._execute_function_for_sources(SynchroniserNode.reset.__name__)
 
-            self._execute_function_for_sources(synchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
-            self._execute_function_for_sources(synchroniserNode.update_fps_by_nodes.__name__)
-            self._execute_function_for_sources(synchroniserNode.update_fps_by_fathers.__name__)
-            self._execute_function_for_sources(synchroniserNode.notify_fps.__name__, self.notify_callback)
-            self._execute_function_for_sources(synchroniserNode.reset.__name__)
-
-            time.sleep(self.updating_interval)
+            time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
 
     def join(self) -> None:
         """Block until the notify delay thread stops.
@@ -128,6 +119,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
         if self.notify_delay_thread.is_alive():
             self.notify_delay_thread.join(timeout=1)
 
+        self.event_loop_process.join(timeout=1)
+
     @events(START_EVENT_NAME)
     def start_notify_process(self):
         """Start the notify process.
@@ -135,7 +128,9 @@ class RoutinesSynchroniser(BaseEventExecutor):
         """
 
         if self._stop_event.is_set():
+            self.notify_delay_thread = threading.Thread(target=self.update_delay_iteration)
             self._stop_event.clear()
+
             self.notify_delay_thread.start()
 
     @events(KILL_EVENT_NAME)
