@@ -53,8 +53,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         """
 
-        synchronise_graph = {}
-        synchroniser_nodes = {}
+        synchronise_graph = dict()
+        synchroniser_nodes = dict()
 
         for wire in self.wires.values():
             for wire_destination_routine in wire.destinations:
@@ -83,7 +83,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
                 if isinstance(wire.source, SourceRoutine):
                     synchronise_graph[source_node.name] = source_node
 
-        return self.mp_manager.dict(synchronise_graph)
+        return synchronise_graph
 
     def get_routine_fps(self, routine_name):
         """Get the median fps by routine name.
