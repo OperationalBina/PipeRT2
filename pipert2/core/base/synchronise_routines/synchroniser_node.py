@@ -53,8 +53,8 @@ class synchroniserNode:
 
         if not self.update_fps:
 
-            self.original_fps.value = calculate_realtime_fps(self.name)
-            self.fps.value = self.original_fps.value
+            self.original_fps = calculate_realtime_fps(self.name)
+            self.fps.value = self.original_fps
 
             for node in self.nodes:
                 node.update_original_fps_by_real_time(calculate_realtime_fps)
@@ -93,10 +93,10 @@ class synchroniserNode:
             max_fathers_name = max(self.father_nodes_fps, key=self.father_nodes_fps.get)
             max_fathers_fps = self.father_nodes_fps[max_fathers_name]
 
-            if max_fathers_fps < self.original_fps.value:
+            if max_fathers_fps < self.original_fps:
                 self.fps.value = max_fathers_fps
             else:
-                self.fps.value = self.original_fps.value
+                self.fps.value = self.original_fps
 
         for node in self.nodes:
             node.update_fps_by_fathers(self.name, self.fps.value)
