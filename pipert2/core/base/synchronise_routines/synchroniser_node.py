@@ -1,4 +1,5 @@
 from typing import List
+import multiprocessing as mp
 from pipert2.utils.consts import UPDATE_FPS_NAME, NULL_FPS
 
 
@@ -120,7 +121,7 @@ class SynchroniserNode:
         if not self.notified_delay_time:
             notify_event(UPDATE_FPS_NAME,
                          {self.flow_name: [self.name]},
-                         fps=self.curr_fps)
+                         fps=float(self.curr_fps))
 
             self.notified_delay_time = True
 
