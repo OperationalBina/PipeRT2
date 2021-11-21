@@ -31,11 +31,11 @@ class RoutinesSynchroniser(BaseEventExecutor):
         mp_manager.register('synchroniserNode', synchroniserNode)
 
         self.mp_manager = mp_manager
-        self.routines_graph: Dict[str, synchroniserNode] = {}
+        self.routines_graph: Dict[str, synchroniserNode] = dict()
 
         self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_delay_iteration)
 
-        self.routines_measurements: Dict[str, list] = {}
+        self.routines_measurements: Dict[str, list] = dict()
 
     def before_build(self) -> None:
         """Start the queue listener process.
