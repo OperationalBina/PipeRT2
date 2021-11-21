@@ -96,7 +96,7 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
             duration = 1 / self._const_fps
 
         self.last_duration = duration
-        self.notifier.data.append(duration)
+        self.notifier.add_record(duration)
 
         return result
 
