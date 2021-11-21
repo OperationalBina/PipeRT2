@@ -1,4 +1,5 @@
 from typing import List
+import multiprocessing as mp
 from pipert2.utils.consts import UPDATE_FPS_NAME, NULL_FPS
 
 
@@ -107,13 +108,12 @@ class SynchroniserNode:
 
         """
 
+        if not self.notified_delay_time:
+            notify_event(UPDATE_FPS_NAME, {self.flow_name: [self.name]}, fps=mp.Value('f', self.curr_fps).value)
+            self.notified_delay_time = True
+
         for node in self.nodes:
             node.notify_fps(notify_event)
-
-        if not self.notified_delay_time:
-            notify_event(UPDATE_FPS_NAME, {self.flow_name: [self.name]}, fps=self.curr_fps)
-
-            self.notified_delay_time = True
 
     def reset(self):
         """Reset the node's flags.
