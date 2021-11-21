@@ -1,7 +1,6 @@
 import time
 import pytest
 from mock import patch
-
 from pipert2 import Pipe, START_EVENT_NAME, KILL_EVENT_NAME, Wire, FPS_MULTIPLIER
 from tests.end_to_end.utils.routines.middle_counter_routine import MiddleCounterRoutine
 from tests.end_to_end.utils.routines.source_counter_routine import SourceCounterRoutine
