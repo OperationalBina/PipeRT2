@@ -31,11 +31,11 @@ class RoutinesSynchroniser(BaseEventExecutor):
         mp_manager.register('synchroniserNode', synchroniserNode)
 
         self.mp_manager = mp_manager
-        self.routines_graph: Dict[str, synchroniserNode] = dict()
+        self.routines_graph: Dict[str, synchroniserNode] = mp_manager.dict()
 
         self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_delay_iteration)
 
-        self.routines_measurements: Dict[str, list] = dict()
+        self.routines_measurements: Dict[str, list] = self.mp_manager.dict()
 
     def before_build(self) -> None:
         """Start the queue listener process.
@@ -53,8 +53,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         """
 
-        synchronise_graph = dict()
-        synchroniser_nodes = dict()
+        synchronise_graph = {}
+        synchroniser_nodes = {}
 
         for wire in self.wires.values():
             for wire_destination_routine in wire.destinations:
@@ -83,7 +83,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
                 if isinstance(wire.source, SourceRoutine):
                     synchronise_graph[source_node.name] = source_node
 
-        return synchronise_graph
+        return self.mp_manager.dict(synchronise_graph)
 
     def get_routine_fps(self, routine_name):
         """Get the median fps by routine name.
