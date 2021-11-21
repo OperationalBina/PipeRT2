@@ -4,6 +4,9 @@ from typing import Dict
 from logging import Logger
 import multiprocessing as mp
 from statistics import median
+
+from pipert2.utils.dummy_object import Dummy
+
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.core.base.routines.source_routine import SourceRoutine
@@ -26,7 +29,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self._stop_event = mp.Event()
 
-        self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_delay_iteration)
+        self.notify_delay_thread: threading.Thread = Dummy()
 
         self.routines_graph: Dict[str, synchroniserNode] = {}
         self.routines_measurements: Dict[str, list] = {}
@@ -55,7 +58,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
                 if wire_destination_routine.name not in synchroniser_nodes:
                     synchroniser_nodes[wire_destination_routine.name] = synchroniserNode(
                         wire_destination_routine.name,
-                        wire_destination_routine.flow_name)
+                        wire_destination_routine.flow_name
+                    )
 
             destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
                                                for wire_destination_routine
@@ -126,7 +130,9 @@ class RoutinesSynchroniser(BaseEventExecutor):
         """
 
         if self._stop_event.is_set():
+            self.notify_delay_thread = threading.Thread(target=self.update_delay_iteration)
             self._stop_event.clear()
+
             self.notify_delay_thread.start()
 
     @events(KILL_EVENT_NAME)
