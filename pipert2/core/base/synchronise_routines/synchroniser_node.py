@@ -69,13 +69,19 @@ class SynchroniserNode:
 
         """
 
+        min_fps_of_nodes = None
+
         if (len(self.nodes) > 0) and (not self.calculated_fps):
             max_nodes_fps = max(self.nodes, key=lambda node: node.update_fps_by_nodes()).fps
-            self.fps = min(self.fps, max_nodes_fps)
+            min_fps_of_nodes = min(self.fps, max_nodes_fps)
 
+            self.fps = min_fps_of_nodes
             self.calculated_fps = True
 
-        return self.fps
+        if min_fps_of_nodes is not None:
+            return min_fps_of_nodes
+        else:
+            return float(self.fps)
 
     def update_fps_by_fathers(self, father_name: str = None, father_fps: int = None):
         """Update the current fps by the fathers of the current nodes.
