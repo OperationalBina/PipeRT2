@@ -1,3 +1,4 @@
+import gc
 import time
 import threading
 from typing import Dict
@@ -117,6 +118,9 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         if self.notify_delay_thread.is_alive():
             self.notify_delay_thread.join(timeout=1)
+
+        del self.routines_graph
+        gc.collect()
 
     @events(START_EVENT_NAME)
     def start_notify_process(self):
