@@ -130,4 +130,4 @@ class synchroniserNode:
 
         self.notified_delay_time = False
         self.calculated_fps = False
-        # self.update_fps = False
+        self.update_fps = False

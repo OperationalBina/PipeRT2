@@ -16,13 +16,12 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
     events = class_functions_dictionary()
 
-    def __init__(self, event_board: any, logger: Logger,
-                 notify_callback: callable):
+    def __init__(self, event_board: any, logger: Logger, notify_callback: callable):
         super().__init__(event_board, logger)
 
         self._logger = logger
         self.notify_callback = notify_callback
-        self.updating_interval = SYNCHRONISER_UPDATE_INTERVAL
+
         self.wires = {}
 
         self._stop_event = mp.Event()
@@ -108,7 +107,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
             self._execute_function_for_sources(synchroniserNode.notify_fps.__name__, self.notify_callback)
             self._execute_function_for_sources(synchroniserNode.reset.__name__)
 
-            time.sleep(self.updating_interval)
+            time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
 
     def join(self) -> None:
         """Block until the notify delay thread stops.
