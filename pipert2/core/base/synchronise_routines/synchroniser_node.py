@@ -1,5 +1,4 @@
 from typing import List
-import multiprocessing as mp
 from pipert2.utils.consts import UPDATE_FPS_NAME, NULL_FPS
 
 
@@ -131,4 +130,4 @@ class synchroniserNode:
 
         self.notified_delay_time = False
         self.calculated_fps = False
-        self.update_fps = False
+        # self.update_fps = False
