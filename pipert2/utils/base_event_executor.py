@@ -42,7 +42,7 @@ class BaseEventExecutor(EventExecutorInterface):
 
         """
 
-        self.before_build()
+        # self.before_build()
 
         self.event_handler = self.event_board.get_event_handler(self.events_to_listen)
 
@@ -60,6 +60,8 @@ class BaseEventExecutor(EventExecutorInterface):
         """The flow process, executing the pipe events that occur.
 
         """
+
+        self.before_build()
 
         event: Method = self.event_handler.wait()
 
