@@ -118,6 +118,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
         if self.notify_delay_thread.is_alive():
             self.notify_delay_thread.join(timeout=1)
 
+        self.event_loop_process.join(timeout=1)
+
     @events(START_EVENT_NAME)
     def start_notify_process(self):
         """Start the notify process.
