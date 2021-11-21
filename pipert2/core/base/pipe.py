@@ -8,12 +8,11 @@ from pipert2.core.managers.network import Network
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
-from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
-from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
+from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 
 add_pipe_log_level()
 
