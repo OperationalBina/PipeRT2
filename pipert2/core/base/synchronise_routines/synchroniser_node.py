@@ -2,7 +2,7 @@ from typing import List
 from pipert2.utils.consts import UPDATE_FPS_NAME, NULL_FPS
 
 
-class synchroniserNode:
+class SynchroniserNode:
     """The SynchroniserNode is used in order to synchronise the fps throughout  the pipe.
      To achieve that, we need to synchronise each sub logic with each other.
 
@@ -28,7 +28,7 @@ class synchroniserNode:
     def __init__(self,
                  routine_name: str,
                  flow_name: str,
-                 nodes: List['synchroniserNode'] = []):
+                 nodes: List['SynchroniserNode'] = []):
 
         self.name = routine_name
         self.flow_name = flow_name
@@ -70,7 +70,7 @@ class synchroniserNode:
         """
 
         if (len(self.nodes) > 0) and (not self.calculated_fps):
-            max_nodes_fps = max(self.nodes, key=lambda node: node.update_fps_by_nodes()).fps.value
+            max_nodes_fps = max(self.nodes, key=lambda node: node.update_fps_by_nodes()).fps
             self.fps = min(self.fps, max_nodes_fps)
 
             self.calculated_fps = True

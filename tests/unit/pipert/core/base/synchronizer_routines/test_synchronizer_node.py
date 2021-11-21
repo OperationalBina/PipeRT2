@@ -1,5 +1,5 @@
 from pytest_mock import MockerFixture
-from pipert2.core.base.synchronise_routines.synchroniser_node import synchroniserNode
+from pipert2.core.base.synchronise_routines.synchroniser_node import SynchroniserNode
 
 #
 # def test_update_fps_by_nodes_required_fps_in_leaf_should_change_source_fps_to_leaf():
