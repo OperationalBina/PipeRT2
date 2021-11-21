@@ -20,6 +20,8 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
 
         self.notifier = None
 
+        self.last_duration = None
+
     def initialize(self, message_handler, event_notifier, **kwargs):
         """Initialize FPSRoutine and initialize the base class.
 
@@ -53,8 +55,11 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
 
         """
 
-        duration = self._extended_run()
-        self._delay_routine(duration)
+        self._extended_run()
+
+        if self.last_duration is not None:
+            self._delay_routine(self.last_duration)
+            self.last_duration = None
 
     def _delay_routine(self, last_duration):
         """Delay the routine by required fps.
@@ -90,9 +95,10 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
         if self._const_fps is not NULL_FPS:
             duration = 1 / self._const_fps
 
+        self.last_duration = duration
         self.notifier.data.append(duration)
 
-        return result, duration
+        return result
 
     @events(UPDATE_FPS_NAME)
     def update_delay_time(self, fps) -> None:

@@ -22,16 +22,12 @@ class SourceRoutine(FPSRoutine, metaclass=ABCMeta):
 
         """
 
-        duration = None
-
         try:
             main_logic_callable = partial(self.main_logic)
-            output_data, duration = self._run_main_logic_with_durations_updating(main_logic_callable)
+            output_data = self._run_main_logic_with_durations_updating(main_logic_callable)
         except Exception as error:
             self._logger.exception(f"The routine has crashed: {error}")
         else:
             if output_data is not None:
                 message = Message(output_data, source_address=self.name)
                 self.message_handler.put(message)
-        finally:
-            return duration

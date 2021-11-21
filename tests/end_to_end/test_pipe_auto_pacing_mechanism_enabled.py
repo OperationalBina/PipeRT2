@@ -2,7 +2,7 @@ import time
 import pytest
 from mock import patch
 
-from pipert2 import Pipe, START_EVENT_NAME, KILL_EVENT_NAME, Wire
+from pipert2 import Pipe, START_EVENT_NAME, KILL_EVENT_NAME, Wire, FPS_MULTIPLIER
 from tests.end_to_end.utils.routines.middle_counter_routine import MiddleCounterRoutine
 from tests.end_to_end.utils.routines.source_counter_routine import SourceCounterRoutine
 from tests.end_to_end.utils.routines.destination_counter_routine import DestinationCounterRoutine
@@ -30,8 +30,8 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one():
     pipe.notify_event(KILL_EVENT_NAME)
     pipe.join()
 
-    assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * source_counter_routine.fps_multiplier
-    assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
+    assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
+    assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
 
 
 @pytest.mark.timeout(15)
@@ -56,7 +56,7 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one_consts_
     pipe.join()
 
     assert source_counter_routine.estimate_fps.value == 20
-    assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
+    assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
 
 
 @pytest.mark.timeout(15)
@@ -78,8 +78,8 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_first_one():
     pipe.notify_event(KILL_EVENT_NAME)
     pipe.join()
 
-    assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * source_counter_routine.fps_multiplier
-    assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * destination_counter_routine.fps_multiplier
+    assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
+    assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
 
 
 @pytest.mark.timeout(15)
@@ -114,7 +114,7 @@ def test_complex_pipe():
     pipe.notify_event(KILL_EVENT_NAME)
     pipe.join()
 
-    assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * source_counter_routine.fps_multiplier
-    assert 0 < round(middle_counter_routine.estimate_fps.value) <= 12 * middle_counter_routine.fps_multiplier
-    assert 0 < round(destination1_counter_routine.estimate_fps.value) <= 12 * destination1_counter_routine.fps_multiplier
-    assert 0 < round(destination2_counter_routine.estimate_fps.value) <= 8 * destination2_counter_routine.fps_multiplier
+    assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
+    assert 0 < round(middle_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
+    assert 0 < round(destination1_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
+    assert 0 < round(destination2_counter_routine.estimate_fps.value) <= 8 * FPS_MULTIPLIER
