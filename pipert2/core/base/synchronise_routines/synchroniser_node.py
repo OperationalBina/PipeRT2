@@ -29,7 +29,10 @@ class synchroniserNode:
     def __init__(self,
                  routine_name: str,
                  flow_name: str,
-                 nodes: List['synchroniserNode']):
+                 nodes=None):
+
+        if nodes is None:
+            nodes = []
 
         self.name = routine_name
         self.flow_name = flow_name

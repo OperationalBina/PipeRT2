@@ -56,8 +56,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
                 if wire_destination_routine.name not in synchroniser_nodes:
                     synchroniser_nodes[wire_destination_routine.name] = synchroniserNode(
                         wire_destination_routine.name,
-                        wire_destination_routine.flow_name,
-                        [])
+                        wire_destination_routine.flow_name)
 
             destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
                                                for wire_destination_routine
