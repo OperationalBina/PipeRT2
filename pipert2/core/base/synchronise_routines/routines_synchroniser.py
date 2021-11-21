@@ -16,10 +16,9 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
     events = class_functions_dictionary()
 
-    def __init__(self, event_board: any, logger: Logger,
-                 notify_callback: callable):
-
+    def __init__(self, event_board: any, logger: Logger, notify_callback: callable):
         super().__init__(event_board, logger)
+
         self._logger = logger
         self.notify_callback = notify_callback
         self.updating_interval = SYNCHRONISER_UPDATE_INTERVAL
