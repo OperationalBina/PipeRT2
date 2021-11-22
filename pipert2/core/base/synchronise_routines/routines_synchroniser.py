@@ -104,16 +104,16 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         routine_graph = self.create_routines_graph()
 
-        while not self._stop_event.is_set():
-            # Run each function of the algorithm for all roots, and then continue to the next functions.
-            # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
-            # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_nodes.__name__)
-            # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_fathers.__name__)
-            # self._execute_function_for_sources(routine_graph, SynchroniserNode.notify_fps.__name__, self.notify_callback)
-            # self._execute_function_for_sources(routine_graph, SynchroniserNode.reset.__name__)
-            pass
-
-            time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
+        # while not self._stop_event.is_set():
+        #     # Run each function of the algorithm for all roots, and then continue to the next functions.
+        #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
+        #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_nodes.__name__)
+        #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_fathers.__name__)
+        #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.notify_fps.__name__, self.notify_callback)
+        #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.reset.__name__)
+        #     pass
+        #
+        #     time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
 
     def join(self) -> None:
         """Block until the notify delay thread stops.
