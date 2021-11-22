@@ -158,8 +158,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         """
 
-        # for value in self.routines_graph.values():
-        #     if param is not None:
-        #         value.__getattribute__(name)(param)
-        #     else:
-        #         value.__getattribute__(name)()
+        for value in self.routines_graph.values():
+            if param is not None:
+                value.__getattribute__(name)(param)
+            else:
+                value.__getattribute__(name)()
