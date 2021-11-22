@@ -32,7 +32,6 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_delay_iteration)
 
-    # TODO - change name
     def before_event_listening(self) -> None:
         """Start the queue listener process.
 
