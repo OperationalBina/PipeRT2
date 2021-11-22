@@ -1,10 +1,9 @@
-import threading
 import time
-from statistics import median
+import threading
 from typing import Dict
 from logging import Logger
 import multiprocessing as mp
-from pipert2.core.base.synchronise_routines.thread_loop_runner import ThreadLoopRunner
+from statistics import median
 from pipert2.utils.dummy_object import Dummy
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
@@ -32,19 +31,13 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self.notify_delay_thread = Dummy()
 
-        self.notify_delay_thread = ThreadLoopRunner(target=self.update_fps_loop)
-
     def before_event_listening(self) -> None:
         """Start the queue listener process.
 
         """
 
-        # self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_fps_loop)
+        self.routines_graph = self.create_routines_graph()
 
-        # self.routines_graph = self.create_routines_graph()
-        self._stop_event = mp.Event()
-        self._stop_event.set()
-#
     def create_routines_graph(self):
         """Build the routine's graph.
 
@@ -106,15 +99,13 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         """
 
-        routine_graph = self.create_routines_graph()
-
         while not self._stop_event.is_set():
             # Run each function of the algorithm for all roots, and then continue to the next functions.
-            self._execute_function_for_sources(routine_graph, SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
-            self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_nodes.__name__)
-            self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_fathers.__name__)
-            self._execute_function_for_sources(routine_graph, SynchroniserNode.notify_fps.__name__, self.notify_callback)
-            self._execute_function_for_sources(routine_graph, SynchroniserNode.reset.__name__)
+            self._execute_function_for_sources(SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
+            self._execute_function_for_sources(SynchroniserNode.update_fps_by_nodes.__name__)
+            self._execute_function_for_sources(SynchroniserNode.update_fps_by_fathers.__name__)
+            self._execute_function_for_sources(SynchroniserNode.notify_fps.__name__, self.notify_callback)
+            self._execute_function_for_sources(SynchroniserNode.reset.__name__)
 
             time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
 
@@ -146,8 +137,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self.routines_measurements[source_name] = list(data)
 
-    @staticmethod
-    def _execute_function_for_sources(graph: {}, name: str, param=None):
+    def _execute_function_for_sources(self, name: str, param=None):
         """Execute the callback function for all the graph's sources.
 
         Args:
@@ -155,7 +145,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         """
 
-        for value in graph.values():
+        for value in self.routines_graph.values():
             if param is not None:
                 value.__getattribute__(name)(param)
             else:
