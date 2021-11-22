@@ -52,29 +52,29 @@ class RoutinesSynchroniser(BaseEventExecutor):
         synchronise_graph = {}
         synchroniser_nodes = {}
 
-        for wire in self.wires.values():
-            for wire_destination_routine in wire.destinations:
-                if wire_destination_routine.name not in synchroniser_nodes:
-                    synchroniser_nodes[wire_destination_routine.name] = SynchroniserNode(
-                        wire_destination_routine.name,
-                        wire_destination_routine.flow_name
-                    )
-
-            destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
-                                               for wire_destination_routine
-                                               in wire.destinations]
-
-            if wire.source.name in synchroniser_nodes:
-                synchroniser_nodes[wire.source.name].nodes = destinations_synchroniser_nodes
-            else:
-                source_node = SynchroniserNode(
-                    wire.source.name,
-                    wire.source.flow_name,
-                    destinations_synchroniser_nodes
-                )
-
-                if isinstance(wire.source, SourceRoutine):
-                    synchronise_graph[source_node.name] = source_node
+        # for wire in self.wires.values():
+        #     for wire_destination_routine in wire.destinations:
+        #         if wire_destination_routine.name not in synchroniser_nodes:
+        #             synchroniser_nodes[wire_destination_routine.name] = SynchroniserNode(
+        #                 wire_destination_routine.name,
+        #                 wire_destination_routine.flow_name
+        #             )
+        #
+        #     destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
+        #                                        for wire_destination_routine
+        #                                        in wire.destinations]
+        #
+        #     if wire.source.name in synchroniser_nodes:
+        #         synchroniser_nodes[wire.source.name].nodes = destinations_synchroniser_nodes
+        #     else:
+        #         source_node = SynchroniserNode(
+        #             wire.source.name,
+        #             wire.source.flow_name,
+        #             destinations_synchroniser_nodes
+        #         )
+        #
+        #         if isinstance(wire.source, SourceRoutine):
+        #             synchronise_graph[source_node.name] = source_node
 
         return synchronise_graph
 #
@@ -97,21 +97,23 @@ class RoutinesSynchroniser(BaseEventExecutor):
 #
 #         return NULL_FPS
 #
-#     def update_fps_loop(self):
-#         """One iteration of updating fps for all graph's routines.
-#
-#         """
-#
-#         while not self._stop_event.is_set():
-#             # Run each function of the algorithm for all roots, and then continue to the next functions.
-#             self._execute_function_for_sources(SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
-#             self._execute_function_for_sources(SynchroniserNode.update_fps_by_nodes.__name__)
-#             self._execute_function_for_sources(SynchroniserNode.update_fps_by_fathers.__name__)
-#             self._execute_function_for_sources(SynchroniserNode.notify_fps.__name__, self.notify_callback)
-#             self._execute_function_for_sources(SynchroniserNode.reset.__name__)
-#
-#             time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
-#
+    def update_fps_loop(self):
+        """One iteration of updating fps for all graph's routines.
+
+        """
+
+        routine_graph = self.create_routines_graph()
+
+        # while not self._stop_event.is_set():
+        #     # Run each function of the algorithm for all roots, and then continue to the next functions.
+        #     self._execute_function_for_sources(SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
+        #     self._execute_function_for_sources(SynchroniserNode.update_fps_by_nodes.__name__)
+        #     self._execute_function_for_sources(SynchroniserNode.update_fps_by_fathers.__name__)
+        #     self._execute_function_for_sources(SynchroniserNode.notify_fps.__name__, self.notify_callback)
+        #     self._execute_function_for_sources(SynchroniserNode.reset.__name__)
+        #
+        #     time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
+
     def join(self) -> None:
         """Block until the notify delay thread stops.
 
