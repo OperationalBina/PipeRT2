@@ -24,7 +24,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
         self.notify_callback = notify_callback
         self.wires = {}
 
-        self._stop_event = mp.Event()
+        self._stop_event = mp.Manager().Event()
 
         self.routines_measurements: Dict[str, list] = {}
         self.routines_graph: Dict[str, SynchroniserNode] = {}
@@ -104,16 +104,16 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         routine_graph = self.create_routines_graph()
 
-        # while not self._stop_event.is_set():
+        while not self._stop_event.is_set():
         #     # Run each function of the algorithm for all roots, and then continue to the next functions.
         #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
         #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_nodes.__name__)
         #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_fathers.__name__)
         #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.notify_fps.__name__, self.notify_callback)
         #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.reset.__name__)
-        #     pass
+            pass
         #
-        #     time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
+            time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
 
     def join(self) -> None:
         """Block until the notify delay thread stops.
