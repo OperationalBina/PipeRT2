@@ -1,3 +1,4 @@
+import threading
 import time
 from statistics import median
 from typing import Dict
@@ -24,7 +25,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
         self.notify_callback = notify_callback
         self.wires = {}
 
-        self._stop_event = None
+        self._stop_event = mp.Event()
 
         self.routines_measurements: Dict[str, list] = {}
         self.routines_graph: Dict[str, SynchroniserNode] = {}
@@ -107,41 +108,43 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         routine_graph = self.create_routines_graph()
 
-        # Run each function of the algorithm for all roots, and then continue to the next functions.
-        self._execute_function_for_sources(routine_graph, SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
-        self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_nodes.__name__)
-        self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_fathers.__name__)
-        self._execute_function_for_sources(routine_graph, SynchroniserNode.notify_fps.__name__, self.notify_callback)
-        self._execute_function_for_sources(routine_graph, SynchroniserNode.reset.__name__)
+        while not self._stop_event.is_set():
+            # Run each function of the algorithm for all roots, and then continue to the next functions.
+            self._execute_function_for_sources(routine_graph, SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
+            self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_nodes.__name__)
+            self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_fathers.__name__)
+            self._execute_function_for_sources(routine_graph, SynchroniserNode.notify_fps.__name__, self.notify_callback)
+            self._execute_function_for_sources(routine_graph, SynchroniserNode.reset.__name__)
 
-        time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
+            time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
 
     @events(START_EVENT_NAME)
     def start_notify_process(self):
         """Start the notify process.
 
         """
-        self.notify_delay_thread.start()
+
+        self._stop_event.clear()
+        threading.Thread(target=self.update_fps_loop).start()
 
     @events(KILL_EVENT_NAME)
     def kill_synchronised_process(self):
         """Kill the listening the queue process.
 
         """
-        self.notify_delay_thread.stop()
 
-#
-#     @events(NOTIFY_ROUTINE_DURATIONS_NAME)
-#     def update_finish_routine_logic_time(self, source_name: str, data: []):
-#         """Updating the duration of routine.
-#
-#         Args:
-#             source_name: The source routine name.
-#             data: The durations time.
-#         """
-#
-#         self.routines_measurements[source_name] = list(data)
-#
+        self._stop_event.set()
+
+    @events(NOTIFY_ROUTINE_DURATIONS_NAME)
+    def update_finish_routine_logic_time(self, source_name: str, data: []):
+        """Updating the duration of routine.
+
+        Args:
+            source_name: The source routine name.
+            data: The durations time.
+        """
+
+        self.routines_measurements[source_name] = list(data)
 
     @staticmethod
     def _execute_function_for_sources(graph: {}, name: str, param=None):
