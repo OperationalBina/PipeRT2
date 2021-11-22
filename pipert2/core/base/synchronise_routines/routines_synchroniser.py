@@ -130,6 +130,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         if self._stop_event.is_set():
             self._stop_event.clear()
+            threading.Thread(target=self.update_fps_loop).start()
             # self.notify_delay_thread.start()
 
     @events(KILL_EVENT_NAME)
