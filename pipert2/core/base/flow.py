@@ -70,6 +70,8 @@ class Flow(BaseEventExecutor):
 
         """
 
+        super().join()
+
         for routine in self.routines.values():
             routine.join()
 

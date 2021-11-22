@@ -84,7 +84,7 @@ class BaseEventExecutor(EventExecutorInterface):
 
         """
 
-        pass
+        self.event_loop_process.terminate()
 
     @classmethod
     def get_events(cls):

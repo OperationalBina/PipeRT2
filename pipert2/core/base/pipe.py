@@ -147,9 +147,9 @@ class Pipe:
         self.event_board.join()
         self.logger.plog(f"Joined event board")
 
-        # if self.routine_synchroniser is not None:
-        #     self.routine_synchroniser.event_loop_process.terminate()
-        #     self.logger.plog("Joined synchroniser")
+        if self.routine_synchroniser is not None:
+            self.routine_synchroniser.join()
+            self.logger.plog("Joined synchroniser")
 
     def _validate_pipe(self):
         """Validate routines and wires in current pipeline.
