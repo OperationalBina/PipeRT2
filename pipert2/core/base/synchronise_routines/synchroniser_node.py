@@ -40,7 +40,7 @@ class SynchroniserNode:
         self.notified_delay_time = False
         self.update_fps = False
 
-        self.curr_fps = mp.Manager().Value('f', -1.0)
+        self.curr_fps = NULL_FPS
         self.original_fps = NULL_FPS
 
     def update_original_fps_by_real_time(self, calculate_realtime_fps: callable):
@@ -109,7 +109,7 @@ class SynchroniserNode:
         """
 
         if not self.notified_delay_time:
-            notify_event(UPDATE_FPS_NAME, {self.flow_name: [self.name]}, fps=mp.Value('f', self.curr_fps.value).value)
+            notify_event(UPDATE_FPS_NAME, {self.flow_name: [self.name]}, fps=self.curr_fps.value)
             self.notified_delay_time = True
 
         for node in self.nodes:
