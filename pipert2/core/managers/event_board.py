@@ -4,7 +4,7 @@ from functools import partial
 from typing import Callable, Set
 from collections import defaultdict
 from pipert2.utils.method_data import Method
-from multiprocessing import Pipe, Queue
+from multiprocessing import Pipe, SimpleQueue
 from pipert2.core.handlers.event_handler import EventHandler
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME
 
@@ -18,7 +18,7 @@ class EventBoard:
 
     def __init__(self):
         self.events_pipes = defaultdict(list)
-        self.new_events_queue = Queue()
+        self.new_events_queue = SimpleQueue()
 
     def get_event_handler(self, events_to_listen: Set[str]):
         """Return an event handler adjusted to the given events.
@@ -79,9 +79,7 @@ class EventBoard:
         try:
             self.new_events_queue.put(Method(event_name=event_name,
                                              specific_flow_routines=specific_flow_routines,
-                                             params=params),
-                                      block=True,
-                                      timeout=2)
+                                             params=params))
         except Full:
             pass
 
