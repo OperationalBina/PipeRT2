@@ -58,11 +58,11 @@ class Pipe:
         self.wires: Dict[tuple, Wire] = {}
 
         if auto_pacing_mechanism:
-            self.routine_synchroniser: RoutinesSynchroniser = RoutinesSynchroniser(event_board=self.event_board,
+            self.routine_synchroniser = RoutinesSynchroniser(event_board=self.event_board,
                                                              logger=self.logger,
                                                              notify_callback=self.event_board.get_event_notifier())
         else:
-            self.routine_synchroniser: RoutinesSynchroniser = Dummy()
+            self.routine_synchroniser = None
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
