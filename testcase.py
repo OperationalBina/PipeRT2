@@ -3,6 +3,7 @@ import time
 
 
 def func():
+    t = thread.currentThread()
     while(True):
         print("a")
         time.sleep(1)

@@ -10,24 +10,24 @@ from tests.end_to_end.utils.routines.destination_counter_routine import Destinat
 TEST_TIME = 2
 
 
-# @pytest.mark.timeout(15)
-# @patch("pipert2.core.base.routines.fps_routine.ROUTINE_NOTIFY_DURATIONS_INTERVAL", 0.25)
-# @patch("pipert2.core.base.synchronise_routines.routines_synchroniser.SYNCHRONISER_UPDATE_INTERVAL", 0.25)
-# def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one():
-#     source_counter_routine = SourceCounterRoutine(20, "src")
-#     destination_counter_routine = DestinationCounterRoutine(12, "dst")
-#
-#     pipe = Pipe(auto_pacing_mechanism=True)
-#
-#     pipe.create_flow("f1", True, source_counter_routine, destination_counter_routine)
-#     pipe.build()
-#
-#     pipe.notify_event(START_EVENT_NAME)
-#
-#     time.sleep(TEST_TIME)
-#
-#     pipe.notify_event(KILL_EVENT_NAME)
-#     pipe.join()
+@pytest.mark.timeout(15)
+@patch("pipert2.core.base.routines.fps_routine.ROUTINE_NOTIFY_DURATIONS_INTERVAL", 0.25)
+@patch("pipert2.core.base.synchronise_routines.routines_synchroniser.SYNCHRONISER_UPDATE_INTERVAL", 0.25)
+def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one():
+    source_counter_routine = SourceCounterRoutine(20, "src")
+    destination_counter_routine = DestinationCounterRoutine(12, "dst")
+
+    pipe = Pipe(auto_pacing_mechanism=True)
+
+    pipe.create_flow("f1", True, source_counter_routine, destination_counter_routine)
+    pipe.build()
+
+    pipe.notify_event(START_EVENT_NAME)
+
+    time.sleep(TEST_TIME)
+
+    pipe.notify_event(KILL_EVENT_NAME)
+    pipe.join()
 
     # assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
     # assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
