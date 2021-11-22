@@ -1,4 +1,5 @@
 import time
+from statistics import median
 from typing import Dict
 from logging import Logger
 import multiprocessing as mp
@@ -79,26 +80,26 @@ class RoutinesSynchroniser(BaseEventExecutor):
                     synchronise_graph[source_node.name] = source_node
 
         return synchronise_graph
-#
-#     def get_routine_fps(self, routine_name):
-#         """Get the median fps by routine name.
-#
-#         Args:
-#             routine_name: The routine name.
-#
-#         Returns:
-#             The median fps for the required fps.
-#
-#         """
-#
-#         if routine_name in self.routines_measurements:
-#             routine_fps_list = self.routines_measurements[routine_name]
-#
-#             if len(routine_fps_list) > 0:
-#                 return 1 / median(routine_fps_list)
-#
-#         return NULL_FPS
-#
+
+    def get_routine_fps(self, routine_name):
+        """Get the median fps by routine name.
+
+        Args:
+            routine_name: The routine name.
+
+        Returns:
+            The median fps for the required fps.
+
+        """
+
+        if routine_name in self.routines_measurements:
+            routine_fps_list = self.routines_measurements[routine_name]
+
+            if len(routine_fps_list) > 0:
+                return 1 / median(routine_fps_list)
+
+        return NULL_FPS
+
     def update_fps_loop(self):
         """One iteration of updating fps for all graph's routines.
 
@@ -106,13 +107,12 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         routine_graph = self.create_routines_graph()
 
-        # #     # Run each function of the algorithm for all roots, and then continue to the next functions.
-        # #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
-        # #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_nodes.__name__)
-        # #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_fathers.__name__)
-        # #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.notify_fps.__name__, self.notify_callback)
-        # #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.reset.__name__)
-        # #
+        # Run each function of the algorithm for all roots, and then continue to the next functions.
+        self._execute_function_for_sources(routine_graph, SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
+        self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_nodes.__name__)
+        self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_fathers.__name__)
+        self._execute_function_for_sources(routine_graph, SynchroniserNode.notify_fps.__name__, self.notify_callback)
+        self._execute_function_for_sources(routine_graph, SynchroniserNode.reset.__name__)
 
         time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
 
