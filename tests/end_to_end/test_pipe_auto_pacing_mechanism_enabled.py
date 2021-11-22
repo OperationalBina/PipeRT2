@@ -7,7 +7,7 @@ from tests.end_to_end.utils.routines.source_counter_routine import SourceCounter
 from tests.end_to_end.utils.routines.destination_counter_routine import DestinationCounterRoutine
 
 
-TEST_TIME = 2
+TEST_TIME = 4
 
 
 @pytest.mark.timeout(15)
