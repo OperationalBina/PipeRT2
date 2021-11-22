@@ -29,8 +29,8 @@ def test_number_of_executions_of_main_logic_slow_routine_in_the_last_one():
     pipe.notify_event(KILL_EVENT_NAME)
     pipe.join()
 
-    # assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
-    # assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
+    assert 0 < round(source_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
+    assert 0 < round(destination_counter_routine.estimate_fps.value) <= 12 * FPS_MULTIPLIER
 #
 #
 # @pytest.mark.timeout(15)
