@@ -1,10 +1,6 @@
-import multiprocessing
 from typing import Dict
 from logging import Logger
 from collections import defaultdict
-
-from pipert2.utils.dummy_object import Dummy
-
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
@@ -151,9 +147,9 @@ class Pipe:
         self.event_board.join()
         self.logger.plog(f"Joined event board")
 
-        if self.routine_synchroniser is not None:
-            self.routine_synchroniser.event_loop_process.terminate()
-            self.logger.plog("Joined synchroniser")
+        # if self.routine_synchroniser is not None:
+        #     self.routine_synchroniser.event_loop_process.terminate()
+        #     self.logger.plog("Joined synchroniser")
 
     def _validate_pipe(self):
         """Validate routines and wires in current pipeline.
