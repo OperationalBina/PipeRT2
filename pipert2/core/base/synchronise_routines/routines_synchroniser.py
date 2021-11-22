@@ -38,45 +38,45 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         # self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_fps_loop)
 
-        # self.routines_graph = self.create_routines_graph()
+        self.routines_graph = self.create_routines_graph()
         self._stop_event.set()
 #
-#     def create_routines_graph(self):
-#         """Build the routine's graph.
-#
-#         Returns:
-#             Multiprocess dictionary of { "routine name": synchronised_node }
-#
-#         """
-#
-#         synchronise_graph = {}
-#         synchroniser_nodes = {}
-#
-#         # for wire in self.wires.values():
-#         #     for wire_destination_routine in wire.destinations:
-#         #         if wire_destination_routine.name not in synchroniser_nodes:
-#         #             synchroniser_nodes[wire_destination_routine.name] = SynchroniserNode(
-#         #                 wire_destination_routine.name,
-#         #                 wire_destination_routine.flow_name
-#         #             )
-#         #
-#         #     destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
-#         #                                        for wire_destination_routine
-#         #                                        in wire.destinations]
-#         #
-#         #     if wire.source.name in synchroniser_nodes:
-#         #         synchroniser_nodes[wire.source.name].nodes = destinations_synchroniser_nodes
-#         #     else:
-#         #         source_node = SynchroniserNode(
-#         #             wire.source.name,
-#         #             wire.source.flow_name,
-#         #             destinations_synchroniser_nodes
-#         #         )
-#         #
-#         #         if isinstance(wire.source, SourceRoutine):
-#         #             synchronise_graph[source_node.name] = source_node
-#
-#         return synchronise_graph
+    def create_routines_graph(self):
+        """Build the routine's graph.
+
+        Returns:
+            Multiprocess dictionary of { "routine name": synchronised_node }
+
+        """
+
+        synchronise_graph = {}
+        synchroniser_nodes = {}
+
+        # for wire in self.wires.values():
+        #     for wire_destination_routine in wire.destinations:
+        #         if wire_destination_routine.name not in synchroniser_nodes:
+        #             synchroniser_nodes[wire_destination_routine.name] = SynchroniserNode(
+        #                 wire_destination_routine.name,
+        #                 wire_destination_routine.flow_name
+        #             )
+        #
+        #     destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
+        #                                        for wire_destination_routine
+        #                                        in wire.destinations]
+        #
+        #     if wire.source.name in synchroniser_nodes:
+        #         synchroniser_nodes[wire.source.name].nodes = destinations_synchroniser_nodes
+        #     else:
+        #         source_node = SynchroniserNode(
+        #             wire.source.name,
+        #             wire.source.flow_name,
+        #             destinations_synchroniser_nodes
+        #         )
+        #
+        #         if isinstance(wire.source, SourceRoutine):
+        #             synchronise_graph[source_node.name] = source_node
+
+        return synchronise_graph
 #
 #     def get_routine_fps(self, routine_name):
 #         """Get the median fps by routine name.
