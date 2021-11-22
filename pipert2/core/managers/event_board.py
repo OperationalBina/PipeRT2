@@ -81,7 +81,7 @@ class EventBoard:
                                              specific_flow_routines=specific_flow_routines,
                                              params=params),
                                       block=True,
-                                      timeout=1)
+                                      timeout=2)
         except Full:
             pass
 
