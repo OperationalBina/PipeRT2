@@ -1,10 +1,10 @@
-import gc
 import time
 import threading
 from typing import Dict
 from logging import Logger
 import multiprocessing as mp
 from statistics import median
+from pipert2.utils.dummy_object import Dummy
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.core.base.routines.source_routine import SourceRoutine
@@ -22,20 +22,21 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self._logger = logger
         self.notify_callback = notify_callback
-        self.updating_interval = SYNCHRONISER_UPDATE_INTERVAL
         self.wires = {}
 
         self._stop_event = mp.Event()
 
-        self.routines_graph: Dict[str, SynchroniserNode] = {}
         self.routines_measurements: Dict[str, list] = {}
+        self.routines_graph: Dict[str, SynchroniserNode] = {}
 
-        self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_delay_iteration)
+        self.notify_delay_thread = Dummy()
 
     def before_event_listening(self) -> None:
         """Start the queue listener process.
 
         """
+
+        self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_fps_loop)
 
         self.routines_graph = self.create_routines_graph()
         self._stop_event.set()
@@ -51,29 +52,29 @@ class RoutinesSynchroniser(BaseEventExecutor):
         synchronise_graph = {}
         synchroniser_nodes = {}
 
-        for wire in self.wires.values():
-            for wire_destination_routine in wire.destinations:
-                if wire_destination_routine.name not in synchroniser_nodes:
-                    synchroniser_nodes[wire_destination_routine.name] = SynchroniserNode(
-                        wire_destination_routine.name,
-                        wire_destination_routine.flow_name
-                    )
-
-            destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
-                                               for wire_destination_routine
-                                               in wire.destinations]
-
-            if wire.source.name in synchroniser_nodes:
-                synchroniser_nodes[wire.source.name].nodes = destinations_synchroniser_nodes
-            else:
-                source_node = SynchroniserNode(
-                    wire.source.name,
-                    wire.source.flow_name,
-                    destinations_synchroniser_nodes
-                )
-
-                if isinstance(wire.source, SourceRoutine):
-                    synchronise_graph[source_node.name] = source_node
+        # for wire in self.wires.values():
+        #     for wire_destination_routine in wire.destinations:
+        #         if wire_destination_routine.name not in synchroniser_nodes:
+        #             synchroniser_nodes[wire_destination_routine.name] = SynchroniserNode(
+        #                 wire_destination_routine.name,
+        #                 wire_destination_routine.flow_name
+        #             )
+        #
+        #     destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
+        #                                        for wire_destination_routine
+        #                                        in wire.destinations]
+        #
+        #     if wire.source.name in synchroniser_nodes:
+        #         synchroniser_nodes[wire.source.name].nodes = destinations_synchroniser_nodes
+        #     else:
+        #         source_node = SynchroniserNode(
+        #             wire.source.name,
+        #             wire.source.flow_name,
+        #             destinations_synchroniser_nodes
+        #         )
+        #
+        #         if isinstance(wire.source, SourceRoutine):
+        #             synchronise_graph[source_node.name] = source_node
 
         return synchronise_graph
 
@@ -96,7 +97,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         return NULL_FPS
 
-    def update_delay_iteration(self):
+    def update_fps_loop(self):
         """One iteration of updating fps for all graph's routines.
 
         """
@@ -109,7 +110,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
             self._execute_function_for_sources(SynchroniserNode.notify_fps.__name__, self.notify_callback)
             self._execute_function_for_sources(SynchroniserNode.reset.__name__)
 
-            time.sleep(self.updating_interval)
+            time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
 
     def join(self) -> None:
         """Block until the notify delay thread stops.
