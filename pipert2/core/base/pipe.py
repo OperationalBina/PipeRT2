@@ -1,6 +1,10 @@
+import multiprocessing
 from typing import Dict
 from logging import Logger
 from collections import defaultdict
+
+from pipert2.utils.dummy_object import Dummy
+
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
@@ -54,11 +58,11 @@ class Pipe:
         self.wires: Dict[tuple, Wire] = {}
 
         if auto_pacing_mechanism:
-            self.routine_synchroniser = RoutinesSynchroniser(event_board=self.event_board,
+            self.routine_synchroniser: RoutinesSynchroniser = RoutinesSynchroniser(event_board=self.event_board,
                                                              logger=self.logger,
                                                              notify_callback=self.event_board.get_event_notifier())
         else:
-            self.routine_synchroniser = None
+            self.routine_synchroniser: RoutinesSynchroniser = Dummy()
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -148,7 +152,7 @@ class Pipe:
         self.logger.plog(f"Joined event board")
 
         if self.routine_synchroniser is not None:
-            self.routine_synchroniser.join()
+            self.routine_synchroniser.event_loop_process.terminate()
             self.logger.plog("Joined synchroniser")
 
     def _validate_pipe(self):
