@@ -38,7 +38,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         """
 
-        self.routines_graph = self.create_routines_graph()
+        # self.routines_graph = self.create_routines_graph()
         self._stop_event.set()
 
     def create_routines_graph(self):
