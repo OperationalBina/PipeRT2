@@ -15,7 +15,7 @@ class BaseEventExecutor(EventExecutorInterface):
 
     events = class_functions_dictionary()
 
-    def __init__(self, event_board: EventBoard, logger: Logger, *args):
+    def __init__(self, event_board: EventBoard, logger: Logger):
         """
         Args:
             event_board (EventBoard): The EventBoard of the pipe.
@@ -37,8 +37,6 @@ class BaseEventExecutor(EventExecutorInterface):
 
         self.event_handler: EventHandler = Dummy()
 
-        self.args = args
-
     def build(self) -> None:
         """Start the event loop process.
 
@@ -46,7 +44,7 @@ class BaseEventExecutor(EventExecutorInterface):
 
         self.event_handler = self.event_board.get_event_handler(self.events_to_listen)
 
-        self.event_loop_process = Process(target=self.run, args=self.args)
+        self.event_loop_process = Process(target=self.run)
         self.event_loop_process.start()
 
     def before_event_listening(self) -> None:

@@ -107,7 +107,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         routine_graph = self.create_routines_graph()
 
-        while not self._stop_event.is_set():
+        while not self._thread_stop_event.is_set():
         # #     # Run each function of the algorithm for all roots, and then continue to the next functions.
         # #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
         # #     # self._execute_function_for_sources(routine_graph, SynchroniserNode.update_fps_by_nodes.__name__)
@@ -133,6 +133,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         if self._stop_event.is_set():
             self._stop_event.clear()
+            self._thread_stop_event = threading.Event()
+            self._thread_stop_event.clear()
             self.notify_delay_thread.start()
 
     @events(KILL_EVENT_NAME)
@@ -141,8 +143,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         """
 
-        if not self._stop_event.is_set():
-            self._stop_event.set()
+        self._stop_event.set()
+        self._thread_stop_event.set()
 #
 #     @events(NOTIFY_ROUTINE_DURATIONS_NAME)
 #     def update_finish_routine_logic_time(self, source_name: str, data: []):
