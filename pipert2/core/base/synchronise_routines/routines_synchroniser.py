@@ -14,13 +14,13 @@ from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTI
 
 
 class RoutinesSynchroniser(BaseEventExecutor):
+
     events = class_functions_dictionary()
 
     def __init__(self, event_board: any, logger: Logger, notify_callback: callable):
         super().__init__(event_board, logger)
 
         self._logger = logger
-
         self.notify_callback = notify_callback
         self.wires = {}
 
@@ -31,45 +31,15 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self.notify_delay_thread = Dummy()
 
-    @events(START_EVENT_NAME)
-    def start_notify_process(self):
-        """Start the notify process.
+    def before_event_listening(self) -> None:
+        """Start the queue listener process.
 
         """
 
-        pass
+        # self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_fps_loop)
 
-    @events(KILL_EVENT_NAME)
-    def kill_synchronised_process(self):
-        pass
-
-# class RoutinesSynchroniser(BaseEventExecutor):
-#
-#     events = class_functions_dictionary()
-#
-#     def __init__(self, event_board: any, logger: Logger, notify_callback: callable):
-#         super().__init__(event_board, logger)
-#
-#         self._logger = logger
-#         self.notify_callback = notify_callback
-#         self.wires = {}
-#
-#         self._stop_event = mp.Event()
-#
-#         self.routines_measurements: Dict[str, list] = {}
-#         self.routines_graph: Dict[str, SynchroniserNode] = {}
-#
-#         self.notify_delay_thread = Dummy()
-#
-#     def before_event_listening(self) -> None:
-#         """Start the queue listener process.
-#
-#         """
-#
-#         self.notify_delay_thread: threading.Thread = threading.Thread(target=self.update_fps_loop)
-#
-#         self.routines_graph = self.create_routines_graph()
-#         self._stop_event.set()
+        # self.routines_graph = self.create_routines_graph()
+        self._stop_event.set()
 #
 #     def create_routines_graph(self):
 #         """Build the routine's graph.
@@ -142,32 +112,32 @@ class RoutinesSynchroniser(BaseEventExecutor):
 #
 #             time.sleep(SYNCHRONISER_UPDATE_INTERVAL)
 #
-#     def join(self) -> None:
-#         """Block until the notify delay thread stops.
-#
-#         """
-#
-#         if self.notify_delay_thread.is_alive():
-#             self.notify_delay_thread.join(timeout=1)
-#
-#     @events(START_EVENT_NAME)
-#     def start_notify_process(self):
-#         """Start the notify process.
-#
-#         """
-#
-#         if self._stop_event.is_set():
-#             self._stop_event.clear()
-#             self.notify_delay_thread.start()
-#
-#     @events(KILL_EVENT_NAME)
-#     def kill_synchronised_process(self):
-#         """Kill the listening the queue process.
-#
-#         """
-#
-#         if not self._stop_event.is_set():
-#             self._stop_event.set()
+    def join(self) -> None:
+        """Block until the notify delay thread stops.
+
+        """
+        pass
+        # if self.notify_delay_thread.is_alive():
+        #     self.notify_delay_thread.join(timeout=1)
+
+    @events(START_EVENT_NAME)
+    def start_notify_process(self):
+        """Start the notify process.
+
+        """
+
+        if self._stop_event.is_set():
+            self._stop_event.clear()
+            # self.notify_delay_thread.start()
+
+    @events(KILL_EVENT_NAME)
+    def kill_synchronised_process(self):
+        """Kill the listening the queue process.
+
+        """
+
+        if not self._stop_event.is_set():
+            self._stop_event.set()
 #
 #     @events(NOTIFY_ROUTINE_DURATIONS_NAME)
 #     def update_finish_routine_logic_time(self, source_name: str, data: []):
