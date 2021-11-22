@@ -16,6 +16,21 @@ from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTI
 class RoutinesSynchroniser(BaseEventExecutor):
     events = class_functions_dictionary()
 
+    def __init__(self, event_board: any, logger: Logger, notify_callback: callable):
+        super().__init__(event_board, logger)
+
+        self._logger = logger
+
+        self.notify_callback = notify_callback
+        self.wires = {}
+
+        self._stop_event = mp.Event()
+
+        self.routines_measurements: Dict[str, list] = {}
+        self.routines_graph: Dict[str, SynchroniserNode] = {}
+
+        self.notify_delay_thread = Dummy()
+
     @events(START_EVENT_NAME)
     def start_notify_process(self):
         """Start the notify process.
