@@ -31,7 +31,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self.notify_delay_thread = Dummy()
 
-    def before_event_listening(self) -> None:
+    def before_build(self) -> None:
         """Start the queue listener process.
 
         """
