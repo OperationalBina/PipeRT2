@@ -82,9 +82,7 @@ class EventBoard:
         try:
             self.new_events_queue.put(Method(event_name=event_name,
                                              specific_flow_routines=specific_flow_routines,
-                                             params=params),
-                                      block=True,
-                                      timeout=2)
+                                             params=params))
         except Full:
             pass
 
