@@ -55,8 +55,8 @@ class Pipe:
 
         if auto_pacing_mechanism:
             self.routine_synchroniser = RoutinesSynchroniser(event_board=self.event_board,
-                                                             logger=self.logger,
-                                                             notify_callback=self.event_board.get_event_notifier())
+                                                             logger=self.logger)
+                                                             # notify_callback=self.event_board.get_event_notifier())
         else:
             self.routine_synchroniser = None
 
