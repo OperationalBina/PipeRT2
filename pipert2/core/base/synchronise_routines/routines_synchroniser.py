@@ -118,9 +118,9 @@ class RoutinesSynchroniser(BaseEventExecutor):
         """Block until the notify delay thread stops.
 
         """
-        pass
-        # if self.notify_delay_thread.is_alive():
-        #     self.notify_delay_thread.join(timeout=1)
+
+        if self.notify_delay_thread.is_alive():
+            self.notify_delay_thread.join(timeout=1)
 
     @events(START_EVENT_NAME)
     def start_notify_process(self):
