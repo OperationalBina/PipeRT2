@@ -76,12 +76,9 @@ class EventBoard:
         return partial(notify_event, self.new_events_queue)
 
     def notify_event(self, event_name, specific_flow_routines: dict = defaultdict(list), **params):
-        try:
-            self.new_events_queue.put(Method(event_name=event_name,
-                                             specific_flow_routines=specific_flow_routines,
-                                             params=params))
-        except Full:
-            pass
+        self.new_events_queue.put(Method(event_name=event_name,
+                                         specific_flow_routines=specific_flow_routines,
+                                         params=params))
 
     def join(self):
         self.event_board_thread.join()

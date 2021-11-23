@@ -10,7 +10,7 @@ from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.core.base.routines.source_routine import SourceRoutine
 from pipert2.core.base.synchronise_routines.synchroniser_node import SynchroniserNode
 from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTINE_DURATIONS_NAME, NULL_FPS, \
-    SYNCHRONISER_UPDATE_INTERVAL
+    SYNCHRONISER_UPDATE_INTERVAL, STOP_EVENT_NAME
 
 
 class RoutinesSynchroniser(BaseEventExecutor):
@@ -30,6 +30,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
         self.routines_graph: Dict[str, SynchroniserNode] = {}
 
         self.notify_delay_thread = Dummy()
+
+        self.name = "synchroniser"
 
     def before_build(self) -> None:
         """Start the queue listener process.
@@ -117,6 +119,14 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self._stop_event.clear()
         threading.Thread(target=self.update_fps_loop).start()
+
+    @events(STOP_EVENT_NAME)
+    def kill_synchronised_process(self):
+        """Kill the listening the queue process.
+
+        """
+
+        self._stop_event.set()
 
     @events(KILL_EVENT_NAME)
     def kill_synchronised_process(self):

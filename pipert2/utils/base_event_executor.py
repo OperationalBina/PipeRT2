@@ -1,3 +1,4 @@
+import os
 from logging import Logger
 from multiprocessing import Process
 from pipert2.utils.method_data import Method
@@ -30,12 +31,14 @@ class BaseEventExecutor(EventExecutorInterface):
 
         self.routines = {}
         self._logger = logger
-        self.event_loop_process = Dummy()
+        self.event_loop_process: Process = Dummy()
 
         self.events_to_listen = set(self.get_events().keys())
         self.event_board = event_board
 
         self.event_handler: EventHandler = Dummy()
+
+        self.process_name = None
 
     def build(self) -> None:
         """Start the event loop process.
@@ -48,6 +51,8 @@ class BaseEventExecutor(EventExecutorInterface):
 
         self.event_loop_process = Process(target=self.run)
         self.event_loop_process.start()
+
+        self.process_name = self.event_loop_process.name
 
     def before_build(self) -> None:
         """The implementation can implement this method and called in build.
@@ -83,8 +88,8 @@ class BaseEventExecutor(EventExecutorInterface):
         """Block until the event loop process terminates
 
         """
-
-        self.event_loop_process.join()
+        if self.event_loop_process.is_alive():
+            self.event_loop_process.join()
 
     @classmethod
     def get_events(cls):
