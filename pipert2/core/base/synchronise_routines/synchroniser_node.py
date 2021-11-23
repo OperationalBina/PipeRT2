@@ -1,5 +1,4 @@
 from typing import List
-import multiprocessing as mp
 from pipert2.utils.consts import UPDATE_FPS_NAME, NULL_FPS
 
 

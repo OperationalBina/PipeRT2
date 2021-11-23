@@ -1,4 +1,3 @@
-from queue import Full
 from threading import Thread
 from functools import partial
 from typing import Callable, Set

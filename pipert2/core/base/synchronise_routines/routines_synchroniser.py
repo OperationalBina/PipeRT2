@@ -31,10 +31,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self.notify_delay_thread = Dummy()
 
-        self.name = "synchroniser"
-
     def before_build(self) -> None:
-        """Start the queue listener process.
+        """Run before the build of the event loop process.
 
         """
 
@@ -121,7 +119,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
         threading.Thread(target=self.update_fps_loop).start()
 
     @events(STOP_EVENT_NAME)
-    def kill_synchronised_process(self):
+    def stop_synchronised_process(self):
         """Kill the listening the queue process.
 
         """

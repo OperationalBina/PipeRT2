@@ -38,8 +38,6 @@ class BaseEventExecutor(EventExecutorInterface):
 
         self.event_handler: EventHandler = Dummy()
 
-        self.process_name = None
-
     def build(self) -> None:
         """Start the event loop process.
 
@@ -51,8 +49,6 @@ class BaseEventExecutor(EventExecutorInterface):
 
         self.event_loop_process = Process(target=self.run)
         self.event_loop_process.start()
-
-        self.process_name = self.event_loop_process.name
 
     def before_build(self) -> None:
         """The implementation can implement this method and called in build.
@@ -88,8 +84,18 @@ class BaseEventExecutor(EventExecutorInterface):
         """Block until the event loop process terminates
 
         """
+
         if self.event_loop_process.is_alive():
             self.event_loop_process.join()
+
+        self.after_join()
+
+    def after_join(self):
+        """The implementation can implement this method and called in build.
+
+        """
+
+        pass
 
     @classmethod
     def get_events(cls):
