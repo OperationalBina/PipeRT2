@@ -17,3 +17,6 @@ from .core import QueueNetwork, QueueHandler, SharedMemoryTransmitter, BasicTran
 
 # Event names.
 from .utils import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
+
+# Routine synchroniser consts.
+from .utils import ROUTINE_NOTIFY_DURATIONS_INTERVAL, FPS_MULTIPLIER

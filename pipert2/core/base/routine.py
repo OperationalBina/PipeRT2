@@ -1,9 +1,9 @@
 import threading
-import multiprocessing as mp
-from collections import defaultdict
 from logging import Logger
-from typing import Callable
+import multiprocessing as mp
 from functools import partial
+from collections import defaultdict
+from typing import Callable, Optional
 from abc import ABCMeta, abstractmethod
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
@@ -68,7 +68,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         self.message_handler = message_handler
         self.event_notifier = event_notifier
-
         self.message_handler.logger = self._logger
 
         if "runner" in kwargs and kwargs["runner"] in self.runners.all:
@@ -137,9 +136,13 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.setup()
 
         while not self.stop_event.is_set():
-            self._extended_run()
+            self._run()
 
         self._base_cleanup()
+
+    @abstractmethod
+    def _run(self):
+        pass
 
     @runners("thread")
     def set_runner_as_thread(self):

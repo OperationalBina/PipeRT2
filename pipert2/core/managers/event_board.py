@@ -1,10 +1,10 @@
-from typing import Callable, Set
 from threading import Thread
 from functools import partial
+from typing import Callable, Set
 from collections import defaultdict
+from pipert2.utils.method_data import Method
 from multiprocessing import Pipe, SimpleQueue
 from pipert2.core.handlers.event_handler import EventHandler
-from pipert2.utils.method_data import Method
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME
 
 DEFAULT_EVENT_HANDLER_EVENTS = [START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME]
@@ -68,7 +68,9 @@ class EventBoard:
         """
 
         def notify_event(output_event_queue, event_name, specific_flow_routines: dict = defaultdict(list), **params):
-            output_event_queue.put(Method(event_name, specific_flow_routines=specific_flow_routines, params=params))
+            output_event_queue.put(Method(event_name,
+                                          specific_flow_routines=specific_flow_routines,
+                                          params=params))
 
         return partial(notify_event, self.new_events_queue)
 

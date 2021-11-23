@@ -32,6 +32,8 @@ def dummy_flow_with_two_routines(mocker: MockerFixture):
                       logger=logger_mocker,
                       routines=[first_routine_mocker, second_routine_mocker])
 
+    dummy_flow.build()
+
     return dummy_flow
 
 
@@ -56,9 +58,13 @@ def dummy_method_with_specific_flow_and_routines(mocker: MockerFixture):
 
 def test_run(mocker, dummy_flow_with_two_routines: Flow):
     start_event_callback_mock = mocker.MagicMock()
+    # start_event_callback_mock.specific_flow_routines.get.return_value = {}
+
     dummy_flow_with_two_routines.get_events()[START_EVENT_NAME] = {start_event_callback_mock}
 
     stop_event_callback_mock = mocker.MagicMock()
+    # stop_event_callback_mock.specific_flow_routines.get.return_value = {}
+
     dummy_flow_with_two_routines.get_events()[STOP_EVENT_NAME] = {stop_event_callback_mock}
 
     routine = dummy_flow_with_two_routines.routines[FIRST_ROUTINE_NAME]

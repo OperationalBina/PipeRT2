@@ -1,9 +1,10 @@
+from functools import partial
 from abc import ABCMeta, abstractmethod
 from pipert2.core.base.data import Data
-from pipert2.core.base.routine import Routine
+from pipert2.core.base.routines.fps_routine import FPSRoutine
 
 
-class DestinationRoutine(Routine, metaclass=ABCMeta):
+class DestinationRoutine(FPSRoutine, metaclass=ABCMeta):
 
     @abstractmethod
     def main_logic(self, data: Data) -> None:
@@ -19,6 +20,7 @@ class DestinationRoutine(Routine, metaclass=ABCMeta):
         message = self.message_handler.get()
         if message is not None:
             try:
-                self.main_logic(message.get_data())
+                main_logic_callable = partial(self.main_logic, message.get_data())
+                self._run_main_logic_with_durations_updating(main_logic_callable)
             except Exception as error:
                 self._logger.exception(f"The routine has crashed: {error}")
