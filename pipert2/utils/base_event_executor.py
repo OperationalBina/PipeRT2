@@ -83,8 +83,8 @@ class BaseEventExecutor(EventExecutorInterface):
         """Block until the event loop process terminates
 
         """
-
-        self.event_loop_process.terminate()
+        pass
+        # self.event_loop_process.terminate()
 
     @classmethod
     def get_events(cls):
