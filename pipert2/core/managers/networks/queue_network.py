@@ -32,9 +32,12 @@ class QueueNetwork(Network):
         if routine_name in self.message_handlers:
             message_handler = self.message_handlers[routine_name]
         else:
-            message_handler = QueueHandler(routine_name, max_queue_len=self.max_queue_sizes, put_block=self.put_block,
+            message_handler = QueueHandler(routine_name,
+                                           max_queue_len=self.max_queue_sizes,
+                                           put_block=self.put_block,
                                            get_block=self.get_block,
                                            timeout=self.timeout)
+
             self.message_handlers[routine_name] = message_handler
 
         return message_handler

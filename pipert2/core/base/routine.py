@@ -98,7 +98,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         return cls.runners.all[cls.__name__]
 
     @abstractmethod
-    def _extended_run(self) -> Optional[float]:
+    def _extended_run(self) -> None:
         """Wrapper method for executing the entire routine logic
 
         """
