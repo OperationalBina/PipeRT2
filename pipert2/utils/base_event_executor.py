@@ -1,11 +1,10 @@
-import os
 from logging import Logger
 from multiprocessing import Process
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from pipert2.utils.interfaces import EventExecutorInterface
-from pipert2.utils.consts import KILL_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.utils.annotations import class_functions_dictionary
+from pipert2.utils.consts import KILL_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.core.managers.event_board import EventBoard, EventHandler
 
 
@@ -22,14 +21,8 @@ class BaseEventExecutor(EventExecutorInterface):
             event_board (EventBoard): The EventBoard of the pipe.
             logger (Logger): Logger object for logging the flow actions.
 
-        Attributes:
-            logger (Logger): Logger object for logging the flow actions.
-            event_handler (EventHandler): EventHandler object for communicating with the
-                event system of the pipe.
-
         """
 
-        self.routines = {}
         self._logger = logger
         self.event_loop_process: Process = Dummy()
 
@@ -43,22 +36,15 @@ class BaseEventExecutor(EventExecutorInterface):
 
         """
 
-        self.before_build()
+        self._before_build()
 
         self.event_handler = self.event_board.get_event_handler(self.events_to_listen)
 
         self.event_loop_process = Process(target=self.run)
         self.event_loop_process.start()
 
-    def before_build(self) -> None:
-        """The implementation can implement this method and called in build.
-
-        """
-
-        pass
-
     def run(self) -> None:
-        """The flow process, executing the pipe events that occur.
+        """The event loop process, executing the pipe events that occur.
 
         """
 
@@ -71,7 +57,7 @@ class BaseEventExecutor(EventExecutorInterface):
         self.execute_event(Method(STOP_EVENT_NAME))
 
     def execute_event(self, event: Method) -> None:
-        """Execute the event callbacks in the flow and its routines.
+        """Execute the event callbacks.
 
         Args:
             event: The event to be executed.
@@ -88,18 +74,11 @@ class BaseEventExecutor(EventExecutorInterface):
         if self.event_loop_process.is_alive():
             self.event_loop_process.join()
 
-        self.after_join()
-
-    def after_join(self):
-        """The implementation can implement this method and called in build.
-
-        """
-
-        pass
+        self._after_join()
 
     @classmethod
     def get_events(cls):
-        """Get the events of the flow.
+        """Get the events of the implement.
 
         Returns:
             dict[str, set[Callback]]: The events callbacks mapped by their events.
@@ -108,3 +87,16 @@ class BaseEventExecutor(EventExecutorInterface):
 
         return cls.events.all[cls.__name__]
 
+    def _before_build(self) -> None:
+        """The implementation can implement this method and called in build.
+
+        """
+
+        pass
+
+    def _after_join(self):
+        """The implementation can implement this method and called in build.
+
+        """
+
+        pass

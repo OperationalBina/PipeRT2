@@ -31,7 +31,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         self.notify_delay_thread = Dummy()
 
-    def before_build(self) -> None:
+    def _before_build(self) -> None:
         """Run before the build of the event loop process.
 
         """
@@ -95,7 +95,7 @@ class RoutinesSynchroniser(BaseEventExecutor):
         return NULL_FPS
 
     def update_fps_loop(self):
-        """One iteration of updating fps for all graph's routines.
+        """Update fps for all graph's routines.
 
         """
 

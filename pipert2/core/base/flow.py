@@ -65,7 +65,7 @@ class Flow(BaseEventExecutor):
 
             EventExecutorInterface.execute_event(self, event)
 
-    def after_join(self):
+    def _after_join(self):
         """Block until the flow process terminates.
 
         """
