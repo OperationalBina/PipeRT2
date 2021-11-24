@@ -12,8 +12,8 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
 
     events = class_functions_dictionary()
 
-    def __init__(self, name: str = None):
-        super().__init__(name)
+    def __init__(self, name: str = None, **kwargs):
+        super().__init__(name, **kwargs)
 
         self._fps = NULL_FPS
         self._const_fps = NULL_FPS
