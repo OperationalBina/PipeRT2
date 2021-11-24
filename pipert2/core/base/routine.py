@@ -23,7 +23,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     """
 
     events = class_functions_dictionary()
-    runners = class_functions_dictionary()
     routines_created_counter = 0
 
     def __init__(self, name: str = None, to_run_in_process: bool = False):
@@ -73,11 +72,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.event_notifier = event_notifier
         self.message_handler.logger = self._logger
 
-        if "runner" in kwargs and kwargs["runner"] in self.runners.all:
-            self._get_runners()[kwargs["runner"]](self)
-        else:
-            self.set_runner_as_thread()
-
     def set_logger(self, logger: Logger):
         self._logger = logger
 
@@ -95,10 +89,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             cls.events.all[cls.__name__][event_name].update(events_functions)
 
         return cls.events.all[cls.__name__]
-
-    @classmethod
-    def _get_runners(cls):
-        return cls.runners.all[cls.__name__]
 
     @abstractmethod
     def _extended_run(self) -> None:
@@ -146,10 +136,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     @abstractmethod
     def _run(self):
         pass
-
-    @runners("thread")
-    def set_runner_as_thread(self):
-        self.runner_creator = partial(threading.Thread, target=self._start_routine_logic)
 
     @events(START_EVENT_NAME)
     def start(self) -> None:
