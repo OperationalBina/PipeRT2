@@ -1,9 +1,9 @@
 import threading
 from logging import Logger
+from typing import Callable
 import multiprocessing as mp
 from functools import partial
 from collections import defaultdict
-from typing import Callable, Optional
 from abc import ABCMeta, abstractmethod
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
@@ -11,6 +11,7 @@ from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
+from pipert2.core.base.routine_logic.routine_logic_runner_manager import RoutineLogicRunnerManager
 
 
 class Routine(EventExecutorInterface, metaclass=ABCMeta):
@@ -25,7 +26,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     runners = class_functions_dictionary()
     routines_created_counter = 0
 
-    def __init__(self, name: str = None):
+    def __init__(self, name: str = None, to_run_in_process: bool = False):
         """
         Args:
             name: Name of the routine.
@@ -55,6 +56,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
+
+        self.routine_logic_runner_manager = RoutineLogicRunnerManager(to_run_in_process, self._start_routine_logic)
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -159,8 +162,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         if self.stop_event.is_set():
             self._logger.plog("Starting")
             self.stop_event.clear()
-            self.runner = self.runner_creator()
-            self.runner.start()
+            self.routine_logic_runner_manager.start()
 
     @events(STOP_EVENT_NAME)
     def stop(self) -> None:
@@ -173,7 +175,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         if not self.stop_event.is_set():
             self._logger.plog("Stopping")
             self.stop_event.set()
-            self.runner.join()
+            self.routine_logic_runner_manager.join()
 
     def execute_event(self, event: Method) -> None:
         """Execute an event to start
