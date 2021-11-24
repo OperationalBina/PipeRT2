@@ -17,10 +17,12 @@ def pipe_with_multiple_flows(mocker: MockerFixture) -> Pipe:
     source_routine = mocker.MagicMock(spec=SourceRoutine)
     source_routine.name = "source"
     source_routine.message_handler = mocker.MagicMock()
+    source_routine.routine_logic_runner_manager = mocker.MagicMock()
 
     destination_routine = mocker.MagicMock(spec=DestinationRoutine)
     destination_routine.name = "destination"
     destination_routine.message_handler = mocker.MagicMock()
+    destination_routine.routine_logic_runner_manager = mocker.MagicMock()
 
     pipe.wires[(FIRST_FLOW_NAME, "source")] = Wire(source=source_routine,
                                                    destinations=(destination_routine,),
