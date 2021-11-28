@@ -1,12 +1,6 @@
-import sys
-from collections import defaultdict
-
 from typing import Dict, Optional
-
-if sys.version_info.minor >= 7:
-    from dataclasses import dataclass, field
-else:
-    from pipert2.utils.data_class.dataclasses import dataclass, field
+from collections import defaultdict
+from pipert2 import dataclass, field
 
 
 @dataclass

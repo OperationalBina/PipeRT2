@@ -1,11 +1,13 @@
+from functools import partial
 from abc import ABCMeta, abstractmethod
-from pipert2.core.base.routine import Routine
+from pipert2.core.base.data import Data
+from pipert2.core.base.routines.fps_routine import FPSRoutine
 
 
-class MiddleRoutine(Routine, metaclass=ABCMeta):
+class MiddleRoutine(FPSRoutine, metaclass=ABCMeta):
 
     @abstractmethod
-    def main_logic(self, data) -> dict:
+    def main_logic(self, data) -> Data:
         """Process the given data to the routine.
 
         Args:
@@ -21,7 +23,8 @@ class MiddleRoutine(Routine, metaclass=ABCMeta):
         message = self.message_handler.get()
         if message is not None:
             try:
-                output_data = self.main_logic(message.get_data())
+                main_logic_callable = partial(self.main_logic, message.get_data())
+                output_data = self._run_main_logic_with_durations_updating(main_logic_callable)
             except Exception as error:
                 self._logger.exception(f"The routine has crashed: {error}")
             else:

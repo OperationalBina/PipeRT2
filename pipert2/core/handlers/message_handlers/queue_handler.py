@@ -1,6 +1,6 @@
 from queue import Full, Empty
-from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.queue_wrapper import QueueWrapper
+from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.exceptions.queue_not_initialized import QueueNotInitialized
 
 
@@ -14,11 +14,12 @@ class QueueHandler(MessageHandler):
 
     """
 
-    def __init__(self, routine_name: str, max_queue_len=1, block=False, timeout=1):
+    def __init__(self, routine_name: str, max_queue_len=1, put_block=False, get_block=True, timeout=1):
         super().__init__(routine_name)
         self.input_queue = QueueWrapper(max_queue_len)
         self.output_queue = None
-        self.block = block
+        self.put_block = put_block
+        self.get_block = get_block
         self.timeout = timeout
 
     def _get(self) -> bytes:
@@ -34,7 +35,7 @@ class QueueHandler(MessageHandler):
         message = None
 
         try:
-            message = self.input_queue.get(block=self.block, timeout=self.timeout)
+            message = self.input_queue.get(block=self.get_block, timeout=self.timeout)
         except Empty:
             pass
 
@@ -54,7 +55,7 @@ class QueueHandler(MessageHandler):
             raise QueueNotInitialized(f"{self.routine_name}'s output_queue was not initialized when put was called!")
 
         try:
-            self.output_queue.put(message, block=self.block, timeout=self.timeout)
+            self.output_queue.put(message, block=self.put_block, timeout=self.timeout)
         except Full:
             self.logger.exception("The queue is full!")
 

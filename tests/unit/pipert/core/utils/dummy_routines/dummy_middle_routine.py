@@ -49,3 +49,12 @@ class DummyMiddleRoutineException(MiddleRoutine):
     @MiddleRoutine.events(DUMMY_ROUTINE_EVENT.event_name)
     def change_logic(self):
         self.inc = not self.inc
+
+
+class DummyMiddleRoutineWithCustomDurationTime(DummyMiddleRoutine):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.duration = 5
+
+    def _extended_run(self) -> float:
+        return self.duration
