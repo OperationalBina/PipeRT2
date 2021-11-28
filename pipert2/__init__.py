@@ -7,7 +7,7 @@ except ImportError:
 
 
 # User interaction classes
-from .core import Pipe, Wire
+from .core import Pipe, Wire, Data
 
 # Interfaces for user implementations
 from .core import SourceRoutine, MiddleRoutine, DestinationRoutine, Network, MessageHandler, DataTransmitter
