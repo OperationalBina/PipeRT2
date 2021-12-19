@@ -33,7 +33,7 @@ jobs:
         pip install mock
         pip install coverage
         pip install python-socketio
-        coverage run --concurrency=multiprocessing --omit=pipert2/utils/logging_module_modifiers.py -m pytest --timeout=15
+        coverage run --concurrency=multiprocessing -m pytest --timeout=15
         coverage combine
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
