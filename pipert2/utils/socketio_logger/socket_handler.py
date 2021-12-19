@@ -1,5 +1,6 @@
 import logging
 import socketio
+from socketio.exceptions import SocketIOError
 
 
 class SocketHandler(logging.Handler):
@@ -15,8 +16,8 @@ class SocketHandler(logging.Handler):
             self.sio.connect(self.url)
         try:
             self.sio.emit(self.log_event_name, self.formatter.format(record))
-        except Exception as e:
-            print(e)
+        except SocketIOError:
+            pass
 
     def close(self) -> None:
         self.sio.disconnect()
