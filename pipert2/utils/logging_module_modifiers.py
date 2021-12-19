@@ -1,9 +1,15 @@
-import logging
+import os
 import sys
+import logging
+from dotenv import load_dotenv
 from pipert2.utils.socketio_logger.socket_logger import SocketLogger
+
 
 PIPE_INFRASTRUCTURE_LOG_LEVEL = 5
 PIPE_INFRASTRUCTURE_LOG_LEVEL_NAME = "PIPE_INFRASTRUCTURE"
+
+
+load_dotenv()
 
 
 def add_pipe_log_level():
@@ -44,7 +50,11 @@ def get_default_print_logger(logger_name):
 def get_socket_logger(logger_name, level):
     logging.setLoggerClass(SocketLogger)
 
-    logger = logging.getLogger(logger_name)
+    logger: SocketLogger = logging.getLogger(logger_name)
+
+    logger.set_url(os.getenv("SOCKET_LOGGER_URL"))
+    logger.set_log_event_name(os.getenv("LOG_EVENT_NAME", "log"))
+
     logger.propagate = False
     logger.setLevel(level)
 

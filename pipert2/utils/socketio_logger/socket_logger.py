@@ -1,14 +1,19 @@
 import logging
-from .socket_handler import SocketHandler
-from ..consts.socket_logger import URL, LOG_EVENT_LOG
+from pipert2.utils.socketio_logger.socket_handler import SocketHandler
 
 
 class SocketLogger(logging.Logger):
     def __init__(self, name):
         logging.Logger.__init__(self, name)
 
-        self._url = URL
-        self._log_event_name = LOG_EVENT_LOG
+        self._log_event_name = None
+        self._url = None
+
+    def set_url(self, url):
+        self._url = url
+
+    def set_log_event_name(self, log_event_name):
+        self._log_event_name = log_event_name
 
     def getChild(self, suffix: str):
         child_logger = super(SocketLogger, self).getChild(suffix)

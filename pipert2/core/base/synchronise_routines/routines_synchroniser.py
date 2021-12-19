@@ -17,10 +17,9 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
     events = class_functions_dictionary()
 
-    def __init__(self, event_board: any, logger: Logger, notify_callback: callable):
-        super().__init__(event_board, logger)
+    def __init__(self, event_board: any, notify_callback: callable):
+        super().__init__(event_board)
 
-        self._logger = logger
         self.notify_callback = notify_callback
         self.wires = {}
 
