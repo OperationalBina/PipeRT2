@@ -55,14 +55,10 @@ class QueueNetwork(Network):
         publish_queue = PublishQueue()
 
         for destination_routine in destinations:
-
-            is_one_routine_runs_as_process = source.routine_logic_runner_manager.is_running_in_process() or \
-                                             destination_routine.routine_logic_runner_manager.is_running_in_process()
-
-            if is_one_routine_runs_as_process or source.flow_name != destination_routine.flow_name:
-                publish_queue.register(destination_routine.message_handler.input_queue.get_queue(process_safe=True))
-            else:
+            if source.flow_name == destination_routine.flow_name:
                 publish_queue.register(destination_routine.message_handler.input_queue.get_queue(process_safe=False))
+            else:
+                publish_queue.register(destination_routine.message_handler.input_queue.get_queue(process_safe=True))
 
             destination_routine.message_handler.receive = data_transmitter.receive()
 

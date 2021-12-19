@@ -1,9 +1,9 @@
 import threading
 from logging import Logger
-from typing import Callable
 import multiprocessing as mp
 from functools import partial
 from collections import defaultdict
+from typing import Callable, Optional
 from abc import ABCMeta, abstractmethod
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
@@ -11,7 +11,6 @@ from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
-from pipert2.core.base.routine_logic.routine_logic_runner_manager import RoutineLogicRunnerManager
 
 
 class Routine(EventExecutorInterface, metaclass=ABCMeta):
@@ -23,9 +22,10 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     """
 
     events = class_functions_dictionary()
+    runners = class_functions_dictionary()
     routines_created_counter = 0
 
-    def __init__(self, name: str = None, to_run_in_process: bool = False):
+    def __init__(self, name: str = None):
         """
         Args:
             name: Name of the routine.
@@ -56,8 +56,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event.set()
         self.runner = Dummy()
 
-        self.routine_logic_runner_manager = RoutineLogicRunnerManager(to_run_in_process, self._start_routine_logic)
-
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
 
@@ -71,6 +69,11 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.message_handler = message_handler
         self.event_notifier = event_notifier
         self.message_handler.logger = self._logger
+
+        if "runner" in kwargs and kwargs["runner"] in self.runners.all:
+            self._get_runners()[kwargs["runner"]](self)
+        else:
+            self.set_runner_as_thread()
 
     def set_logger(self, logger: Logger):
         self._logger = logger
@@ -89,6 +92,10 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             cls.events.all[cls.__name__][event_name].update(events_functions)
 
         return cls.events.all[cls.__name__]
+
+    @classmethod
+    def _get_runners(cls):
+        return cls.runners.all[cls.__name__]
 
     @abstractmethod
     def _extended_run(self) -> None:
@@ -137,6 +144,10 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     def _run(self):
         pass
 
+    @runners("thread")
+    def set_runner_as_thread(self):
+        self.runner_creator = partial(threading.Thread, target=self._start_routine_logic)
+
     @events(START_EVENT_NAME)
     def start(self) -> None:
         """Start running the routine
@@ -148,7 +159,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         if self.stop_event.is_set():
             self._logger.plog("Starting")
             self.stop_event.clear()
-            self.routine_logic_runner_manager.start()
+            self.runner = self.runner_creator()
+            self.runner.start()
 
     @events(STOP_EVENT_NAME)
     def stop(self) -> None:
@@ -161,7 +173,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         if not self.stop_event.is_set():
             self._logger.plog("Stopping")
             self.stop_event.set()
-            self.routine_logic_runner_manager.join()
+            self.runner.join()
 
     def execute_event(self, event: Method) -> None:
         """Execute an event to start
