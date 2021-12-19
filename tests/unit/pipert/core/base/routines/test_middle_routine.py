@@ -1,9 +1,6 @@
 import pytest
 from collections import deque
 from functools import partial
-
-from mock.mock import MagicMock
-
 from pipert2 import MiddleRoutine
 from pytest_mock import MockerFixture
 from pipert2.utils.dummy_object import Dummy
