@@ -1,5 +1,6 @@
 import logging
 import sys
+from pipert2.utils.socketio_logger.socket_logger import SocketLogger
 
 PIPE_INFRASTRUCTURE_LOG_LEVEL = 5
 PIPE_INFRASTRUCTURE_LOG_LEVEL_NAME = "PIPE_INFRASTRUCTURE"
@@ -37,4 +38,14 @@ def get_default_print_logger(logger_name):
                                                    datefmt="%d-%m-%y %H:%M:%S"))
     logger.addHandler(console_handler)
     logger.setLevel(logging.INFO)
+    return logger
+
+
+def get_socket_logger(logger_name, level):
+    logging.setLoggerClass(SocketLogger)
+
+    logger = logging.getLogger(logger_name)
+    logger.propagate = False
+    logger.setLevel(level)
+
     return logger
