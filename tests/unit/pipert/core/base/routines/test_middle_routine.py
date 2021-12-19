@@ -1,4 +1,5 @@
 import pytest
+from mock import MagicMock
 from collections import deque
 from functools import partial
 from pipert2 import MiddleRoutine

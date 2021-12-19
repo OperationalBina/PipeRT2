@@ -17,7 +17,6 @@ class SocketHandler(logging.Handler):
         try:
             self.sio.emit(self.log_event_name, self.formatter.format(record))
         except SocketIOError:
-            print("Shit")
             pass
 
     def close(self) -> None:
