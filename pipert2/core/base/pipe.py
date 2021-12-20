@@ -1,6 +1,8 @@
 from typing import Dict
 from logging import Logger
 from collections import defaultdict
+
+from pipert2.core.base.common_pipe import CommonPipe
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
@@ -17,7 +19,7 @@ from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_defau
 add_pipe_log_level()
 
 
-class Pipe:
+class Pipe(CommonPipe):
     """The pipe object is the center of the pipe.
     Once it is created it act as a central registry for the
     pipe methods such as create flows, register routines, notify events
@@ -45,6 +47,7 @@ class Pipe:
             routine_synchroniser (RoutinesSynchroniser): Routine synchroniser if auto_pacing_mechanism is true, else None.
 
         """
+        super().__init__()
 
         self.network = network
         self.logger = logger
