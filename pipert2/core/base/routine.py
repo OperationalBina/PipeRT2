@@ -1,5 +1,4 @@
 import threading
-from logging import Logger
 import multiprocessing as mp
 from functools import partial
 from collections import defaultdict
@@ -7,9 +6,10 @@ from typing import Callable, Optional
 from abc import ABCMeta, abstractmethod
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
+from logging import Logger, Formatter, LoggerAdapter
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
+from pipert2.utils.consts.event_names import LOG_DATA, START_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
@@ -50,8 +50,10 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.flow_name = None
         self.message_handler: MessageHandler = None
         self.runner_creator = None
+        self.send_data = False
         self.event_notifier: Callable = Dummy()
         self._logger: Logger = Dummy()
+        self.adapter = None
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
@@ -103,6 +105,26 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
         raise NotImplementedError
+
+    @events(LOG_DATA)
+    def update_logger_formatter(self):
+        self.send_data = not self.send_data
+        for handler in self._logger.handlers:
+            if self.send_data:
+                handler.setFormatter(Formatter("{'time': %(asctime)s.%(msecs)03d, "
+                                               "'source': %(name)s, "
+                                               "'level': %(levelname)s, "
+                                               "'message': %(message)s} "
+                                               "'data': %(data)s",
+                                               datefmt="%d-%m-%y %H:%M:%S"))
+                self.adapter = LoggerAdapter(self._logger, {'data': []})
+            else:
+                handler.setFormatter(Formatter("{'time': %(asctime)s.%(msecs)03d, "
+                                               "'source': %(name)s, "
+                                               "'level': %(levelname)s, "
+                                               "'message': %(message)s}",
+                                               datefmt="%d-%m-%y %H:%M:%S"))
+                self.adapter = None
 
     def setup(self) -> None:
         """An initial setup before running
@@ -196,7 +218,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        self.event_notifier(event_name, routines_by_flow,  **event_parameters)
+        self.event_notifier(event_name, routines_by_flow, **event_parameters)
 
     def join(self):
         """Block until all routine thread terminates
