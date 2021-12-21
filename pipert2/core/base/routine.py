@@ -108,23 +108,20 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     @events(LOG_DATA)
     def update_logger_formatter(self):
+        import logging
+
+        class CustomAdapter(logging.LoggerAdapter):
+            def process(self, msg, kwargs):
+                # use my_context from kwargs or the default given on instantiation
+                data = kwargs.pop('data', self.extra['data'])
+                return f"{msg}, 'data': {data}", kwargs
+
         self.send_data = not self.send_data
-        for handler in self._logger.handlers:
-            if self.send_data:
-                handler.setFormatter(Formatter("{'time': %(asctime)s.%(msecs)03d, "
-                                               "'source': %(name)s, "
-                                               "'level': %(levelname)s, "
-                                               "'message': %(message)s} "
-                                               "'data': %(data)s",
-                                               datefmt="%d-%m-%y %H:%M:%S"))
-                self.adapter = LoggerAdapter(self._logger, {'data': []})
-            else:
-                handler.setFormatter(Formatter("{'time': %(asctime)s.%(msecs)03d, "
-                                               "'source': %(name)s, "
-                                               "'level': %(levelname)s, "
-                                               "'message': %(message)s}",
-                                               datefmt="%d-%m-%y %H:%M:%S"))
-                self.adapter = None
+
+        if self.send_data:
+            self.adapter = CustomAdapter(self._logger, {'data': '1956'})
+        else:
+            self.adapter = None
 
     def setup(self) -> None:
         """An initial setup before running
