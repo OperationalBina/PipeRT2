@@ -13,14 +13,14 @@ class DummyCount(SourceRoutine):
         data = Data()
         data.additional_data = {"count": self.count}
         self.count += 1
+        time.sleep(0.5)
 
         return data
 
 
 class DummyMiddle(MiddleRoutine):
     def main_logic(self, data) -> Data:
-        data_dict = data.additional_data
-        data_dict["count"] *= 10
+        data.additional_data["count"] *= 10
 
         return data
 
@@ -29,12 +29,12 @@ class DummyDest(DestinationRoutine):
     def main_logic(self, data: Data) -> None:
         data_dict = data.additional_data
         if self.adapter is not None:
-            self.adapter.info(data_dict["count"]*10)
+            self.adapter.info(f"{self.name} Result: ", data=data_dict['count']*10)
 
 
 def create_test_pipe():
     in_pipe = Pipe(network=QueueNetwork(get_block=True), data_transmitter=BasicTransmitter(),
-                logger=get_socket_logger("pipe", 5), auto_pacing_mechanism=False)
+                   logger=get_socket_logger("pipe", 20), auto_pacing_mechanism=False)
 
     source = DummyCount()
     middle = DummyMiddle()
@@ -53,6 +53,6 @@ if __name__ == '__main__':
     pipe.notify_event(LOG_DATA)
     pipe.notify_event(START_EVENT_NAME)
 
-    time.sleep(10)
+    time.sleep(5)
 
     pipe.notify_event(KILL_EVENT_NAME)
