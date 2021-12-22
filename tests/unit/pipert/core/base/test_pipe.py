@@ -4,7 +4,6 @@ from collections import defaultdict
 from pytest_mock import MockerFixture
 from pipert2 import Wire
 from pipert2.core.base.pipe import Pipe
-from pipert2.utils.exceptions import FloatingRoutine
 from pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
 
 

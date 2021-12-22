@@ -1,11 +1,9 @@
 import zerorpc
-
 from typing import Dict
 from logging import Logger
 from collections import defaultdict
-
-from pipert2.core.base.common_pipe import RPCListener
 from pipert2.core.base.flow import Flow
+from pipert2.core.base.rpc_listener import RPCListener
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
@@ -21,7 +19,7 @@ from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_defau
 add_pipe_log_level()
 
 
-class Pipe():
+class Pipe:
     """The pipe object is the center of the pipe.
     Once it is created it act as a central registry for the
     pipe methods such as create flows, register routines, notify events
@@ -51,7 +49,7 @@ class Pipe():
         """
         super().__init__()
 
-        self.rpc_listener = self.RPCListener(self)
+        self.rpc_listener = RPCListener(self)
         self.rpc_server = zerorpc.Server(self.rpc_listener)
 
         self.network = network
@@ -67,14 +65,6 @@ class Pipe():
                                                              notify_callback=self.event_board.get_event_notifier())
         else:
             self.routine_synchroniser = None
-
-    class RPCListener:
-        """A RPC listener which invokes pipeline cli commands
-
-        """
-        def __init__(self, pipe):
-            self.pipe = pipe # TODO better
-
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
