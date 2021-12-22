@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 import pytest
 from mock import Mock, patch
 from pipert2.core.base.rpc_listener import RPCListener

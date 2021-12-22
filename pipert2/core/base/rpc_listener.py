@@ -26,3 +26,9 @@ class RPCListener:
 
         """
         self.pipe.notify_event(event_name=KILL_EVENT_NAME)
+
+    def event(self, event: str):
+        """General Invocation of pipe events
+
+        """
+        raise NotImplementedError()

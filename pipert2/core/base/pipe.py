@@ -1,12 +1,13 @@
 import zerorpc
 from typing import Dict
 from logging import Logger
+from threading import Thread
 from collections import defaultdict
 from pipert2.core.base.flow import Flow
-from pipert2.core.base.rpc_listener import RPCListener
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
+from pipert2.core.base.rpc_listener import RPCListener
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
@@ -30,27 +31,23 @@ class Pipe:
     def __init__(self, network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
                  data_transmitter: DataTransmitter = BasicTransmitter(),
-                 auto_pacing_mechanism: bool = False):
+                 auto_pacing_mechanism: bool = False, run_cli: bool = False, rpc_args: Dict = None):
         """
         Args:
             network: Network object responsible for the routine's communication.
             logger: Logger object for logging the pipe actions.
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             auto_pacing_mechanism: True if the user want to use auto pacing mechanism.
-
-        Attributes:
-            network: Network object responsible for the routine's communication.
-            logger: Logger object for logging the pipe actions.
-            data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
-            flows (dict[str, Flow]): Dictionary mapping the pipe flows to their name.
-            event_board (EventBoard): EventBoard object responsible for the pipe events.
-            routine_synchroniser (RoutinesSynchroniser): Routine synchroniser if auto_pacing_mechanism is true, else None.
-
+            run_cli: True if the user want to run the pipeline command line interface.
+            rpc_args: Arguments for the RPC Server of the cli.
         """
-        super().__init__()
 
-        self.rpc_listener = RPCListener(self)
-        self.rpc_server = zerorpc.Server(self.rpc_listener)
+        self.run_cli = run_cli
+        if self.run_cli:
+            self.rpc_listener = RPCListener(self)
+            self.rpc_server = zerorpc.Server(self.rpc_listener)
+            self.rpc_args = rpc_args
+            self.rpc_thread = None
 
         self.network = network
         self.logger = logger
@@ -65,6 +62,14 @@ class Pipe:
                                                              notify_callback=self.event_board.get_event_notifier())
         else:
             self.routine_synchroniser = None
+
+    def run_rpc_server(self):
+        """Binds the RPC Server to a given endpoint and runs it in a new thread.
+
+        """
+
+        self.rpc_server.bind(self.rpc_args['endpoint'])
+        self.rpc_server.run()
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -120,7 +125,10 @@ class Pipe:
             self.routine_synchroniser.wires = self.wires
             self.routine_synchroniser.build()
 
-        self.event_board.build()
+        if self.run_cli:
+            self.event_board.build()
+            self.rpc_thread = Thread(target=self.run_rpc_server, args=(self,))
+            self.rpc_thread.start()
 
     def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list),
                      **event_parameters) -> None:
@@ -156,6 +164,11 @@ class Pipe:
         if self.routine_synchroniser is not None:
             self.routine_synchroniser.join()
             self.logger.plog("Joined synchroniser")
+
+        if self.run_cli:
+            self.rpc_server.close()
+            self.rpc_thread.join()
+            self.logger.plog("Joined rpc server")
 
     def _validate_pipe(self):
         """Validate routines and wires in current pipeline.
