@@ -19,13 +19,16 @@ class RPCListener:
         """Invokes the stop event in the pipe
 
         """
+        print("stopped")
         self.pipe.notify_event(event_name=STOP_EVENT_NAME)
 
     def kill(self):
         """Invokes the kill event in the pipe
 
         """
+        print("about to kill")
         self.pipe.notify_event(event_name=KILL_EVENT_NAME)
+        return "i killed it"
 
     def event(self, event: str):
         """General Invocation of pipe events

@@ -1,6 +1,5 @@
 import time
-
-from demo.const import RPC_ENDPOINT
+from const import RPC_ENDPOINT
 from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from pipert2 import Pipe, BasicTransmitter, SourceRoutine, MiddleRoutine, DestinationRoutine, Data
 
@@ -31,7 +30,6 @@ class DummyMiddle(MiddleRoutine):
 class DummyDest(DestinationRoutine):
     def main_logic(self, data: Data) -> None:
         data_dict = data.additional_data
-        # self.message_handler.logger.info(data_dict["count"] * 10)
 
 
 def create_test_pipe():
@@ -51,6 +49,5 @@ def create_test_pipe():
 
 if __name__ == '__main__':
     pipe = create_test_pipe()
-    pipe.notify_event(START_EVENT_NAME)
-    # pipe.notify_event(STOP_EVENT_NAME)
-    # pipe.join(to_kill=True)
+    # pipe.notify_event(START_EVENT_NAME)
+    pipe.join()

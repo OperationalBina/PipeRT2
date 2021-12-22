@@ -50,6 +50,7 @@ class Pipe:
             self.rpc_args = rpc_args
             self.rpc_thread = None
 
+        self.rpc_worker = None
         self.network = network
         self.logger = logger
         self.flows = {}
@@ -70,7 +71,7 @@ class Pipe:
         """
 
         self.rpc_server.bind(self.rpc_args['endpoint'])
-        gevent.spawn(self.rpc_server.run)
+        self.rpc_worker = gevent.spawn(self.rpc_server.run)
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -130,8 +131,6 @@ class Pipe:
 
         if self.run_cli:
             self.run_rpc_server()
-            # self.rpc_thread = Thread(target=self.run_rpc_server)
-            # self.rpc_thread.start()
 
     def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list),
                      **event_parameters) -> None:
@@ -156,6 +155,10 @@ class Pipe:
         if to_kill:
             self.notify_event(KILL_EVENT_NAME)
 
+        if self.run_cli:
+            gevent.joinall([self.rpc_worker])
+            self.logger.plog("Joined rpc server")
+
         for flow in self.flows.values():
             flow.join()
 
@@ -167,11 +170,6 @@ class Pipe:
         if self.routine_synchroniser is not None:
             self.routine_synchroniser.join()
             self.logger.plog("Joined synchroniser")
-
-        if self.run_cli:
-            self.rpc_server.close()
-            self.rpc_thread.join()
-            self.logger.plog("Joined rpc server")
 
     def _validate_pipe(self):
         """Validate routines and wires in current pipeline.
