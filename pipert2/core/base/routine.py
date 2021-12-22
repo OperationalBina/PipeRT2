@@ -6,7 +6,7 @@ from typing import Callable, Optional
 from abc import ABCMeta, abstractmethod
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
-from logging import Logger, Formatter, LoggerAdapter
+from logging import Logger, LoggerAdapter
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.consts.event_names import LOG_DATA, START_EVENT_NAME, STOP_EVENT_NAME
@@ -53,7 +53,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.send_data = False
         self.event_notifier: Callable = Dummy()
         self._logger: Logger = Dummy()
-        self.adapter = None
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
@@ -108,20 +107,18 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     @events(LOG_DATA)
     def update_logger_formatter(self):
-        import logging
-
-        class CustomAdapter(logging.LoggerAdapter):
+        class CustomAdapter(LoggerAdapter):
             def process(self, msg, kwargs):
                 # use my_context from kwargs or the default given on instantiation
                 data = kwargs.pop('data', self.extra['data'])
                 return f"{msg}, 'data': {data}", kwargs
 
-        self.send_data = not self.send_data
-
-        if self.send_data:
-            self.adapter = CustomAdapter(self._logger, {'data': '1956'})
+        if not self.message_handler.send_data:
+            self.message_handler.logger = CustomAdapter(self._logger, {'data': '1956'})
         else:
-            self.adapter = None
+            self.message_handler.logger = self._logger
+        
+        self.message_handler.send_data = not self.message_handler.send_data
 
     def setup(self) -> None:
         """An initial setup before running

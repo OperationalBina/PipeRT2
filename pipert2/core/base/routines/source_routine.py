@@ -27,8 +27,6 @@ class SourceRoutine(FPSRoutine, metaclass=ABCMeta):
             main_logic_callable = partial(self.main_logic)
             output_data = self._run_main_logic_with_durations_updating(main_logic_callable)
 
-            if self.send_data:
-                self.adapter.info(f"{self.name} output: ", data=output_data)
         except Exception as error:
             self._logger.exception(f"The routine has crashed: {error}")
         else:

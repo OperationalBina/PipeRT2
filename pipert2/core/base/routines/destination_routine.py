@@ -20,8 +20,6 @@ class DestinationRoutine(FPSRoutine, metaclass=ABCMeta):
         message = self.message_handler.get()
         if message is not None:
             try:
-                if self.send_data:
-                    self.adapter.info(f"{self.name} input: ", data=message.get_data())
                 main_logic_callable = partial(self.main_logic, message.get_data())
                 self._run_main_logic_with_durations_updating(main_logic_callable)
             except Exception as error:
