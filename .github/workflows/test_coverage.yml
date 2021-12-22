@@ -32,6 +32,8 @@ jobs:
         pip install numpy
         pip install mock
         pip install coverage
+        pip install python-socketio
+        pip install python-dotenv
         coverage run --concurrency=multiprocessing -m pytest --timeout=15
         coverage combine
     - name: Upload Coverage to Codecov

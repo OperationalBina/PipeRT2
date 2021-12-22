@@ -15,15 +15,13 @@ class BaseEventExecutor(EventExecutorInterface):
 
     events = class_functions_dictionary()
 
-    def __init__(self, event_board: EventBoard, logger: Logger):
+    def __init__(self, event_board: EventBoard):
         """
         Args:
             event_board (EventBoard): The EventBoard of the pipe.
-            logger (Logger): Logger object for logging the flow actions.
 
         """
 
-        self._logger = logger
         self.event_loop_process: Process = Dummy()
 
         self.events_to_listen = set(self.get_events().keys())

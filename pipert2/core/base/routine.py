@@ -205,3 +205,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         if self.stop_event.is_set():
             self.runner.join()
+
+        for handler in self._logger.handlers:
+            handler.close()

@@ -41,7 +41,6 @@ def complex_synchroniser(mocker: MockerFixture):
     routine_fps_listener.calculate_median_fps.return_value = 0
 
     routine_synchroniser = RoutinesSynchroniser(mocker.MagicMock(),
-                                                mocker.MagicMock(),
                                                 mocker.MagicMock())
 
     routine_synchroniser.wires = wires
@@ -52,7 +51,6 @@ def complex_synchroniser(mocker: MockerFixture):
 @pytest.fixture
 def base_synchroniser(mocker: MockerFixture):
     return RoutinesSynchroniser(mocker.MagicMock(),
-                                mocker.MagicMock(),
                                 mocker.MagicMock())
 
 
@@ -63,17 +61,17 @@ def dummy_callback():
 def test_build_routines_graph(complex_synchroniser):
     routine_graphs = complex_synchroniser.create_routines_graph()
 
-    # synchronise1_source = routine_graphs['source1']
+    synchronise1_source = routine_graphs['source1']
 
-    # assert len(synchronise1_source.nodes) == 2
-    # assert [node.name for node in synchronise1_source.nodes] == ["m1", "m2"]
-    # assert [node.nodes[0].name for node in synchronise1_source.nodes] == ["destination", "destination"]
-    #
-    # synchronise1_source = routine_graphs['source2']
-    #
-    # assert len(synchronise1_source.nodes) == 1
-    # assert [node.name for node in synchronise1_source.nodes] == ["m1"]
-    # assert [node.nodes[0].name for node in synchronise1_source.nodes] == ["destination"]
+    assert len(synchronise1_source.nodes) == 2
+    assert [node.name for node in synchronise1_source.nodes] == ["m1", "m2"]
+    assert [node.nodes[0].name for node in synchronise1_source.nodes] == ["destination", "destination"]
+
+    synchronise1_source = routine_graphs['source2']
+
+    assert len(synchronise1_source.nodes) == 1
+    assert [node.name for node in synchronise1_source.nodes] == ["m1"]
+    assert [node.nodes[0].name for node in synchronise1_source.nodes] == ["destination"]
 
 
 def test_update_finish_routine_logic_time_empty_queue(base_synchroniser: RoutinesSynchroniser):

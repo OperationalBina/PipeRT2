@@ -55,7 +55,6 @@ class Pipe:
 
         if auto_pacing_mechanism:
             self.routine_synchroniser = RoutinesSynchroniser(event_board=self.event_board,
-                                                             logger=self.logger,
                                                              notify_callback=self.event_board.get_event_notifier())
         else:
             self.routine_synchroniser = None
@@ -150,6 +149,9 @@ class Pipe:
         if self.routine_synchroniser is not None:
             self.routine_synchroniser.join()
             self.logger.plog("Joined synchroniser")
+
+        for handler in self.logger.handlers:
+            handler.close()
 
     def _validate_pipe(self):
         """Validate routines and wires in current pipeline.
