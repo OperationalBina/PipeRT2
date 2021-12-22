@@ -1,3 +1,4 @@
+import gevent
 import zerorpc
 from typing import Dict
 from logging import Logger
@@ -69,7 +70,7 @@ class Pipe:
         """
 
         self.rpc_server.bind(self.rpc_args['endpoint'])
-        self.rpc_server.run()
+        gevent.spawn(self.rpc_server.run)
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -125,10 +126,12 @@ class Pipe:
             self.routine_synchroniser.wires = self.wires
             self.routine_synchroniser.build()
 
+        self.event_board.build()
+
         if self.run_cli:
-            self.event_board.build()
-            self.rpc_thread = Thread(target=self.run_rpc_server, args=(self,))
-            self.rpc_thread.start()
+            self.run_rpc_server()
+            # self.rpc_thread = Thread(target=self.run_rpc_server)
+            # self.rpc_thread.start()
 
     def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list),
                      **event_parameters) -> None:
