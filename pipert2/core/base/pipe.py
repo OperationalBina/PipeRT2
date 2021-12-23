@@ -1,14 +1,10 @@
-import gevent
-import zerorpc
 from typing import Dict
 from logging import Logger
-from threading import Thread
 from collections import defaultdict
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
-from pipert2.core.base.rpc_listener import RPCListener
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
@@ -32,25 +28,14 @@ class Pipe:
     def __init__(self, network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
                  data_transmitter: DataTransmitter = BasicTransmitter(),
-                 auto_pacing_mechanism: bool = False, run_cli: bool = False, rpc_args: Dict = None):
+                 auto_pacing_mechanism: bool = False):
         """
         Args:
             network: Network object responsible for the routine's communication.
             logger: Logger object for logging the pipe actions.
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             auto_pacing_mechanism: True if the user want to use auto pacing mechanism.
-            run_cli: True if the user want to run the pipeline command line interface.
-            rpc_args: Arguments for the RPC Server of the cli.
         """
-
-        self.run_cli = run_cli
-        if self.run_cli:
-            self.rpc_listener = RPCListener(self)
-            self.rpc_server = zerorpc.Server(self.rpc_listener)
-            self.rpc_args = rpc_args
-            self.rpc_thread = None
-
-        self.rpc_worker = None
         self.network = network
         self.logger = logger
         self.flows = {}
@@ -64,14 +49,6 @@ class Pipe:
                                                              notify_callback=self.event_board.get_event_notifier())
         else:
             self.routine_synchroniser = None
-
-    def run_rpc_server(self):
-        """Binds the RPC Server to a given endpoint and runs it in a new thread.
-
-        """
-
-        self.rpc_server.bind(self.rpc_args['endpoint'])
-        self.rpc_worker = gevent.spawn(self.rpc_server.run)
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -129,9 +106,6 @@ class Pipe:
 
         self.event_board.build()
 
-        if self.run_cli:
-            self.run_rpc_server()
-
     def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list),
                      **event_parameters) -> None:
         """Notify an event has started
@@ -147,6 +121,8 @@ class Pipe:
 
         self.event_board.notify_event(event_name, specific_flow_routines, **event_parameters)
 
+
+
     def join(self, to_kill=False):
         """Block the execution until all of the flows have been killed
 
@@ -154,10 +130,6 @@ class Pipe:
 
         if to_kill:
             self.notify_event(KILL_EVENT_NAME)
-
-        if self.run_cli:
-            gevent.joinall([self.rpc_worker])
-            self.logger.plog("Joined rpc server")
 
         for flow in self.flows.values():
             flow.join()

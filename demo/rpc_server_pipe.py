@@ -1,6 +1,6 @@
 import time
 from const import RPC_ENDPOINT
-from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
+from pipert2.core.base.rpc_pipe_wrapper import RPCPipeWrapper
 from pipert2 import Pipe, BasicTransmitter, SourceRoutine, MiddleRoutine, DestinationRoutine, Data
 
 
@@ -33,8 +33,7 @@ class DummyDest(DestinationRoutine):
 
 
 def create_test_pipe():
-    in_pipe = Pipe(data_transmitter=BasicTransmitter(), auto_pacing_mechanism=False, run_cli=True,
-                   rpc_args={'endpoint': RPC_ENDPOINT})
+    in_pipe = Pipe(data_transmitter=BasicTransmitter(), auto_pacing_mechanism=False)
 
     source = DummyCount()
     middle = DummyMiddle()
@@ -49,5 +48,4 @@ def create_test_pipe():
 
 if __name__ == '__main__':
     pipe = create_test_pipe()
-    pipe.notify_event(START_EVENT_NAME)
-    pipe.join()
+    rpc_pipe = RPCPipeWrapper(pipe, endpoint=RPC_ENDPOINT)
