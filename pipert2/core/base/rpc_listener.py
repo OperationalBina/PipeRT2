@@ -15,7 +15,7 @@ class RPCListener:
         """
         self.pipe.notify_event(event_name=START_EVENT_NAME)
 
-    def stop3(self):
+    def pause(self):
         """Invokes the stop event in the pipe
 
         """

@@ -16,7 +16,7 @@ def test_start(rpc_listener):
 
 
 def test_stop(rpc_listener):
-    rpc_listener.stop3()
+    rpc_listener.pause()
     pipe_mock: Mock = rpc_listener.pipe
     pipe_mock.notify_event.assert_called_with(event_name=STOP_EVENT_NAME)
 
