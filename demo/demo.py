@@ -49,5 +49,5 @@ def create_test_pipe():
 
 if __name__ == '__main__':
     pipe = create_test_pipe()
-    # pipe.notify_event(START_EVENT_NAME)
+    pipe.notify_event(START_EVENT_NAME)
     pipe.join()
