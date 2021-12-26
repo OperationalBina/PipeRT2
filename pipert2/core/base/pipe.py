@@ -121,8 +121,6 @@ class Pipe:
 
         self.event_board.notify_event(event_name, specific_flow_routines, **event_parameters)
 
-
-
     def join(self, to_kill=False):
         """Block the execution until all of the flows have been killed
 
