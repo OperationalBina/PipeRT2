@@ -50,7 +50,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.flow_name = None
         self.message_handler: MessageHandler = None
         self.runner_creator = None
-        self.send_data = False
         self.event_notifier: Callable = Dummy()
         self._logger: Logger = Dummy()
         self.stop_event = mp.Event()
