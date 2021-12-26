@@ -18,11 +18,6 @@ def dummy_pipe():
 
 
 @pytest.fixture
-def pipe_with_cli():
-    return Pipe(network=Mock(), logger=Mock(), run_cli=True, rpc_args={'endpoint': 'tcp://0.0.0.0:4242'})
-
-
-@pytest.fixture
 def dummy_pipe_with_flows(dummy_pipe: Pipe, mocker: MockerFixture):
     FLOW_NAMES = ["f1", "f2", "f3"]
 
@@ -118,4 +113,3 @@ def test_join(dummy_pipe_with_flows):
     dummy_pipe_object, flow_names = dummy_pipe_with_flows
     dummy_pipe_object.join()
     assert dummy_pipe_object.flows[flow_names[0]].join.call_count == 3
-

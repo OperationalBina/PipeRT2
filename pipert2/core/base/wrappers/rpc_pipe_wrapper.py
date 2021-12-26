@@ -3,17 +3,27 @@ from pipert2.core.base.pipe import Pipe
 from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME
 
 
-class RPCPipeWrapper:
+class RPCPipeWrapper(Server):
     """A RPC wrapper which invokes pipeline cli commands
 
     """
 
-    def __init__(self, pipe: Pipe, endpoint: str):
+    def __init__(self, pipe: Pipe):
+        """
+            Arguments:
+                pipe: the center of the pipeline
+        """
+        super().__init__()
         self.pipe = pipe
-        self.rpc_server = Server(self)
-        self.endpoint = endpoint
-        self.rpc_server.bind(self.endpoint)
-        self.rpc_server.run()
+
+    def run_rpc_server(self, endpoint: str):
+        """Binds it to a given endpoint and runs the rpc server.
+
+            Arguments:
+                endpoint: server's endpoint
+        """
+        self.bind(endpoint)
+        self.run()
 
     def start(self):
         """Invokes the start event in the pipe
@@ -32,4 +42,4 @@ class RPCPipeWrapper:
 
         """
         self.pipe.join(to_kill=True)
-        self.rpc_server.stop()
+        self.stop()
