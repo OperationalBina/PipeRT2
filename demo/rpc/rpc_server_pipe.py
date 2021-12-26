@@ -33,7 +33,7 @@ class DummyDest(DestinationRoutine):
 
 
 def create_test_pipe():
-    in_pipe = Pipe(data_transmitter=BasicTransmitter(), auto_pacing_mechanism=False)
+    in_pipe = Pipe(data_transmitter=BasicTransmitter(), auto_pacing_mechanism=False, run_rpc_cli=True)
 
     source = DummyCount()
     middle = DummyMiddle()
@@ -48,5 +48,4 @@ def create_test_pipe():
 
 if __name__ == '__main__':
     pipe = create_test_pipe()
-    rpc_pipe = RPCPipeWrapper(pipe)
-    rpc_pipe.run_rpc_server(endpoint=RPC_ENDPOINT)
+    pipe.run_rpc_server(endpoint=RPC_ENDPOINT)
