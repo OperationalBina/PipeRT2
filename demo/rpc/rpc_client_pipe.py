@@ -1,7 +1,7 @@
 import zerorpc
-from const import RPC_ENDPOINT
+from utlis import load_rpc_endpoint
 
 if __name__ == '__main__':
     client = zerorpc.Client()
-    client.connect(RPC_ENDPOINT)
+    client.connect(load_rpc_endpoint())
     client.pause()

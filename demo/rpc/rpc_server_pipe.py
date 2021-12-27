@@ -1,6 +1,5 @@
 import time
-from const import RPC_ENDPOINT
-from pipert2.core.base.wrappers.rpc_pipe_wrapper import RPCPipeWrapper
+from utlis import load_rpc_endpoint
 from pipert2 import Pipe, BasicTransmitter, SourceRoutine, MiddleRoutine, DestinationRoutine, Data
 
 
@@ -48,4 +47,4 @@ def create_test_pipe():
 
 if __name__ == '__main__':
     pipe = create_test_pipe()
-    pipe.run_rpc_server(endpoint=RPC_ENDPOINT)
+    pipe.run_rpc_server(endpoint=load_rpc_endpoint())

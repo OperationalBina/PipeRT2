@@ -1,4 +1,5 @@
 import zerorpc
+from utlis import load_rpc_endpoint
 
 
 class HelloRPC(object):
@@ -8,5 +9,5 @@ class HelloRPC(object):
 
 if __name__ == '__main__':
     server = zerorpc.Server(HelloRPC())
-    server.bind("tcp://127.0.0.1:4242")
+    server.bind(load_rpc_endpoint())
     server.run()
