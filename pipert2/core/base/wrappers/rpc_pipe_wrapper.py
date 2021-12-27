@@ -45,7 +45,5 @@ class RPCPipeWrapper(Server):
         self.notify_callback(event_name="join", to_kill=True)
         self.stop()
 
-    # TODO: think about kwargs workaround
-    # TODO: check out github environment variables
-    def execute(self, name, args):
+    def execute(self, name):
         self.notify_callback(event_name=name)
