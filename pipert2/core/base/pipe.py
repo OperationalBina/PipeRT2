@@ -49,6 +49,7 @@ class Pipe:
         self.network = network
         self.logger = logger
         self.flows = {}
+        self.routines_dict = {}
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
         self.wires: Dict[tuple, Wire] = {}
@@ -107,20 +108,15 @@ class Pipe:
             self.network.link(source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
 
         for flow in self.flows.values():
-            routines_dict = {self.logger.name: {}}
-
+            self.routines_dict = {self.logger.name: {}}
             flow.build()
-            routines_dict[self.logger.name][flow.name] = list(flow.routines.keys())
-
-        print(f"Pipe structure: {routines_dict}")
-        self.logger.handlers[0].log_event_name = "pipe_creation"
-        self.logger.info("{" + f"'Pipe structure': {routines_dict}" + "}")
-        self.logger.handlers[0].log_event_name = "log"
+            self.routines_dict[self.logger.name][flow.name] = list(flow.routines.keys())
 
         if self.routine_synchroniser is not None:
             self.routine_synchroniser.wires = self.wires
             self.routine_synchroniser.build()
-
+        
+        self._send_initial_log()
         self.event_board.build()
 
     def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list),
@@ -171,3 +167,8 @@ class Pipe:
 
         flow_validator.validate_flow(self.flows, self.wires)
         wires_validator.validate_wires(self.wires.values())
+
+    def _send_initial_log(self):
+        self.logger.handlers[0].log_event_name = "pipe_creation"
+        self.logger.info("{" + f"'Pipe structure': {self.routines_dict}" + "}")
+        self.logger.handlers[0].log_event_name = "log"
