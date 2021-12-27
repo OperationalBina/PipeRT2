@@ -1,5 +1,7 @@
 import pytest
 import collections
+from logging import Logger
+from mock.mock import Mock
 from multiprocessing import Manager
 from pipert2.core.base.message import Message
 from pipert2.core.base.transmitters import BasicTransmitter
@@ -115,6 +117,52 @@ def test_get_no_receive_method(blocking_queue_handler, non_blocking_queue_handle
     assert non_blocking_queue_handler.get() == message
     assert blocking_queue_handler.get() is None
     assert non_blocking_queue_handler.get() is None
+
+
+def test_send_data_true_put(non_blocking_queue_handler):
+    message = StrMessage("Test Message", "dummy")
+    logger: Logger = Mock()
+
+    non_blocking_queue_handler.send_data = True
+    non_blocking_queue_handler.logger = logger
+
+    non_blocking_queue_handler.put(message)
+    logger.info.assert_called_once_with(f"output: ", data=message.payload.data)
+
+
+def test_send_data_true_get(non_blocking_queue_handler, input_queue):
+    message = StrMessage("Test Message", "dummy")
+    logger: Logger = Mock()
+
+    non_blocking_queue_handler.send_data = True
+    non_blocking_queue_handler.logger = logger
+
+    input_queue.put(message)
+    non_blocking_queue_handler.get()
+    logger.info.assert_called_once_with(f"input: ", data=message.payload.data)
+
+
+def test_send_data_false_put(non_blocking_queue_handler):
+    message = StrMessage("Test Message", "dummy")
+    logger: Logger = Mock()
+
+    non_blocking_queue_handler.send_data = False
+    non_blocking_queue_handler.logger = logger
+
+    non_blocking_queue_handler.put(message)
+    assert not logger.info.called
+
+
+def test_send_data_false_get(non_blocking_queue_handler, input_queue):
+    message = StrMessage("Test Message", "dummy")
+    logger: Logger = Mock()
+
+    non_blocking_queue_handler.send_data = False
+    non_blocking_queue_handler.logger = logger
+
+    input_queue.put(message)
+    non_blocking_queue_handler.get()
+    assert not logger.info.called
 
 
 class StrMessage(Message):

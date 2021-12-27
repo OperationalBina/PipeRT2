@@ -18,7 +18,8 @@ class SocketLogger(logging.Logger):
     def getChild(self, suffix: str):
         child_logger = super(SocketLogger, self).getChild(suffix)
 
-        child_logger.url = self._url
+        child_logger.set_url(self._url)
+        child_logger.set_log_event_name(self._log_event_name)
         child_logger.propagate = False
         child_logger.setLevel(self.level)
         handler = SocketHandler(self._url, self._log_event_name)

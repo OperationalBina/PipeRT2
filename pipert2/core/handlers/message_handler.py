@@ -17,6 +17,7 @@ class MessageHandler(ABC):
         self.routine_name = routine_name
         self.transmit = None
         self.receive = None
+        self.send_data = False
         self.logger: Logger = Dummy()
 
     @abstractmethod
@@ -57,6 +58,9 @@ class MessageHandler(ABC):
 
         """
 
+        if self.send_data:
+            self.logger.info(f"output: ", data=message.payload.data)
+
         if callable(self.transmit):
             transmitted_data = self.transmit(message.payload.data)
             message.update_data(transmitted_data)
@@ -75,6 +79,9 @@ class MessageHandler(ABC):
 
         if message is not None:
             message = Message.decode(message)
+
+            if self.send_data:
+                self.logger.info(f"input: ", data=message.payload.data)
 
             if callable(self.receive):
                 received_data = self.receive(message.payload.data)
