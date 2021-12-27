@@ -107,7 +107,15 @@ class Pipe:
             self.network.link(source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
 
         for flow in self.flows.values():
+            routines_dict = {self.logger.name: {}}
+
             flow.build()
+            routines_dict[self.logger.name][flow.name] = list(flow.routines.keys())
+
+        print(f"Pipe structure: {routines_dict}")
+        self.logger.handlers[0].log_event_name = "pipe_creation"
+        self.logger.info("{" + f"'Pipe structure': {routines_dict}" + "}")
+        self.logger.handlers[0].log_event_name = "log"
 
         if self.routine_synchroniser is not None:
             self.routine_synchroniser.wires = self.wires
