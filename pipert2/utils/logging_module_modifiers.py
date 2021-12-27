@@ -3,6 +3,7 @@ import sys
 import logging
 from dotenv import load_dotenv
 from pipert2.utils.socketio_logger.socket_logger import SocketLogger
+from pipert2.utils.socketio_logger.socket_handler import SocketHandler
 
 
 PIPE_INFRASTRUCTURE_LOG_LEVEL = 5
@@ -54,8 +55,15 @@ def get_socket_logger(logger_name, level):
 
     logger.set_url(os.getenv("SOCKET_LOGGER_URL"))
     logger.set_log_event_name(os.getenv("LOG_EVENT_NAME", "log"))
-
     logger.propagate = False
     logger.setLevel(level)
+
+    handler = SocketHandler(logger._url, logger._log_event_name)
+    handler.setFormatter(logging.Formatter('{"time": "%(asctime)s.%(msecs)03d", '
+                                            '"source": "%(name)s", '
+                                            '"level": "%(levelname)s", '
+                                            '"message": "%(message)s"}',
+                                            datefmt="%d-%m-%y %H:%M:%S"))
+    logger.addHandler(handler)
 
     return logger
