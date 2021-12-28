@@ -49,10 +49,9 @@ class RPCPipeWrapper(Server):
         """Parses user command and arguments and executes it.
 
         """
-        kwargs = json.loads(encoded_args)
-
         if name == self.kill.__name__:
-            self.notify_callback(event_name=JOIN_EVENT_NAME, **kwargs)
+            self.notify_callback(event_name=JOIN_EVENT_NAME, to_kill=True)
             self.stop()
         else:
-            self.notify_callback(event_name=name)
+            kwargs = json.loads(encoded_args)
+            self.notify_callback(event_name=name, **kwargs)
