@@ -147,7 +147,7 @@ Arguments to pipe events are passed in a JSON format, for example:
     client.execute('join', '{"to_kill":true}')
     ```
 - for example via CLI:\
-    `zerorpc tcp://127.0.0.1:4242 execute join '{"to_kill":true}'`
+    `zerorpc tcp://0.0.0.0:1234 execute join '{"to_kill":true}'`
  
     
 # Contributing
