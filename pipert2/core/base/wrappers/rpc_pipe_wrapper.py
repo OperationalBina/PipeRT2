@@ -1,6 +1,6 @@
-import zerorpc
+import json
 from zerorpc import Server
-from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME
+from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, JOIN_EVENT_NAME
 
 
 class RPCPipeWrapper(Server):
@@ -42,8 +42,17 @@ class RPCPipeWrapper(Server):
         """Invokes the kill event in the pipe
 
         """
-        self.notify_callback(event_name="join", to_kill=True)
+        self.notify_callback(event_name=JOIN_EVENT_NAME, to_kill=True)
         self.stop()
 
-    def execute(self, name):
-        self.notify_callback(event_name=name)
+    def execute(self, name, encoded_args):
+        """Parses user command and arguments and executes it.
+
+        """
+        kwargs = json.loads(encoded_args)
+
+        if name == self.kill.__name__:
+            self.notify_callback(event_name=JOIN_EVENT_NAME, **kwargs)
+            self.stop()
+        else:
+            self.notify_callback(event_name=name)

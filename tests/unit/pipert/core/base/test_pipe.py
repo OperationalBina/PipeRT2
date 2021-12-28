@@ -1,6 +1,4 @@
 import pytest
-import zerorpc
-
 from pipert2 import Wire
 from mock import patch, Mock
 from collections import defaultdict

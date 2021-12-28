@@ -4,14 +4,14 @@ from collections import defaultdict
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
-from pipert2.core.base.wrappers.rpc_pipe_wrapper import RPCPipeWrapper
 from pipert2.core.managers.network import Network
 from pipert2.core.managers.event_board import EventBoard
-from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.base_event_executor import BaseEventExecutor
-from pipert2.utils.consts.event_names import KILL_EVENT_NAME
+from pipert2.utils.consts.event_names import KILL_EVENT_NAME, JOIN_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
+from pipert2.utils.base_event_executor import BaseEventExecutor
+from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.core.managers.networks.queue_network import QueueNetwork
+from pipert2.core.base.wrappers.rpc_pipe_wrapper import RPCPipeWrapper
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
@@ -71,6 +71,9 @@ class Pipe(BaseEventExecutor):
             Arguments:
                 endpoint: server's endpoint
         """
+        if self.rpc_server is None:
+            raise TypeError
+
         self.rpc_server.run_rpc_server(endpoint=endpoint)
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
@@ -145,13 +148,13 @@ class Pipe(BaseEventExecutor):
 
         self.event_board.notify_event(event_name, specific_flow_routines, **event_parameters)
 
-    @events("join")
+    @events(JOIN_EVENT_NAME)
     def join(self, to_kill=False):
         """Block the execution until all of the flows have been killed
 
         """
 
-        if to_kill:
+        if to_kill or self.run_rpc_cli:
             self.notify_event(KILL_EVENT_NAME)
 
         for flow in self.flows.values():
