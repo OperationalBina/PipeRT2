@@ -132,13 +132,23 @@ Then, you need to add a flag in the Pipe object creation:
 rpc_pipe = Pipe(run_rpc_cli=True)
 ```
    
-Finally, in order to run the RPC Server you need to run the following commands:
+The next step is running the RPC Server you need to run the following commands:
 ```Python
 endpoint = 'tcp://0.0.0.0:1234'
-roc_pipe.run_rpc_server(endpoint=endpoint)
-```
-    
-From now on you can easily connect to the RPC server via Python and CLI following the example in the [ZeroRPC's page](https://pypi.org/project/zerorpc/)
+rpc_pipe.run_rpc_server(endpoint=endpoint)
+``` 
+   
+You can easily connect to the RPC server via Python and CLI following the example in the [ZeroRPC's page](https://pypi.org/project/zerorpc/)
+
+In order to execute pipe events you need to run the `execute` function of the server.
+Arguments to pipe events are passed in a JSON format, for example:
+- for example via python: 
+    ```Python
+    client.execute('join', '{"to_kill":true}')
+    ```
+- for example via CLI:\
+    `zerorpc tcp://127.0.0.1:4242 execute join '{"to_kill":true}'`
+ 
     
 # Contributing
 
