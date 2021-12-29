@@ -144,9 +144,11 @@ In order to execute pipe events you need to run the `execute` function of the se
 Arguments to pipe events are passed in a JSON format, for example:
 - for example via python: 
     ```Python
-    client.execute('join', '{"to_kill":true}')
+    client.execute('start') # no arguments example
+    client.execute('join', '{"to_kill":true}') # including arguments example
     ```
 - for example via CLI:\
+    `zerorpc tcp://0.0.0.0:1234 execute start`\
     `zerorpc tcp://0.0.0.0:1234 execute join '{"to_kill":true}'`
  
     
