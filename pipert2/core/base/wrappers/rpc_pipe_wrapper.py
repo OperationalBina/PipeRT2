@@ -1,5 +1,5 @@
-import json
 from zerorpc import Server
+from pipert2.core.base.wrappers.utils import parse_arguments
 from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, JOIN_EVENT_NAME
 
 
@@ -45,7 +45,7 @@ class RPCPipeWrapper(Server):
         self.notify_callback(event_name=JOIN_EVENT_NAME, to_kill=True)
         self.stop()
 
-    def execute(self, name, encoded_args):
+    def execute(self, name: str, encoded_arguments: str = None):
         """Parses user command and arguments and executes it.
 
         """
@@ -53,5 +53,5 @@ class RPCPipeWrapper(Server):
             self.notify_callback(event_name=JOIN_EVENT_NAME, to_kill=True)
             self.stop()
         else:
-            kwargs = json.loads(encoded_args)
+            kwargs = parse_arguments(encoded_arguments)
             self.notify_callback(event_name=name, **kwargs)
