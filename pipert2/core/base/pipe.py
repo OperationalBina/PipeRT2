@@ -6,7 +6,7 @@ from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
 from pipert2.core.managers.event_board import EventBoard
-from pipert2.utils.consts.event_names import KILL_EVENT_NAME, JOIN_EVENT_NAME
+from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
@@ -75,6 +75,7 @@ class Pipe(BaseEventExecutor):
             raise TypeError
 
         self.rpc_server.run_rpc_server(endpoint=endpoint)
+
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -148,7 +149,6 @@ class Pipe(BaseEventExecutor):
 
         self.event_board.notify_event(event_name, specific_flow_routines, **event_parameters)
 
-    @events(JOIN_EVENT_NAME)
     def join(self, to_kill=False):
         """Block the execution until all of the flows have been killed
 

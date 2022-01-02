@@ -1,6 +1,5 @@
 STOP_EVENT_NAME = "stop"
 KILL_EVENT_NAME = "kill"
 START_EVENT_NAME = "start"
-JOIN_EVENT_NAME = "join"
 UPDATE_FPS_NAME = "update_fps"
 NOTIFY_ROUTINE_DURATIONS_NAME = "finish_routine_logic"

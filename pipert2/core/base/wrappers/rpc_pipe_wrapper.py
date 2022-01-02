@@ -1,6 +1,6 @@
 from zerorpc import Server
 from pipert2.core.base.wrappers.utils import parse_arguments
-from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, JOIN_EVENT_NAME
+from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 
 
 class RPCPipeWrapper(Server):
@@ -42,7 +42,7 @@ class RPCPipeWrapper(Server):
         """Invokes the kill event in the pipe
 
         """
-        self.notify_callback(event_name=JOIN_EVENT_NAME, to_kill=True)
+        self.notify_callback(event_name=KILL_EVENT_NAME)
         self.stop()
 
     def execute(self, name: str, encoded_arguments: dict = None):
