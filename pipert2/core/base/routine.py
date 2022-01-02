@@ -1,5 +1,4 @@
 import threading
-from logging import Logger
 import multiprocessing as mp
 from functools import partial
 from collections import defaultdict
@@ -7,9 +6,10 @@ from typing import Callable, Optional
 from abc import ABCMeta, abstractmethod
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
+from logging import Logger, LoggerAdapter
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
+from pipert2.utils.consts.event_names import LOG_DATA, START_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
@@ -104,6 +104,21 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """
         raise NotImplementedError
 
+    @events(LOG_DATA)
+    def update_logger_formatter(self):
+        class CustomAdapter(LoggerAdapter):
+            def process(self, msg, kwargs):
+                # use my_context from kwargs or the default given on instantiation
+                data = kwargs.pop('data', self.extra['data'])
+                return f"{msg}, 'data': {data}", kwargs
+
+        if not self.message_handler.send_data:
+            self.message_handler.logger = CustomAdapter(self._logger, {'data': '1956'})
+        else:
+            self.message_handler.logger = self._logger
+        
+        self.message_handler.send_data = not self.message_handler.send_data
+
     def setup(self) -> None:
         """An initial setup before running
         The user supposed to implement this method
@@ -196,7 +211,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        self.event_notifier(event_name, routines_by_flow,  **event_parameters)
+        self.event_notifier(event_name, routines_by_flow, **event_parameters)
 
     def join(self):
         """Block until all routine thread terminates
@@ -205,3 +220,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         if self.stop_event.is_set():
             self.runner.join()
+
+        for handler in self._logger.handlers:
+            handler.close()

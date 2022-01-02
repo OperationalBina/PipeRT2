@@ -44,10 +44,13 @@ class Pipe(BaseEventExecutor):
             run_rpc_cli: True if the user want to use RPC command line interface.
         """
 
-        super().__init__(event_board, logger)
+        super().__init__(event_board)
         self.event_board = event_board
         self.network = network
         self.logger = logger
+        self.flows = {}
+        self.routines_dict = {}
+        self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
         self.run_rpc_cli = run_rpc_cli
         self.flows = {}
@@ -60,7 +63,6 @@ class Pipe(BaseEventExecutor):
 
         if auto_pacing_mechanism:
             self.routine_synchroniser = RoutinesSynchroniser(event_board=self.event_board,
-                                                             logger=self.logger,
                                                              notify_callback=self.event_board.get_event_notifier())
         else:
             self.routine_synchroniser = None
@@ -126,12 +128,15 @@ class Pipe(BaseEventExecutor):
             self.network.link(source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
 
         for flow in self.flows.values():
+            self.routines_dict = {self.logger.name: {}}
             flow.build()
+            self.routines_dict[self.logger.name][flow.name] = list(flow.routines.keys())
 
         if self.routine_synchroniser is not None:
             self.routine_synchroniser.wires = self.wires
             self.routine_synchroniser.build()
 
+        self._send_initial_log()
         self.event_board.build()
 
     def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list),
@@ -154,7 +159,7 @@ class Pipe(BaseEventExecutor):
 
         """
 
-        if to_kill or self.run_rpc_cli:
+        if to_kill:
             self.notify_event(KILL_EVENT_NAME)
 
         for flow in self.flows.values():
@@ -162,9 +167,15 @@ class Pipe(BaseEventExecutor):
 
         self.logger.plog(f"Joined all flows")
 
+        self.event_board.join()
+        self.logger.plog(f"Joined event board")
+
         if self.routine_synchroniser is not None:
             self.routine_synchroniser.join()
             self.logger.plog("Joined synchroniser")
+
+        for handler in self.logger.handlers:
+            handler.close()
 
     def _validate_pipe(self):
         """Validate routines and wires in current pipeline.
@@ -176,3 +187,8 @@ class Pipe(BaseEventExecutor):
 
         flow_validator.validate_flow(self.flows, self.wires)
         wires_validator.validate_wires(self.wires.values())
+
+    def _send_initial_log(self):
+        self.logger.handlers[0].log_event_name = "pipe_creation"
+        self.logger.info("{" + f"'Pipe structure': {self.routines_dict}" + "}")
+        self.logger.handlers[0].log_event_name = "log"

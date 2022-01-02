@@ -30,10 +30,9 @@ class Flow(BaseEventExecutor):
             logger (Logger): Logger object for logging the flow actions.
         """
 
-        super().__init__(event_board, logger)
+        super().__init__(event_board)
         self.routines = {}
         self.name = name
-        self._logger = logger
 
         flow_events_to_listen = set(self.get_events().keys())
 
