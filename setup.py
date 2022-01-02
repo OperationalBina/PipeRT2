@@ -39,6 +39,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     packages=setuptools.find_packages(),
-    install_requires=["posix-ipc", "numpy"],
+    install_requires=["posix-ipc", "numpy", "zerorpc"],
     python_requires=">=3.6",
 )
