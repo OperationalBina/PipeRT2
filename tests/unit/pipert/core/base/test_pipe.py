@@ -1,14 +1,13 @@
 import pytest
+from pipert2 import Wire
 from mock import patch, Mock
 from collections import defaultdict
 from pytest_mock import MockerFixture
-from pipert2 import Wire
 from pipert2.core.base.pipe import Pipe
-from pipert2.utils.exceptions import FloatingRoutine
 from pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
 
 
-@pytest.fixture()
+@pytest.fixture
 def dummy_pipe():
     with patch('pipert2.core.base.pipe.Flow'):
         with patch('pipert2.core.base.pipe.EventBoard'):
@@ -16,7 +15,7 @@ def dummy_pipe():
             yield pipe
 
 
-@pytest.fixture()
+@pytest.fixture
 def dummy_pipe_with_flows(dummy_pipe: Pipe, mocker: MockerFixture):
     FLOW_NAMES = ["f1", "f2", "f3"]
 
@@ -73,7 +72,8 @@ def test_link_link_new_wires_should_add_to_dictionary(dummy_pipe: Pipe, mocker: 
     assert dummy_pipe.wires[(middle_routine.flow_name, middle_routine.name)] == middle_to_destination_wire
 
 
-def test_link_link_existing_wires_sources_should_override_existing_in_dictionary(dummy_pipe: Pipe, mocker: MockerFixture):
+def test_link_link_existing_wires_sources_should_override_existing_in_dictionary(dummy_pipe: Pipe,
+                                                                                 mocker: MockerFixture):
     source_routine = mocker.MagicMock(spec=SourceRoutine)
     source_routine.name = "source"
     source_routine.flow_name = "Flow"

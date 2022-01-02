@@ -6,9 +6,12 @@ from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
 from pipert2.core.managers.event_board import EventBoard
-from pipert2.utils.consts.event_names import KILL_EVENT_NAME
+from pipert2.utils.consts.event_names import KILL_EVENT_NAME, JOIN_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
+from pipert2.utils.base_event_executor import BaseEventExecutor
+from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.core.managers.networks.queue_network import QueueNetwork
+from pipert2.core.base.wrappers.rpc_pipe_wrapper import RPCPipeWrapper
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
@@ -17,7 +20,7 @@ from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_defau
 add_pipe_log_level()
 
 
-class Pipe:
+class Pipe(BaseEventExecutor):
     """The pipe object is the center of the pipe.
     Once it is created it act as a central registry for the
     pipe methods such as create flows, register routines, notify events
@@ -25,33 +28,35 @@ class Pipe:
 
     """
 
-    def __init__(self, network: Network = QueueNetwork(),
+    events = class_functions_dictionary()
+
+    def __init__(self, event_board: EventBoard = EventBoard(), network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
-                 data_transmitter: DataTransmitter = BasicTransmitter(),
-                 auto_pacing_mechanism: bool = False):
+                 data_transmitter: DataTransmitter = BasicTransmitter(), auto_pacing_mechanism: bool = False,
+                 run_rpc_cli: bool = False):
         """
         Args:
+            event_board (EventBoard): The EventBoard of the pipe.
             network: Network object responsible for the routine's communication.
             logger: Logger object for logging the pipe actions.
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             auto_pacing_mechanism: True if the user want to use auto pacing mechanism.
-
-        Attributes:
-            network: Network object responsible for the routine's communication.
-            logger: Logger object for logging the pipe actions.
-            data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
-            flows (dict[str, Flow]): Dictionary mapping the pipe flows to their name.
-            event_board (EventBoard): EventBoard object responsible for the pipe events.
-            routine_synchroniser (RoutinesSynchroniser): Routine synchroniser if auto_pacing_mechanism is true, else None.
-
+            run_rpc_cli: True if the user want to use RPC command line interface.
         """
 
+        super().__init__(event_board, logger)
+        self.event_board = event_board
         self.network = network
         self.logger = logger
-        self.flows = {}
-        self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
+        self.run_rpc_cli = run_rpc_cli
+        self.flows = {}
         self.wires: Dict[tuple, Wire] = {}
+
+        if self.run_rpc_cli:
+            self.rpc_server = RPCPipeWrapper(notify_callback=self.event_board.get_event_notifier())
+        else:
+            self.rpc_server = None
 
         if auto_pacing_mechanism:
             self.routine_synchroniser = RoutinesSynchroniser(event_board=self.event_board,
@@ -59,6 +64,17 @@ class Pipe:
                                                              notify_callback=self.event_board.get_event_notifier())
         else:
             self.routine_synchroniser = None
+
+    def run_rpc_server(self, endpoint: str):
+        """Binds it to a given endpoint and runs the rpc server.
+
+            Arguments:
+                endpoint: server's endpoint
+        """
+        if self.rpc_server is None:
+            raise TypeError
+
+        self.rpc_server.run_rpc_server(endpoint=endpoint)
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -100,6 +116,7 @@ class Pipe:
         """Build the pipe to be ready to start working.
 
         """
+        super(Pipe, self).build()
 
         self._validate_pipe()
 
@@ -131,21 +148,19 @@ class Pipe:
 
         self.event_board.notify_event(event_name, specific_flow_routines, **event_parameters)
 
+    @events(JOIN_EVENT_NAME)
     def join(self, to_kill=False):
         """Block the execution until all of the flows have been killed
 
         """
 
-        if to_kill:
+        if to_kill or self.run_rpc_cli:
             self.notify_event(KILL_EVENT_NAME)
 
         for flow in self.flows.values():
             flow.join()
 
         self.logger.plog(f"Joined all flows")
-
-        self.event_board.join()
-        self.logger.plog(f"Joined event board")
 
         if self.routine_synchroniser is not None:
             self.routine_synchroniser.join()
