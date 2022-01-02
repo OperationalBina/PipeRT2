@@ -145,11 +145,11 @@ Arguments to pipe events are passed in a JSON format:
 - for example via python: 
     ```Python
     client.execute('start') # no arguments example
-    client.execute('join', {"to_kill": True}) # including arguments example
+    client.execute('print', {"arg": "hello world!"}) # including arguments example
     ```
 - for example via CLI:\
     `zerorpc tcp://0.0.0.0:1234 execute start`\
-    `zerorpc tcp://0.0.0.0:1234 execute join '{"to_kill":true}'`
+    `zerorpc tcp://0.0.0.0:1234 execute print '{"arg":"hello world!"}'`
  
     
 # Contributing
