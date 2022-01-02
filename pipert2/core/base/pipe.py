@@ -8,8 +8,6 @@ from pipert2.core.managers.network import Network
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
-from pipert2.utils.base_event_executor import BaseEventExecutor
-from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.wrappers.rpc_pipe_wrapper import RPCPipeWrapper
 from pipert2.core.base.validators import wires_validator, flow_validator
@@ -20,15 +18,13 @@ from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_defau
 add_pipe_log_level()
 
 
-class Pipe(BaseEventExecutor):
+class Pipe:
     """The pipe object is the center of the pipe.
     Once it is created it act as a central registry for the
     pipe methods such as create flows, register routines, notify events
     and more.
 
     """
-
-    events = class_functions_dictionary()
 
     def __init__(self, event_board: EventBoard = EventBoard(), network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
@@ -43,8 +39,6 @@ class Pipe(BaseEventExecutor):
             auto_pacing_mechanism: True if the user want to use auto pacing mechanism.
             run_rpc_cli: True if the user want to use RPC command line interface.
         """
-
-        super().__init__(event_board)
         self.event_board = event_board
         self.network = network
         self.logger = logger
@@ -77,7 +71,6 @@ class Pipe(BaseEventExecutor):
             raise TypeError
 
         self.rpc_server.run_rpc_server(endpoint=endpoint)
-
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -119,8 +112,6 @@ class Pipe(BaseEventExecutor):
         """Build the pipe to be ready to start working.
 
         """
-        super(Pipe, self).build()
-
         self._validate_pipe()
 
         for wire in self.wires.values():
