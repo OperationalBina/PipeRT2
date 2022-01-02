@@ -45,13 +45,18 @@ class RPCPipeWrapper(Server):
         self.notify_callback(event_name=JOIN_EVENT_NAME, to_kill=True)
         self.stop()
 
-    def execute(self, name: str, encoded_arguments: str = None):
+    def execute(self, name: str, encoded_arguments: dict = None):
         """Parses user command and arguments and executes it.
 
         """
-        if name == self.kill.__name__:
-            self.notify_callback(event_name=JOIN_EVENT_NAME, to_kill=True)
-            self.stop()
-        else:
-            kwargs = parse_arguments(encoded_arguments)
-            self.notify_callback(event_name=name, **kwargs)
+        args_type = type(encoded_arguments)
+        if args_type == str or encoded_arguments is None:
+            if name == self.kill.__name__:
+                self.kill()
+            else:
+                kwargs = parse_arguments(encoded_arguments)
+                self.notify_callback(event_name=name, **kwargs)
+        elif args_type == dict:
+            if name == self.kill.__name__:
+                self.kill()
+            self.notify_callback(event_name=name, **encoded_arguments)
