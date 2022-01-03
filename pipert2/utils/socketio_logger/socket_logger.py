@@ -1,4 +1,6 @@
 import logging
+
+from pipert2.utils.socketio_logger.socket_formatter import SocketFormatter
 from pipert2.utils.socketio_logger.socket_handler import SocketHandler
 
 
@@ -24,7 +26,7 @@ class SocketLogger(logging.Logger):
         child_logger.setLevel(self.level)
         handler = SocketHandler(self._url, self._log_event_name)
 
-        handler.setFormatter(logging.Formatter('{"time": "%(asctime)s.%(msecs)03d", '
+        handler.setFormatter(SocketFormatter('{"time": "%(asctime)s.%(msecs)03d", '
                                                '"source": "%(name)s", '
                                                '"level": "%(levelname)s", '
                                                '"message": "%(message)s"}',

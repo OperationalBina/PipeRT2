@@ -1,3 +1,4 @@
+import json
 from logging import Logger
 from typing import Optional
 from abc import ABC, abstractmethod
@@ -59,7 +60,7 @@ class MessageHandler(ABC):
         """
 
         if self.send_data:
-            self.logger.info(f"output: ", data=message.payload.data)
+            self.logger.info(f"output: ", data=message.payload.data.additional_data)
 
         if callable(self.transmit):
             transmitted_data = self.transmit(message.payload.data)
@@ -81,7 +82,7 @@ class MessageHandler(ABC):
             message = Message.decode(message)
 
             if self.send_data:
-                self.logger.info(f"input: ", data=message.payload.data)
+                self.logger.info(f"input: ", data=message.payload.data.additional_data)
 
             if callable(self.receive):
                 received_data = self.receive(message.payload.data)
