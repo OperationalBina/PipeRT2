@@ -1,4 +1,3 @@
-import json
 from logging import Logger
 from typing import Optional
 from abc import ABC, abstractmethod

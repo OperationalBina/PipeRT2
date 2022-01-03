@@ -1,7 +1,6 @@
 import logging
-
-from pipert2.utils.socketio_logger.socket_formatter import SocketFormatter
 from pipert2.utils.socketio_logger.socket_handler import SocketHandler
+from pipert2.utils.socketio_logger.socket_formatter import SocketFormatter
 
 
 class SocketLogger(logging.Logger):
