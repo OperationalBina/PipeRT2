@@ -1,8 +1,13 @@
 import pytest
 import collections
 from logging import Logger
-from mock.mock import Mock
+from mock.mock import Mock, patch
 from multiprocessing import Manager
+
+from pytest_mock import MockerFixture
+
+from pipert2 import Data
+from pipert2.core.base.data import FrameData
 from pipert2.core.base.message import Message
 from pipert2.core.base.transmitters import BasicTransmitter
 from pipert2.core.handlers.message_handlers import QueueHandler
@@ -119,27 +124,46 @@ def test_get_no_receive_method(blocking_queue_handler, non_blocking_queue_handle
     assert non_blocking_queue_handler.get() is None
 
 
-def test_send_data_true_put(non_blocking_queue_handler):
-    message = StrMessage("Test Message", "dummy")
-    logger: Logger = Mock()
+def test_send_data_true_put(non_blocking_queue_handler, mocker: MockerFixture):
+    with mocker.patch("pipert2.core.handlers.message_handler.numpy_frame_to_base64", return_value="base64"):
+        message = StrMessage("Test Message", "dummy")
 
-    non_blocking_queue_handler.send_data = True
-    non_blocking_queue_handler.logger = logger
+        data = FrameData()
+        data.additional_data = {}
 
-    non_blocking_queue_handler.put(message)
-    logger.info.assert_called_once_with(f"output: ", data=message.payload.data)
+        message.payload.data = data
+
+        logger: Logger = Mock()
+
+        non_blocking_queue_handler.send_data = True
+        non_blocking_queue_handler.logger = logger
+
+        non_blocking_queue_handler.put(message)
+        logger.info.assert_called_once_with(f"output: ", data={
+            'image_base64': "base64"
+        })
 
 
-def test_send_data_true_get(non_blocking_queue_handler, input_queue):
-    message = StrMessage("Test Message", "dummy")
-    logger: Logger = Mock()
+def test_send_data_true_get(non_blocking_queue_handler, input_queue, mocker: MockerFixture):
+    with mocker.patch("pipert2.core.handlers.message_handler.numpy_frame_to_base64", return_value="base64"):
+        message = StrMessage("Test Message", "dummy")
 
-    non_blocking_queue_handler.send_data = True
-    non_blocking_queue_handler.logger = logger
+        data = FrameData()
+        data.additional_data = {}
 
-    input_queue.put(message)
-    non_blocking_queue_handler.get()
-    logger.info.assert_called_once_with(f"input: ", data=message.payload.data)
+        message.payload.data = data
+
+        logger: Logger = Mock()
+
+        non_blocking_queue_handler.send_data = True
+        non_blocking_queue_handler.logger = logger
+
+        input_queue.put(message)
+        non_blocking_queue_handler.get()
+
+        logger.info.assert_called_once_with(f"input: ", data={
+                'image_base64': "base64"
+            })
 
 
 def test_send_data_false_put(non_blocking_queue_handler):
