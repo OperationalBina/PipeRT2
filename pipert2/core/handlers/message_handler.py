@@ -1,8 +1,11 @@
 from logging import Logger
 from typing import Optional
 from abc import ABC, abstractmethod
+
+from pipert2.core.base.data.frame_data import FrameData
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.base.message import Message
+from pipert2.utils.socketio_logger.frame_utils import numpy_frame_to_base64
 
 
 class MessageHandler(ABC):
@@ -58,8 +61,8 @@ class MessageHandler(ABC):
 
         """
 
-        if self.send_data:
-            self.logger.info(f"output: ", data=message.payload.data.additional_data)
+        if self.send_data and isinstance(message.payload.data, FrameData):
+            self.log_frame("output", message)
 
         if callable(self.transmit):
             transmitted_data = self.transmit(message.payload.data)
@@ -80,8 +83,8 @@ class MessageHandler(ABC):
         if message is not None:
             message = Message.decode(message)
 
-            if self.send_data:
-                self.logger.info(f"input: ", data=message.payload.data.additional_data)
+            if self.send_data and isinstance(message.payload.data, FrameData):
+                self.log_frame("input", message)
 
             if callable(self.receive):
                 received_data = self.receive(message.payload.data)
@@ -90,3 +93,8 @@ class MessageHandler(ABC):
             message.record_entry(self.routine_name)
 
         return message
+
+    def log_frame(self, input_output_type, message):
+        self.logger.info(f"{input_output_type}: ", data={
+            'image_base64': numpy_frame_to_base64(message.payload.data.get_frame())
+        })

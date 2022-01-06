@@ -1,3 +1,4 @@
+import cv2
 import base64
 import numpy as np
 
@@ -15,8 +16,11 @@ def create_log_record_of_frame(name: str, numpy_frame: np.array):
 
 
 def numpy_frame_to_base64(numpy_frame: np.array):
-    jpg_as_base64 = base64.b64encode(numpy_frame)
-    base64_encode = f"{jpg_as_base64}"[2:]
-    base64_encode = base64_encode[:len(base64_encode) - 1]
+    ret, encoded_frame = cv2.imencode('.jpg', numpy_frame)
 
-    return base64_encode
+    if ret:
+        jpg_as_base64 = base64.b64encode(encoded_frame)
+        base64_encode = f"{jpg_as_base64}"[2:]
+        base64_encode = base64_encode[:len(base64_encode) - 1]
+
+        return base64_encode
