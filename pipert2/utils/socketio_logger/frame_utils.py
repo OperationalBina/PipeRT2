@@ -3,7 +3,7 @@ import base64
 import numpy as np
 
 
-def create_log_record_of_frame(name: str, numpy_frame: np.array):
+def create_log_record_of_extra_frame(name: str, numpy_frame: np.array):
 
     base64_frame = numpy_frame_to_base64(numpy_frame)
 
