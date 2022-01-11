@@ -20,13 +20,14 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Components](#components)
 - [Installation](#installation)
 - [Getting Started](#getting-started)
+- [Running via RPC CLI](#running-via-rpc-cli)
 - [Contributing](#contributing)
 
-## Requirements
+# Requirements
 
 - Python 3.6
 
-## Components
+# Components
 
 **Routine** - The smallest component in the pipe.
 
@@ -43,13 +44,13 @@ through the pipeline.
 
 **Pipe** - Controls the different elements and aspects of the system. Contains all flows. Distributing events through all components.
 
-## Installation
+# Installation
 
 We publish PipeRT2 as `PipeRT` package in PyPi. 
 
 Run `pip3 install PipeRT` for installing the official PipeRT2 stable version.
 
-## Getting Started 
+# Getting Started 
 
 For example, we're going to create a pipe which contains simple flows with very simple routines.
 
@@ -122,6 +123,35 @@ For triggering an event for a specific flow or routine we add a dictionary of th
   example_pipe.notify_event(START_EVENT_NAME, {"example_flow": [generate_data_routine.name, print_result_routine.name]})  
   ```
 
+# Running via RPC CLI
+
+Firstly, you need to install the zerorpc python package via `pip3 install zerorpc`
+    
+Then, you need to add a flag in the Pipe object creation:
+```Python
+rpc_pipe = Pipe(run_rpc_cli=True)
+```
+   
+The next step is running the RPC Server:
+```Python
+endpoint = 'tcp://0.0.0.0:1234'
+rpc_pipe.run_rpc_server(endpoint=endpoint)
+``` 
+   
+You can easily connect to the RPC server via Python and CLI following the example in the [ZeroRPC's page](https://pypi.org/project/zerorpc/)
+
+In order to execute pipe events you need to run the `execute` function of the server.
+Arguments to pipe events are passed in a JSON format:
+- for example via python: 
+    ```Python
+    client.execute('start') # no arguments example
+    client.execute('join', '{"to_kill":true}') # including arguments example
+    ```
+- for example via CLI:\
+    `zerorpc tcp://0.0.0.0:1234 execute start`\
+    `zerorpc tcp://0.0.0.0:1234 execute join '{"to_kill":true}'`
+ 
+    
 # Contributing
 
 For contributing please contact with [San-Moshe](https://github.com/San-Moshe) for accessing our Jira. 
