@@ -15,8 +15,8 @@ def create_log_record_of_extra_frame(name: str, numpy_frame: np.array):
     return f"extra_image: {extra_image}"
 
 
-def numpy_frame_to_base64(numpy_frame: np.array):
-    ret, encoded_frame = cv2.imencode('.jpg', numpy_frame)
+def numpy_frame_to_base64(numpy_frame: np.array, image_quality=50):
+    ret, encoded_frame = cv2.imencode('.jpg', numpy_frame, [cv2.IMWRITE_JPEG_QUALITY, image_quality])
 
     if ret:
         jpg_as_base64 = base64.b64encode(encoded_frame)
