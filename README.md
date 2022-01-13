@@ -20,6 +20,8 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Components](#components)
 - [Installation](#installation)
 - [Getting Started](#getting-started)
+- [The Events Mechanism](#the-events-mechanism)
+- [Custom Events](#custom-events)
 - [Running via RPC CLI](#running-via-rpc-cli)
 - [Contributing](#contributing)
 
@@ -122,6 +124,81 @@ For triggering an event for a specific flow or routine we add a dictionary of th
     ```Python
   example_pipe.notify_event(START_EVENT_NAME, {"example_flow": [generate_data_routine.name, print_result_routine.name]})  
   ```
+
+# The Events Mechanism
+Events within the pipe can change its behaviour in real time.
+Events can be called with the `Pipe` or `Routine` objects using the `notify_event` function in the following syntax:
+```Python
+# Notifies all of the flows within the pipe with the given event.
+example_pipe.notify_event(<Event_name>)
+
+# Notifies a specific flow or flows with the given event.
+example_pipe.notify_event(<Event_name>, {<Flow_name1>: [], <Flow_name2>: []...})
+
+# Notifies only specified routines with the given event.
+example_pipe.notify_event(<Event_name>, {<Flow_name1>: [<routine_name1>, <routine_name2>...]})
+    
+# Same applies for routine except 
+class SomeRoutine(Routine):
+    ...
+    def SomeFunc(self):
+        # In order to notify event within the routine
+        self.notify_event(<Event_name>, {<Flow_name1>: [<routine_name1>, <routine_name2>...]})
+        # Same syntax used in notify_event of the pipe
+```
+
+The pipe package has a few builtin events already implemented, those events are:
+- STOP_EVENT_NAME: Stops the specified routines.
+- KILL_EVENT_NAME: Force stops the specified routines.
+- START_EVENT_NAME: Starts the specified routines.
+
+# Custom Events
+When writing your routines, you can implement your own events to issue custom behaviour.
+
+Here is an example routine that has two custom events:
+```Python
+class OpencvReader(SourceRoutine):
+    def __init__(self, name):
+        super().__init__(name)
+        self.cap = None
+
+    # This event causes the routine to set its opencv reader.
+    @events("SET_OPENCV")
+    def set_opencv(self):
+        self.cap = cv2.VideoCapture(<some_url>)
+
+    # This event releases the routines VideoCapture object.
+    @events("RELEASE_OPENCV")
+    def release_opencv(self):
+        self.cap.release()
+```
+To call the new events `notify_event` is used just like any other event:
+```Python
+from pipert2 import Pipe
+from pipert2.utils.consts.event_names import START_EVENT_NAME, KILL_EVENT_NAME
+
+# Creating the pipe.
+example_pipe = Pipe()
+
+# Create an instance of each routine.
+opencv_routine = OpencvReader("opencv_reader")
+print_result_routine = PrintResult()
+
+# Create a flow with the required routines.
+example_pipe.create_flow("example_flow", True, opencv_routine, print_result_routine)
+
+# Notify the custom event
+example_pipe.notify_event("SET_OPENCV", "example_flow": ["opencv_reader"])
+
+# Start the pipe
+example_pipe.notify_event(START_EVENT_NAME)
+
+# Notify our second custom event
+example_pipe.notify_event("RELEASE_OPENCV", "example_flow": ["opencv_reader"])
+
+# Kill the pipe
+example_pipe.notify_event(KILL_EVENT_NAME)
+```
 
 # Running via RPC CLI
 
