@@ -44,6 +44,11 @@ through the pipeline.
 
 **Flow** - Contains multiple routines with the same context.
 
+Each flow within the pipe runs as a seperate process. Utilizing this correctly will improve the pipes performence.
+
+For example, if you have a pipe that includes multiple CPU heavy operations, it is better to seperate them into different routines within different flows.
+Doing so will maximize your pipes performence.
+
 **Pipe** - Controls the different elements and aspects of the system. Contains all flows. Distributing events through all components.
 
 # Installation
