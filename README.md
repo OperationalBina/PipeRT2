@@ -120,8 +120,15 @@ For triggering an event for a specific flow or routine we add a dictionary of th
     ```
 - for example trigger specific routines in `example_flow`:
     ```Python
-  example_pipe.notify_event(START_EVENT_NAME, {"example_flow": [generate_data_routine.name, print_result_routine.name]})  
-  ```
+    example_pipe.notify_event(START_EVENT_NAME, {"example_flow": [generate_data_routine.name, print_result_routine.name]})  
+    ```
+
+- You can also trigger an event within a routine:
+    ```Python
+    self.notify_event("some_event_name", {"example_flow_name": ["example_routine_name"]}, paramA=123)
+    # Here we activated the event 'some_event_name' on the routine 'example_routine_name' 
+    # that is inside the flow 'example_flow_name' with the parameter 'paramA' equals to 123
+    ```
 
 # Running via RPC CLI
 
