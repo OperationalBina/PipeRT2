@@ -11,7 +11,19 @@ def api_wrapper_with_mock_notify(mocker: MockerFixture):
 
     notify = mocker.MagicMock()
 
-    return APIWrapper(url="", notify_callback=notify)
+    api_wrapper = APIWrapper(host="", port=0, notify_callback=notify)
+    api_wrapper.app = mocker.MagicMock()
+
+    return api_wrapper
+
+
+def test_run_api(api_wrapper_with_mock_notify):
+    api_wrapper_with_mock_notify.host = "test_url"
+    api_wrapper_with_mock_notify.port = "10"
+
+    api_wrapper_with_mock_notify.run_api()
+
+    assert list(api_wrapper_with_mock_notify.app.run.call_args)[1] == {"host": "test_url", "port": "10"}
 
 
 def test_start(api_wrapper_with_mock_notify):

@@ -5,8 +5,9 @@ from pipert2 import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 
 
 class APIWrapper:
-    def __init__(self, url, notify_callback):
-        self.url = url
+    def __init__(self, host, port, notify_callback):
+        self.host = host
+        self.port = port
         self.notify_callback = notify_callback
 
         self.app = Flask(__name__)
@@ -20,7 +21,7 @@ class APIWrapper:
         """Run flask api.
 
         """
-        self.app.run(host="localhost", port=8888)
+        self.app.run(host=self.host, port=self.port)
 
     def start(self):
         """Notify the pipe to start.
