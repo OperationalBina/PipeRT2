@@ -28,8 +28,7 @@ class Pipe:
 
     def __init__(self, event_board: EventBoard = EventBoard(), network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
-                 data_transmitter: DataTransmitter = BasicTransmitter(), auto_pacing_mechanism: bool = False,
-                 run_rpc_cli: bool = False):
+                 data_transmitter: DataTransmitter = BasicTransmitter(), auto_pacing_mechanism: bool = False):
         """
         Args:
             event_board (EventBoard): The EventBoard of the pipe.
@@ -37,7 +36,6 @@ class Pipe:
             logger: Logger object for logging the pipe actions.
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             auto_pacing_mechanism: True if the user want to use auto pacing mechanism.
-            run_rpc_cli: True if the user want to use RPC command line interface.
         """
         self.event_board = event_board
         self.network = network
@@ -46,14 +44,8 @@ class Pipe:
         self.routines_dict = {}
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
-        self.run_rpc_cli = run_rpc_cli
         self.flows = {}
         self.wires: Dict[tuple, Wire] = {}
-
-        if self.run_rpc_cli:
-            self.rpc_server = RPCPipeWrapper(notify_callback=self.event_board.get_event_notifier())
-        else:
-            self.rpc_server = None
 
         if auto_pacing_mechanism:
             self.routine_synchroniser = RoutinesSynchroniser(event_board=self.event_board,
@@ -67,10 +59,9 @@ class Pipe:
             Arguments:
                 endpoint: server's endpoint
         """
-        if self.rpc_server is None:
-            raise TypeError
 
-        self.rpc_server.run_rpc_server(endpoint=endpoint)
+        rpc_server = RPCPipeWrapper(notify_callback=self.event_board.get_event_notifier())
+        rpc_server.run_rpc_server(endpoint=endpoint)
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
