@@ -7,7 +7,6 @@ from statistics import median
 from pipert2.utils.dummy_object import Dummy
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.core.base.routines.source_routine import SourceRoutine
 from pipert2.core.base.synchronise_routines.synchroniser_node import SynchroniserNode
 from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTINE_DURATIONS_NAME, NULL_FPS, \
     SYNCHRONISER_UPDATE_INTERVAL, STOP_EVENT_NAME
