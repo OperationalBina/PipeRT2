@@ -1,7 +1,7 @@
 import flask
 from flask import Flask
 from flask import Response
-from pipert2 import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
+from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 
 
 class APIWrapper:
