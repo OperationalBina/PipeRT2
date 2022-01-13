@@ -3,7 +3,7 @@ from pipert2 import dataclass, field
 
 @dataclass
 class Data:
-    """ase class for transportation of data within the pipeline.
+    """Base class for transportation of data within the pipeline.
     User can implement Data classes for customizing types.
 
     Example usage:

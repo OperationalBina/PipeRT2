@@ -44,6 +44,8 @@ through the pipeline.
 
 **Pipe** - Controls the different elements and aspects of the system. Contains all flows. Distributing events through all components.
 
+**Data** - Base class for transportation of data within the pipeline. User can implement Data classes for customizing types.
+
 ## Installation
 
 We publish PipeRT2 as `PipeRT` package in PyPi. 
@@ -126,6 +128,24 @@ For triggering an event for a specific flow or routine we add a dictionary of th
     ```Python
   example_pipe.notify_event(START_EVENT_NAME, {"example_flow": [generate_data_routine.name, print_result_routine.name]})  
   ```
+
+
+### Creating a Data class
+
+Have a look at the dataclass package for more options: [Dataclass Docs](https://docs.python.org/3/library/dataclasses.html)
+
+```Python
+from pipert2 import dataclass, Data
+import numpy as np
+
+@dataclass
+class FrameData(Data):
+    frame: np.ndarray
+    source: str
+
+frame = np.zeros((4,5))
+data = FrameData(frame=frame, source="Doctest")
+```
 
 # Contributing
 

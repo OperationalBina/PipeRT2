@@ -67,35 +67,6 @@ def class_functions_dictionary():
 
 
 def main_logics_dictionary():
-    """Create a decorator for marking functions as main logics and storing them in a
-    dictionary by their class and their expected input data type.
-
-    Returns:
-        Decorator that stores its functions in the 'all' attribute.
-
-    Example usage:
-
-    >>> class Bakery:
-    ...     cooking_styles = class_functions_dictionary()
-    ...
-    ...     @cooking_styles("indian")
-    ...     def indian_backing(self):
-    ...         pass
-    ...
-    ...     @cooking_styles("asian")
-    ...     def asian_backing(self):
-    ...         pass
-    ...
-    ...     @classmethod
-    ...     def get_cooking_styles(cls):
-    ...         return cls.cooking_styles.all(cls)
-
-
-    >>> print(Bakery.get_cooking_styles())  # {'indian': [<function Bakery.indian_backing at 0x7f8c4f339dc0>],
-    ...                                     #  'asian': [<function Bakery.asian_backing at 0x7f8c4f339e50>]})
-
-    """
-
     registry = defaultdict(dict)
 
     def key_registrar(expected_input_type):
