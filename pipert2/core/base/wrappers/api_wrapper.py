@@ -51,7 +51,7 @@ class APIWrapper:
             Status 200 when succeed.
 
         """
-        self.notify_callback(event_name=KILL_EVENT_NAME)
+        self.notify_callback(KILL_EVENT_NAME)
 
         return Response(status=200)
 
