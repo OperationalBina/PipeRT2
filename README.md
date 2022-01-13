@@ -145,6 +145,10 @@ class SomeRoutine(Routine):
         # In order to notify event within the routine
         self.notify_event(<Event_name>, {<Flow_name1>: [<routine_name1>, <routine_name2>...]})
         # Same syntax used in notify_event of the pipe
+
+# Or alternatively 
+some_routine = SomeRoutine()
+some_routine.notify_event(<Event_name>, {<Flow_name1>: [<routine_name1>, <routine_name2>...]})
 ```
 
 The pipe package has a few builtin events already implemented, those events are:
@@ -157,20 +161,15 @@ When writing your routines, you can implement your own events to issue custom be
 
 Here is an example routine that has two custom events:
 ```Python
-class OpencvReader(SourceRoutine):
+class SomeRoutine(Routine):
     def __init__(self, name):
         super().__init__(name)
         self.cap = None
 
     # This event causes the routine to set its opencv reader.
-    @events("SET_OPENCV")
-    def set_opencv(self):
-        self.cap = cv2.VideoCapture(<some_url>)
-
-    # This event releases the routines VideoCapture object.
-    @events("RELEASE_OPENCV")
-    def release_opencv(self):
-        self.cap.release()
+    @events("CUSTOM_EVENT_NAME")
+    def some_func(self):
+        # Some logic
 ```
 To call the new events `notify_event` is used just like any other event:
 ```Python
@@ -181,23 +180,17 @@ from pipert2.utils.consts.event_names import START_EVENT_NAME, KILL_EVENT_NAME
 example_pipe = Pipe()
 
 # Create an instance of each routine.
-opencv_routine = OpencvReader("opencv_reader")
+some_routine = SomeRoutine("some_routine")
 print_result_routine = PrintResult()
 
 # Create a flow with the required routines.
-example_pipe.create_flow("example_flow", True, opencv_routine, print_result_routine)
+example_pipe.create_flow("example_flow", True, some_routine, print_result_routine)
 
 # Notify the custom event
-example_pipe.notify_event("SET_OPENCV", "example_flow": ["opencv_reader"])
+example_pipe.notify_event("CUSTOM_EVENT_NAME", "example_flow": ["some_routine"])
 
 # Start the pipe
 example_pipe.notify_event(START_EVENT_NAME)
-
-# Notify our second custom event
-example_pipe.notify_event("RELEASE_OPENCV", "example_flow": ["opencv_reader"])
-
-# Kill the pipe
-example_pipe.notify_event(KILL_EVENT_NAME)
 ```
 
 # Running via RPC CLI
