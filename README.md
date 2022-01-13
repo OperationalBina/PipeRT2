@@ -23,6 +23,7 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Advanced](#advanced)
 - [The Events Mechanism](#the-events-mechanism)
 - [Custom Events](#custom-events)
+- [Using The Cockpit](#using-the-cockpit)
 - [Running via RPC CLI](#running-via-rpc-cli)
 - [Contributing](#contributing)
 
@@ -239,6 +240,24 @@ example_pipe.notify_event("CUSTOM_EVENT_NAME", "example_flow": ["some_routine"])
 # Start the pipe
 example_pipe.notify_event(START_EVENT_NAME)
 ```
+
+# Using The Cockpit
+(Before you get started, make sure you have an instance of the cockpit up and running. For more information visit the [PipeRT-Cockpit repository](https://github.com/OperationalBina/PipeRT-Cockpit))  
+In order for the pipe to be able to communicate with the cockpit a few things must be done.  
+First create a `.env` file with the following contents:
+```.env
+SOCKET_LOGGER_URL="<cockpit url here (usually http://localhost:3000 if on the same system)>/api/socketio"
+```  
+After that your pipes default logger with the socket logger like so:
+```Python
+from pipert2 import Pipe
+from pipert2.utils.logging_module_modifiers import get_socket_logger
+
+# logger level indicates what logs will be sent, if logging.INFO is provided info logs and above will be sent and so on.
+example_pipe = Pipe(logger=get_socket_logger("<desired base name here>", <logger level>))
+```
+And that's it!  
+After that your pipe will send its logs to the cockpit!
 
 # Running via RPC CLI
 
