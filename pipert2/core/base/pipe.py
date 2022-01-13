@@ -1,7 +1,9 @@
+import types
 from typing import Dict
 from logging import Logger
 from collections import defaultdict
 from pipert2.core.base.flow import Flow
+from pipert2.core.base.routines.runner_factory import FINAL_EXTENDED_RUN, GENERATOR_EXTENDED_RUN, INNER_EXTENDED_RUN, RunnerFactory
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
@@ -14,6 +16,7 @@ from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
+from pipert2.utils.routine_graph_identifier import solve_graph
 
 add_pipe_log_level()
 
@@ -51,7 +54,8 @@ class Pipe:
         self.wires: Dict[tuple, Wire] = {}
 
         if self.run_rpc_cli:
-            self.rpc_server = RPCPipeWrapper(notify_callback=self.event_board.get_event_notifier())
+            self.rpc_server = RPCPipeWrapper(
+                notify_callback=self.event_board.get_event_notifier())
         else:
             self.rpc_server = None
 
@@ -89,12 +93,14 @@ class Pipe:
             routine.initialize(message_handler=self.network.get_message_handler(routine.name),
                                event_notifier=self.event_board.get_event_notifier())
 
-        flow = Flow(flow_name, self.event_board, self.logger.getChild(flow_name), routines=list(routines))
+        flow = Flow(flow_name, self.event_board, self.logger.getChild(
+            flow_name), routines=list(routines))
         self.flows[flow_name] = flow
 
         if auto_wire:
             for first_routine, second_routine in zip(routines, routines[1:]):
-                wire = Wire(source=first_routine, destinations=(second_routine,), data_transmitter=data_transmitter)
+                wire = Wire(source=first_routine, destinations=(
+                    second_routine,), data_transmitter=data_transmitter)
                 self.wires[(wire.source.flow_name, wire.source.name)] = wire
 
     def link(self, *wires):
@@ -114,14 +120,27 @@ class Pipe:
         """
         self._validate_pipe()
 
+        # Dynamically assign routine extended_run function to the proper implementation
+        # based on connections provided by the user
+        # @@@@@@@!!Important!! @@@@@@@@@
+        # Do not place this code after flow creation because it is not possible
+        # to perform this action on different processes
+        runnerFactory = RunnerFactory()
+        for routine_type, routines in solve_graph(self.wires.values()).items():
+            for routine in routines:
+                routine._extended_run = runnerFactory.get_runner_for_type(
+                    routine_type, routine)
+
         for wire in self.wires.values():
             data_transmitter = wire.data_transmitter if wire.data_transmitter is not None else self.default_data_transmitter
-            self.network.link(source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
+            self.network.link(
+                source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
 
         for flow in self.flows.values():
             self.routines_dict = {self.logger.name: {}}
             flow.build()
-            self.routines_dict[self.logger.name][flow.name] = list(flow.routines.keys())
+            self.routines_dict[self.logger.name][flow.name] = list(
+                flow.routines.keys())
 
         if self.routine_synchroniser is not None:
             self.routine_synchroniser.wires = self.wires
@@ -143,7 +162,8 @@ class Pipe:
 
             """
 
-        self.event_board.notify_event(event_name, specific_flow_routines, **event_parameters)
+        self.event_board.notify_event(
+            event_name, specific_flow_routines, **event_parameters)
 
     def join(self, to_kill=False):
         """Block the execution until all of the flows have been killed
@@ -177,7 +197,6 @@ class Pipe:
         """
 
         flow_validator.validate_flow(self.flows, self.wires)
-        wires_validator.validate_wires(self.wires.values())
 
     def _send_initial_log(self):
         self.logger.handlers[0].log_event_name = "pipe_creation"
