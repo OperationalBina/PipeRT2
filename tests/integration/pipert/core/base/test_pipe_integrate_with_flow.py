@@ -49,8 +49,8 @@ def test_build_multiple_flows_should_create_flow_process(pipe_with_multiple_flow
     pipe_with_multiple_flows.build()
 
     for flow in pipe_with_multiple_flows.flows.values():
-        assert flow.flow_process is not None
-        os.kill(flow.flow_process.pid, signal.SIGTERM)
+        assert flow.event_loop_process is not None
+        os.kill(flow.event_loop_process.pid, signal.SIGTERM)
 
 
 def test_join_multiple_flows_should_join_processes(pipe_with_multiple_flows: Pipe, mocker: MockerFixture):
@@ -58,10 +58,7 @@ def test_join_multiple_flows_should_join_processes(pipe_with_multiple_flows: Pip
     flow_processes = []
 
     for flow in pipe_with_multiple_flows.flows.values():
-        flow.flow_process = mocker.MagicMock()
-        flow_processes.append(flow.flow_process)
+        flow.event_loop_process = mocker.MagicMock()
+        flow_processes.append(flow.event_loop_process)
 
     pipe_with_multiple_flows.join()
-
-    for flow_process in flow_processes:
-        flow_process.join.assert_called()

@@ -17,10 +17,10 @@ class QueueWrapper:
     """
 
     def __init__(self, max_queue_size=1):
-        self.mp_queue = None
+        self.mp_queue: mpQueue = None
         self.max_queue_size = max_queue_size
         self.out_queue = thQueue(maxsize=max_queue_size)
-        self.multiprocess_thread = Thread()
+        self.multiprocess_thread = Thread(target=self.queue_worker)
 
     def get(self, block: bool, timeout: int):
         """Return whatever is in the out_queue.
@@ -84,7 +84,7 @@ class QueueWrapper:
 
         for item in iter(self.mp_queue.get, None):
             try:
-                self.out_queue.put(item)
+                self.out_queue.put(item, block=True, timeout=1)
             except Full:
                 pass
 

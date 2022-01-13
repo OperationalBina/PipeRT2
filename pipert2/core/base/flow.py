@@ -1,17 +1,14 @@
 from typing import List
 from logging import Logger
-from multiprocessing import Process
-from pipert2.core.base.routine import Routine
-from pipert2.core.handlers import EventHandler
-from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.method_data import Method
+from pipert2.core.base.routine import Routine
+from pipert2.core.managers.event_board import EventBoard
+from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
-from pipert2.utils.dummy_object import Dummy
 
 
-class Flow(EventExecutorInterface):
+class Flow(BaseEventExecutor):
     """Flow is an entity designed for running a group of routines in a single process.
     It is also responsible to notify his routines when an event is triggered.
 
@@ -31,15 +28,11 @@ class Flow(EventExecutorInterface):
             routines (dict[str, Routine]): Dictionary mapping the routines to their name.
             name (str): Name of the flow.
             logger (Logger): Logger object for logging the flow actions.
-            event_handler (EventHandler): EventHandler object for communicating with the
-                event system of the pipe.
-
         """
 
+        super().__init__(event_board)
         self.routines = {}
         self.name = name
-        self._logger = logger
-        self.flow_process = Dummy()
 
         flow_events_to_listen = set(self.get_events().keys())
 
@@ -49,38 +42,7 @@ class Flow(EventExecutorInterface):
             flow_events_to_listen.update(routine.get_events().keys())
             self.routines[routine.name] = routine
 
-        self.event_handler: EventHandler = event_board.get_event_handler(flow_events_to_listen)
-
-    def build(self) -> None:
-        """Start the flow process.
-
-        """
-
-        self.flow_process = Process(target=self.run)
-        self.flow_process.start()
-
-    def run(self) -> None:
-        """The flow process, executing the pipe events that occur.
-
-        """
-
-        event: Method = self.event_handler.wait()
-        while event.event_name != KILL_EVENT_NAME:
-            self.execute_event(event)
-            event = self.event_handler.wait()
-
-        self.execute_event(Method(STOP_EVENT_NAME))
-
-        for routine in self.routines.values():
-            routine.join()
-
-    @events(START_EVENT_NAME)
-    def start(self):
-        self._logger.plog("Starting")
-
-    @events(STOP_EVENT_NAME)
-    def stop(self):
-        self._logger.plog("Stopping")
+        self.events_to_listen.update(flow_events_to_listen)
 
     def execute_event(self, event: Method) -> None:
         """Execute the event callbacks in the flow and its routines.
@@ -102,12 +64,13 @@ class Flow(EventExecutorInterface):
 
             EventExecutorInterface.execute_event(self, event)
 
-    def join(self) -> None:
-        """Block until the flow process terminates
+    def _after_join(self):
+        """Block until the flow process terminates.
 
         """
 
-        self.flow_process.join()
+        for routine in self.routines.values():
+            routine.join()
 
     @classmethod
     def get_events(cls):

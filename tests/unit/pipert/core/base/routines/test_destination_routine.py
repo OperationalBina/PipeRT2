@@ -1,13 +1,13 @@
-from functools import partial
-
 import pytest
+from functools import partial
 from pytest_mock import MockerFixture
 from pipert2.core.base.data import Data
 from pipert2.utils.dummy_object import Dummy
 from pipert2.utils.exceptions.main_logic_not_exist_error import MainLogicNotExistError
 from tests.unit.pipert.core.utils.dummy_data import DummyData
 from tests.unit.pipert.core.utils.functions_test_utils import message_generator, timeout_wrapper
-from tests.unit.pipert.core.utils.dummy_routines.dummy_destination_routine import DummyDestinationRoutine
+from tests.unit.pipert.core.utils.dummy_routines.dummy_destination_routine import DummyDestinationRoutine, \
+    DummyDestinationRoutineException
 
 MAX_TIMEOUT_WAITING = 3
 
@@ -57,3 +57,24 @@ def test_destination_routine_receive_unexpected_data_type_expects_error_log(mock
     assert did_not_timeout
 
     assert type(logger_mock.error.call_args[0][0]) == MainLogicNotExistError
+
+
+def test_routine_execution_catch_exception(mocker, dummy_routine):
+
+    dummy_routine = DummyDestinationRoutineException()
+    mock_message_handler = mocker.MagicMock()
+    dummy_routine.initialize(mock_message_handler, event_notifier=Dummy())
+
+    assert dummy_routine.stop_event.is_set()
+
+    dummy_routine.start()
+
+    assert not dummy_routine.stop_event.is_set()
+
+    dummy_routine.stop()
+
+    assert dummy_routine.stop_event.is_set()
+
+    message_handler = dummy_routine.message_handler
+
+    assert message_handler.put.call_count == 0

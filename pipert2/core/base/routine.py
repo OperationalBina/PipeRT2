@@ -1,18 +1,18 @@
 import threading
 import multiprocessing as mp
-from logging import Logger
 from typing import Callable
 from functools import partial
 from collections import defaultdict
 from abc import ABCMeta, abstractmethod
+from logging import Logger, LoggerAdapter
 from pipert2.core.base.data import Data
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.handlers.message_handler import MessageHandler
-from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 from pipert2.utils.exceptions.main_logic_not_exist_error import MainLogicNotExistError
 from pipert2.utils.annotations import class_functions_dictionary, main_logics_dictionary
+from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, LOG_DATA
 
 
 class Routine(EventExecutorInterface, metaclass=ABCMeta):
@@ -71,7 +71,6 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         self.message_handler = message_handler
         self.event_notifier = event_notifier
-
         self.message_handler.logger = self._logger
 
         if "runner" in kwargs and kwargs["runner"] in self.runners.all:
@@ -108,6 +107,21 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """
         raise NotImplementedError
 
+    @events(LOG_DATA)
+    def update_logger_formatter(self):
+        class CustomAdapter(LoggerAdapter):
+            def process(self, msg, kwargs):
+                # use my_context from kwargs or the default given on instantiation
+                data = kwargs.pop('data', self.extra['data'])
+                return f"{msg}, 'data': {data}", kwargs
+
+        if not self.message_handler.send_data:
+            self.message_handler.logger = CustomAdapter(self._logger, {'data': '1956'})
+        else:
+            self.message_handler.logger = self._logger
+
+        self.message_handler.send_data = not self.message_handler.send_data
+
     def setup(self) -> None:
         """An initial setup before running
         The user supposed to implement this method
@@ -140,9 +154,13 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.setup()
 
         while not self.stop_event.is_set():
-            self._extended_run()
+            self._run()
 
         self._base_cleanup()
+
+    @abstractmethod
+    def _run(self):
+        pass
 
     @runners("thread")
     def set_runner_as_thread(self):
@@ -196,7 +214,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
 
-        self.event_notifier(event_name, routines_by_flow,  **event_parameters)
+        self.event_notifier(event_name, routines_by_flow, **event_parameters)
 
     def join(self):
         """Block until all routine thread terminates
@@ -205,6 +223,9 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         if self.stop_event.is_set():
             self.runner.join()
+
+        for handler in self._logger.handlers:
+            handler.close()
 
     def _get_main_logic_callback(self, input_data_type=Data):
         try:

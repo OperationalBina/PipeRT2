@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
@@ -31,8 +32,12 @@ jobs:
         pip install numpy
         pip install mock
         pip install coverage
-        pip install posix-ipc
-        coverage run -m pytest
+        pip install python-socketio
+        pip install python-dotenv
+        pip install opencv-python
+        pip install zerorpc
+        coverage run --concurrency=multiprocessing -m pytest --timeout=15
+        coverage combine
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
       with:

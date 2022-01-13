@@ -2,7 +2,7 @@ import time
 import pytest
 from multiprocessing import Manager
 from pipert2.core.base.data import Data
-from pipert2 import Pipe, QueueNetwork, Wire
+from pipert2 import Wire, Pipe, QueueNetwork
 from tests.unit.pipert.core.utils.events_utils import START_EVENT
 from tests.end_to_end.utils.routines.user_input_source_routine import UserInputSourceRoutine
 from tests.end_to_end.utils.routines.data_assertion_destination_routine import DataAssertionDestinationRoutine
@@ -63,6 +63,7 @@ def multiple_flows_pipe_with_input_output_validations_routines(pipe_and_validati
 @pytest.mark.timeout(15)
 def test_pipe_start_flow_using_events_expecting_the_validation_routine_to_get_all_of_the_given_data(
         single_flow_pipe_with_input_output_validations_routines):
+
     pipe, input_routine, validation_routine = single_flow_pipe_with_input_output_validations_routines
     pipe.notify_event(START_EVENT.event_name)
 
@@ -80,6 +81,7 @@ def test_pipe_start_flow_using_events_expecting_the_validation_routine_to_get_al
 @pytest.mark.timeout(15)
 def test_pipe_start_multiple_flows_using_events_expecting_the_validation_routine_to_get_all_of_the_given_data(
         multiple_flows_pipe_with_input_output_validations_routines):
+
     pipe, input_routine, validation_routine = multiple_flows_pipe_with_input_output_validations_routines
     pipe.notify_event(START_EVENT.event_name)
 

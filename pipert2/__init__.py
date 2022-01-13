@@ -1,4 +1,4 @@
-__version__ = "2.1.2"
+__version__ = "2.1.3"
 
 try:
     from dataclasses import dataclass, field, fields
@@ -7,7 +7,7 @@ except ImportError:
 
 
 # User interaction classes
-from .core import Pipe, Wire
+from .core import Pipe, Wire, Data
 
 # Interfaces for user implementations
 from .core import SourceRoutine, MiddleRoutine, DestinationRoutine, Network, MessageHandler, DataTransmitter, Data
@@ -17,3 +17,6 @@ from .core import QueueNetwork, QueueHandler, SharedMemoryTransmitter, BasicTran
 
 # Event names.
 from .utils import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
+
+# Routine synchroniser consts.
+from .utils import ROUTINE_NOTIFY_DURATIONS_INTERVAL, FPS_MULTIPLIER

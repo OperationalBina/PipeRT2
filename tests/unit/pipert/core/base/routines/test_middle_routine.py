@@ -1,10 +1,13 @@
 import pytest
+from mock import MagicMock
+from collections import deque
 from functools import partial
+from pipert2 import MiddleRoutine
 from pytest_mock import MockerFixture
 from pipert2.core.base.data import Data
 from pipert2.utils.dummy_object import Dummy
-from pipert2.utils.exceptions.main_logic_not_exist_error import MainLogicNotExistError
 from tests.unit.pipert.core.utils.dummy_data import DummyData
+from pipert2.utils.exceptions.main_logic_not_exist_error import MainLogicNotExistError
 from tests.unit.pipert.core.utils.functions_test_utils import timeout_wrapper, message_generator
 from tests.unit.pipert.core.utils.dummy_routines.dummy_middle_routine import DummyMiddleRoutine, DUMMY_ROUTINE_EVENT, \
     DummyMiddleRoutineException
@@ -97,3 +100,35 @@ def test_middle_routine_receive_unexpected_data_type_expects_error_log(mocker: M
 
     assert did_not_timeout
     assert type(logger_mock.error.call_args[0][0]) == MainLogicNotExistError
+
+
+def test_run_main_logic_with_time_measurement_full_duration_queue(mocker: MockerFixture, dummy_routine: MiddleRoutine):
+
+    dummy_routine.durations = deque(maxlen=1)
+    dummy_routine.durations.append(1)
+
+    callback = mocker.MagicMock()
+
+    dummy_routine._run_main_logic_with_durations_updating(callback)
+
+
+def test_update_delay_time(dummy_routine: MiddleRoutine):
+
+    dummy_routine.fps_multiplier = 2
+
+    dummy_routine.update_delay_time(**{"fps": 10})
+
+    assert dummy_routine._fps == 20
+
+
+def test_join(dummy_routine: MiddleRoutine, mocker: MagicMock):
+
+    logger = mocker.MagicMock()
+    handler = mocker.MagicMock()
+    logger.handlers = [handler]
+
+    dummy_routine.set_logger(logger)
+
+    dummy_routine.join()
+
+    handler.close.assert_called()
