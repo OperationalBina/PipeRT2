@@ -20,6 +20,7 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Components](#components)
 - [Installation](#installation)
 - [Getting Started](#getting-started)
+- [Advanced](#advanced)
 - [The Events Mechanism](#the-events-mechanism)
 - [Custom Events](#custom-events)
 - [Running via RPC CLI](#running-via-rpc-cli)
@@ -129,6 +130,47 @@ For triggering an event for a specific flow or routine we add a dictionary of th
     ```Python
   example_pipe.notify_event(START_EVENT_NAME, {"example_flow": [generate_data_routine.name, print_result_routine.name]})  
   ```
+
+# Advanced
+## The Routine
+When inhereting the base routine class, there are 3 main functions to extend upon.
+
+The first:
+### main_logic
+The `main_logic` function acts as the core of the routine. Each routine *has* to implement this method in order for it to work.  
+The `main_logic` function can serve a few porpouses according to the routines need:
+```Python
+# The first type of main logic for a generator type routine
+def main_logic(self) -> Data:
+    # This main logic will return a new `Data` object without any input required.
+    # Usually this type of routine will be placed as a starting routine for the pipe/flow.
+
+    # This main logic must return data as its return clause.
+
+# The second type of main logic is for a 'computational' routine.
+def main_logic(self, data: Data) -> Data:
+    # This main logic will get input from a previous routine within the pipe, and send out new data.
+    # This type of routine will most likely be the core of your pipe, doing manipulations on your data or whatever you desire it to do!
+
+    # This main logic must return data as its return clause.
+
+# The third type of main logic is for a final routine.
+def main_logic(self, data: Data) -> None:
+    # This main logic will get input from a previous routine within the pipe, and do whatever you define it to do.
+    # This type of routine will usually be the finalizing process of your pipe, doing things such as: saving to a file, showing a resulting image, and so on.
+```
+
+The second:
+### setup
+The `setup` function of a routine happens right before the routine starts working.  
+The `setup` function should be used to set a starting state for your routine.  
+For example: opening a file, setting up a socket for a stream, resetting attributes of the routine, etc...  
+
+The third:
+### cleanup
+The `cleanup` function acts as the counterpart to the `setup`.  
+The `cleanup` function should be used to clean any resources left used by the routine.  
+For example: releasing a file reader, closing a socket, etc...  
 
 # The Events Mechanism
 Events within the pipe can change its behaviour in real time.
