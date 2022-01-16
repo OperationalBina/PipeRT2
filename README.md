@@ -165,7 +165,7 @@ In order to execute pipe events you need to execute `GET` http calls for `your_h
 
 - To pause the pipe, use route: `your_host:your_port/pause`
 
-- To kill the pipe, use route: `your_host:your_port/kill`
+- To kill the pipe and kill the API server, use route: `your_host:your_port/kill`
 
 - For start/stop specific flows, add it as dictionary to `specific_flows_routine` parameter in the url. 
 For example, use route: `your_host:your_port/execute?event_name=start/stopspecific_flows_routine={"flow_name": []}` 
