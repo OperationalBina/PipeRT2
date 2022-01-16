@@ -1,5 +1,6 @@
+from pipert2 import Pipe
 from zerorpc import Server
-from pipert2.core.base.wrappers.utils import parse_arguments
+from pipert2.core.wrappers.utils import parse_arguments
 from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 
 
@@ -8,14 +9,14 @@ class RPCPipeWrapper(Server):
 
     """
 
-    def __init__(self, notify_callback: callable):
+    def __init__(self, pipe: Pipe):
         """
             Args:
-                notify_callback: The callback for notifying event.
+                pipe: The pipe for notifying event.
 
         """
         super().__init__()
-        self.notify_callback = notify_callback
+        self.notify_callback = self.notify_callback = pipe.get_event_notify()
 
     def run_rpc_server(self, endpoint: str):
         """Binds it to a given endpoint and runs the rpc server.

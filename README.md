@@ -130,8 +130,8 @@ Firstly, you need to install the zerorpc python package via `pip3 install zerorp
 The next step is running the RPC Server:
 ```Python
 rpc_pipe = Pipe()
-endpoint = 'tcp://0.0.0.0:1234'
-rpc_pipe.run_rpc_server(endpoint=endpoint)
+rpc_server = RPCPipeWrapper(pipe)
+rpc_server.run_rpc_server(endpoint="<end_point>")
 ``` 
    
 You can easily connect to the RPC server via Python and CLI following the example in the [ZeroRPC's page](https://pypi.org/project/zerorpc/)
@@ -154,7 +154,9 @@ After creating a pipeline, you need to call run_api_wrapper with you host and po
 ```Python
 pipe = Pipe()
 ...
-pipe.run_api_wrapper(host=your_host, port=your_port)
+
+api_wrapper = APIWrapper(host="<host>", port=<port>, pipe=pipe)
+api_wrapper.run()
 ```
 
 In order to execute pipe events you need to execute `GET` http calls for `your_host:your_port` address.

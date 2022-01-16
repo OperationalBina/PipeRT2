@@ -4,13 +4,11 @@ from collections import defaultdict
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
-from pipert2.core.base.wrappers.api_wrapper import APIWrapper
 from pipert2.core.managers.network import Network
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
-from pipert2.core.base.wrappers.rpc_pipe_wrapper import RPCPipeWrapper
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
@@ -54,19 +52,13 @@ class Pipe:
         else:
             self.routine_synchroniser = None
 
-    def run_rpc_server(self, endpoint: str):
-        """Binds it to a given endpoint and runs the rpc server.
+    def get_event_notify(self) -> callable:
+        """Get callable for the event notify function.
 
-            Arguments:
-                endpoint: server's endpoint
+        Returns:
+            Callable for the event notify function.
         """
-
-        rpc_server = RPCPipeWrapper(notify_callback=self.event_board.get_event_notifier())
-        rpc_server.run_rpc_server(endpoint=endpoint)
-
-    def run_api_wrapper(self, host, port):
-        api_wrapper = APIWrapper(host, port, self.event_board.get_event_notifier())
-        api_wrapper.run_api()
+        return self.event_board.get_event_notifier()
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
