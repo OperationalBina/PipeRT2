@@ -19,7 +19,7 @@ class Method:
         if params is None:
             self.params = {}
         else:
-            self.params = {}
+            self.params = params
 
     def is_applied_on_flow(self, flow_name_to_validate: str):
         """Check if current method apply on the given flow.

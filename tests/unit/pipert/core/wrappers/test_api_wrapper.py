@@ -2,7 +2,7 @@ import mock
 import pytest
 from pytest_mock import MockerFixture
 from werkzeug.datastructures import MultiDict
-from pipert2.core.wrappers import APIWrapper
+from pipert2.core.wrappers.api_wrapper import APIWrapper
 from pipert2 import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME, Pipe
 
 
@@ -17,10 +17,10 @@ def api_wrapper_with_mock_notify(mocker: MockerFixture):
     return api_wrapper
 
 
-def test_run_api(api_wrapper_with_mock_notify, mocker: MockerFixture):
+def test_run(api_wrapper_with_mock_notify, mocker: MockerFixture):
 
     api_wrapper_with_mock_notify.api_process = mocker.MagicMock()
-    api_wrapper_with_mock_notify.run_api()
+    api_wrapper_with_mock_notify.run()
 
     api_wrapper_with_mock_notify.api_process.start.assert_called_once()
 
