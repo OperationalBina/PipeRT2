@@ -21,6 +21,7 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Running via RPC CLI](#running-via-rpc-cli)
+- [FAQ](#faq)
 - [Contributing](#contributing)
 
 # Requirements
@@ -150,8 +151,31 @@ Arguments to pipe events are passed in a JSON format:
 - for example via CLI:\
     `zerorpc tcp://0.0.0.0:1234 execute start`\
     `zerorpc tcp://0.0.0.0:1234 execute join '{"to_kill":true}'`
- 
+
+
+# FAQ 
     
+    Q: What will happen when returning nothing from main logic?
+    A: Not returning anything from a function will return None.
+       We detect when None is returned and just ignore it.
+       So in short, you will not send anything to the next routine in line.
+.
+    
+    Q: What happens if exception is raised within the Pipe (main_logic, setup, cleanup)?
+    A: setup and cleanup methods - The routine Thread will crash.
+                                   It will cause the routine to stop working untill you 
+                                   stop and start again.
+
+       main_logic method - The crash will notify the user with the routine’s logger.
+                           The crash won’t effect the routine’s execution because it will just 
+                           take the next data inline from the message handler and will 
+                           execute the main logic on it.
+.
+    
+    Q: Why and how to use data transmitters?
+    A: The user can decide to not transport the data of a message through the message broker 
+       and decide on an other way for example via Shared memory or local file system.
+
 # Contributing
 
 For contributing please contact with [San-Moshe](https://github.com/San-Moshe) for accessing our Jira. 
