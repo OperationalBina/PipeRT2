@@ -1,18 +1,25 @@
+import json
 from typing import Dict
 from logging import Logger
 from collections import defaultdict
+
+from pipert2.utils.annotations import class_functions_dictionary
+
+from pipert2.core.base.routines import SourceRoutine, DestinationRoutine
+
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
 from pipert2.core.managers.event_board import EventBoard
-from pipert2.utils.consts.event_names import KILL_EVENT_NAME
+from pipert2.utils.consts.event_names import KILL_EVENT_NAME, INTERNAL_EVENT_NAMES
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
-from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
+from pipert2.utils.consts.socket_names import CREATION_LOG_NAME, LOG_NAME
+from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger, get_socket_logger
 
 add_pipe_log_level()
 
@@ -168,6 +175,22 @@ class Pipe:
         wires_validator.validate_wires(self.wires.values())
 
     def _send_initial_log(self):
-        self.logger.handlers[0].log_event_name = "pipe_creation"
-        self.logger.info("{" + f"'Pipe structure': {self.routines_dict}" + "}")
-        self.logger.handlers[0].log_event_name = "log"
+        events = []
+
+        for flow in self.flows.values():
+            for routine in flow.routines.values():
+                events += routine.get_events().keys()
+
+        events_without_duplications = set(events)
+        events_without_internal_events = events_without_duplications.difference(INTERNAL_EVENT_NAMES)
+
+        creation_log = {
+            'Pipe structure': self.routines_dict,
+            'Events': list(events_without_internal_events)
+        }
+
+        self.logger.handlers[0].log_event_name = CREATION_LOG_NAME
+        self.logger.info(creation_log)
+
+        # After sending the pipe creation log, the other logs will emit on topic 'log'
+        self.logger.handlers[0].log_event_name = LOG_NAME
