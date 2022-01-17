@@ -150,7 +150,7 @@ Arguments to pipe events are passed in a JSON format:
 
 # Running via API
 
-After creating a pipeline, you need to call run_api_wrapper with you host and port:
+After creating a pipeline, you need to call run_api_wrapper with your host and port:
 ```Python
 pipe = Pipe()
 ...
@@ -168,7 +168,7 @@ In order to execute pipe events you need to execute `GET` http calls for `your_h
 - To kill the pipe and kill the API server, use route: `your_host:your_port/kill`
 
 - For start/stop specific flows, add it as dictionary to `specific_flows_routine` parameter in the url. 
-For example, use route: `your_host:your_port/execute?event_name=start/stopspecific_flows_routine={"flow_name": []}` 
+For example, use route: `your_host:your_port/execute?event_name=start/stop&specific_flows_routine={"flow_name": []}` 
 
 For custom requests:
 

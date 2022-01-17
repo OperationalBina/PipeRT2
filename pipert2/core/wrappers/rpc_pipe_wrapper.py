@@ -12,11 +12,11 @@ class RPCPipeWrapper(Server):
     def __init__(self, pipe: Pipe):
         """
             Args:
-                pipe: The pipe for notifying event.
+                pipe: The pipe that the event will notify through it.
 
         """
         super().__init__()
-        self.notify_callback = self.notify_callback = pipe.get_event_notify()
+        self.notify_callback = pipe.get_event_notify()
 
     def run_rpc_server(self, endpoint: str):
         """Binds it to a given endpoint and runs the rpc server.

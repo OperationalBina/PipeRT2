@@ -1,8 +1,7 @@
-import time
-
+import json
 import flask
-from flask import Flask, request
-from pipert2 import Pipe, SourceRoutine, Data, DestinationRoutine
+from flask import Flask
+from pipert2 import Pipe
 from flask import Response
 from multiprocessing import Process
 from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
@@ -79,6 +78,11 @@ class APIWrapper:
 
         """
 
-        self.notify_callback(**flask.request.args.to_dict())
+        args = flask.request.args.to_dict()
+
+        if args.get("specific_flow_routines") is not None:
+            args["specific_flow_routines"] = json.loads(args.get("specific_flow_routines"))
+
+        self.notify_callback(**args)
 
         return Response(status=200)
