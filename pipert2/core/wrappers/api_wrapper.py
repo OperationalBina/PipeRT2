@@ -1,3 +1,4 @@
+import json
 import flask
 from flask import Flask
 from pipert2 import Pipe
@@ -77,6 +78,11 @@ class APIWrapper:
 
         """
 
-        self.notify_callback(**flask.request.args.to_dict())
+        args = flask.request.args.to_dict()
+
+        if args.get("specific_flow_routines") is not None:
+            args["specific_flow_routines"] = json.loads(args.get("specific_flow_routines"))
+
+        self.notify_callback(**args)
 
         return Response(status=200)

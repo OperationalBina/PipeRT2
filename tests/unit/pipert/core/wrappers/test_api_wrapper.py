@@ -80,7 +80,7 @@ def test_execute_with_kwargs_and_specific_flow_routines(api_wrapper_with_mock_no
     args = MultiDict()
     args.add("event_name", "test")
     args.add("external_params", "param")
-    args.add("specific_flow_routines", {"a1": ["a2, a3"]})
+    args.add("specific_flow_routines", "{\"a1\": [\"a2, a3\"]}")
 
     request_mock.args = args
 
