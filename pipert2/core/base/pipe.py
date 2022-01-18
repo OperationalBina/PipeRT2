@@ -9,7 +9,7 @@ from pipert2.core.managers.event_board import EventBoard
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
-from pipert2.utils.consts.socket_names import CREATION_LOG_NAME, LOG_NAME
+from pipert2.utils.consts.emit_socket_names import CREATION_LOG_NAME, LOG_NAME
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME, INTERNAL_EVENT_NAMES
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
