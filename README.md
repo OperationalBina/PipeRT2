@@ -139,6 +139,7 @@ When inhereting the base routine class, there are 3 main functions to extend upo
 The first:
 ### main_logic
 The `main_logic` function acts as the core of the routine. Each routine *has* to implement this method in order for it to work.  
+The `main_logic` function occurs each time new data is being received from another routine. A routine that generates data will have its `main_logic` executed whenever possible.  
 The `main_logic` function can serve a few porpouses according to the routines need:
 ```Python
 # The first type of main logic for a generator type routine
@@ -235,7 +236,7 @@ print_result_routine = PrintResult()
 example_pipe.create_flow("example_flow", True, some_routine, print_result_routine)
 
 # Notify the custom event
-example_pipe.notify_event("CUSTOM_EVENT_NAME", "example_flow": ["some_routine"])
+example_pipe.notify_event("CUSTOM_EVENT_NAME", {"example_flow": ["some_routine"]}, example_param1="some_value1", example_param2="some_value2"...)
 
 # Start the pipe
 example_pipe.notify_event(START_EVENT_NAME)
