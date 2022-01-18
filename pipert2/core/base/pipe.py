@@ -9,7 +9,6 @@ from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
-from pipert2.core.base.wrappers.rpc_pipe_wrapper import RPCPipeWrapper
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
@@ -28,8 +27,7 @@ class Pipe:
 
     def __init__(self, event_board: EventBoard = EventBoard(), network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
-                 data_transmitter: DataTransmitter = BasicTransmitter(), auto_pacing_mechanism: bool = False,
-                 run_rpc_cli: bool = False):
+                 data_transmitter: DataTransmitter = BasicTransmitter(), auto_pacing_mechanism: bool = False):
         """
         Args:
             event_board (EventBoard): The EventBoard of the pipe.
@@ -37,7 +35,6 @@ class Pipe:
             logger: Logger object for logging the pipe actions.
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             auto_pacing_mechanism: True if the user want to use auto pacing mechanism.
-            run_rpc_cli: True if the user want to use RPC command line interface.
         """
         self.event_board = event_board
         self.network = network
@@ -46,14 +43,8 @@ class Pipe:
         self.routines_dict = {}
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
-        self.run_rpc_cli = run_rpc_cli
         self.flows = {}
         self.wires: Dict[tuple, Wire] = {}
-
-        if self.run_rpc_cli:
-            self.rpc_server = RPCPipeWrapper(notify_callback=self.event_board.get_event_notifier())
-        else:
-            self.rpc_server = None
 
         if auto_pacing_mechanism:
             self.routine_synchroniser = RoutinesSynchroniser(event_board=self.event_board,
@@ -61,16 +52,13 @@ class Pipe:
         else:
             self.routine_synchroniser = None
 
-    def run_rpc_server(self, endpoint: str):
-        """Binds it to a given endpoint and runs the rpc server.
+    def get_event_notify(self) -> callable:
+        """Get callable for the event notify function.
 
-            Arguments:
-                endpoint: server's endpoint
+        Returns:
+            Callable for the event notify function.
         """
-        if self.rpc_server is None:
-            raise TypeError
-
-        self.rpc_server.run_rpc_server(endpoint=endpoint)
+        return self.event_board.get_event_notifier()
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):

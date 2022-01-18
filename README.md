@@ -126,16 +126,12 @@ For triggering an event for a specific flow or routine we add a dictionary of th
 # Running via RPC CLI
 
 Firstly, you need to install the zerorpc python package via `pip3 install zerorpc`
-    
-Then, you need to add a flag in the Pipe object creation:
-```Python
-rpc_pipe = Pipe(run_rpc_cli=True)
-```
-   
+
 The next step is running the RPC Server:
 ```Python
-endpoint = 'tcp://0.0.0.0:1234'
-rpc_pipe.run_rpc_server(endpoint=endpoint)
+rpc_pipe = Pipe()
+rpc_server = RPCPipeWrapper(pipe)
+rpc_server.run_rpc_server(endpoint="<end_point>")
 ``` 
    
 You can easily connect to the RPC server via Python and CLI following the example in the [ZeroRPC's page](https://pypi.org/project/zerorpc/)
@@ -151,7 +147,39 @@ Arguments to pipe events are passed in a JSON format:
     `zerorpc tcp://0.0.0.0:1234 execute start`\
     `zerorpc tcp://0.0.0.0:1234 execute join '{"to_kill":true}'`
  
-    
+
+# Running via API
+
+After creating a pipeline, you need to call run_api_wrapper with your host and port:
+```Python
+pipe = Pipe()
+...
+
+api_wrapper = APIWrapper(host="<host>", port=<port>, pipe=pipe)
+api_wrapper.run()
+```
+
+In order to execute pipe events you need to execute `GET` http calls for `your_host:your_port` address.
+
+- To start the pipe, use route: `your_host:your_port/start`
+
+- To pause the pipe, use route: `your_host:your_port/pause`
+
+- To kill the pipe and kill the API server, use route: `your_host:your_port/kill`
+
+- For start/stop specific flows, add it as dictionary to `specific_flows_routine` parameter in the url. 
+For example, use route: `your_host:your_port/execute?event_name=start/stop&specific_flows_routine={"flow_name": []}` 
+
+For custom requests:
+
+- To call custom event use execute route and add `event_name` parameter in the url: `url/execute?event_name=custom_event_name`
+
+- To call a specific flows use execute route and add `specific_flows_routine` parameters in the url: `url/execute?event_name=custom_event_name&specific_flow_routines={"flow_name": [], ...}`
+
+- To call specific routines in flows use execute route and add `specific_flows_routine` parameters in the url: `url/execute?event_name=custom_event_name&specific_flow_routines={"flow_name": ["r1", "r2", ...], ...}`
+
+- To add external parameters use execute route and add them to the url: `url/execute?event_name=custom_event_name&param1=0&param2=0&...`
+
 # Contributing
 
 For contributing please contact with [San-Moshe](https://github.com/San-Moshe) for accessing our Jira. 

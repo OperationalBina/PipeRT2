@@ -11,10 +11,8 @@ class Method:
 
     def is_applied_on_flow(self, flow_name_to_validate: str):
         """Check if current method apply on the given flow.
-
         Args:
             flow_name_to_validate: The flow name to validate.
-
         Returns:
             True if flow can run, false otherwise.
         """
@@ -26,10 +24,8 @@ class Method:
 
     def is_applied_on_specific_routines(self, flow_name_to_validate: str):
         """Check if current method applies on specific routines.
-
         Args:
             flow_name_to_validate: The flow name to validate.
-
         Returns:
             True if method applies on specific routines, false otherwise.
         """
