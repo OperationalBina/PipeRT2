@@ -81,7 +81,7 @@ class APIWrapper:
 
         params = flask.request.json
         specific_flow_routines = params.get("specific_flow_routines", None)
-        extra_args = params.get("args", {})
+        extra_args = params.get("extra_args", {})
 
         self.notify_callback(event_name, specific_flow_routines, **extra_args)
 
