@@ -15,7 +15,7 @@ class Src(SourceRoutine):
         print(f"Hello in {self.name}")
 
     @events("Param")
-    def hello(self, param):
+    def param(self, param):
         print(f"Param in {self.name}: {param}")
 
 
@@ -30,11 +30,11 @@ class Dst(DestinationRoutine):
         print(f"Hello in {self.name}")
 
     @events("Param")
-    def hello(self, param):
+    def param(self, param):
         print(f"Param in {self.name}: {param}")
 
     @events("Dst only")
-    def hello(self, param):
+    def dst(self, param):
         print(f"Dst in {self.name}: {param}")
 
 
