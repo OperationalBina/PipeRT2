@@ -37,6 +37,7 @@ jobs:
         pip install opencv-python
         pip install zerorpc
         pip install Flask
+        pip install Flask-Cors
         coverage run --concurrency=multiprocessing -m pytest --timeout=15
         coverage combine
     - name: Upload Coverage to Codecov
