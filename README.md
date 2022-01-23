@@ -25,6 +25,8 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Custom Events](#custom-events)
 - [Using The Cockpit](#using-the-cockpit)
 - [Running via RPC CLI](#running-via-rpc-cli)
+- [Running via API](#running-via-api)
+- [FAQ](#faq)
 - [Contributing](#contributing)
 
 # Requirements
@@ -316,6 +318,31 @@ For custom requests:
 - To call specific routines in flows use execute route and add `specific_flows_routine` parameters in the url: `url/execute?event_name=custom_event_name&specific_flow_routines={"flow_name": ["r1", "r2", ...], ...}`
 
 - To add external parameters use execute route and add them to the url: `url/execute?event_name=custom_event_name&param1=0&param2=0&...`
+
+
+# FAQ 
+    
+    Q: What will happen when nothing is returned from the main logic?
+    A: Not returning anything from a function will return None.
+       We detect when None is returned and just ignore it.
+       So in short, you will not send anything to the next routine in line.
+.
+    
+    Q: What happens if an exception is raised within the Pipe (main_logic, setup, cleanup)?
+    A: setup and cleanup methods - The routine Thread will crash.
+                                   It will cause the routine to stop working untill you 
+                                   stop and start again.
+
+       main_logic method - The crash will notify the user with the routine’s logger.
+                           The crash won’t effect the routine’s execution because it will just 
+                           take the next data inline from the message handler and will 
+                           execute the main logic on it.
+.
+    
+    Q: Why and how to use data transmitters?
+    A: The user can decide to not transport the data of a message through the message broker 
+       and choose different approach, for example via Shared memory or local file system.
+
 
 # Contributing
 
