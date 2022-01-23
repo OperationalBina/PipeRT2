@@ -174,7 +174,7 @@ Arguments to pipe events are passed in a JSON format:
     
     Q: Why and how to use data transmitters?
     A: The user can decide to not transport the data of a message through the message broker 
-       and decide on an other way for example via Shared memory or local file system.
+       and choose different approach, for example via Shared memory or local file system.
 
 # Contributing
 
