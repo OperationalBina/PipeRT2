@@ -166,19 +166,21 @@ class Pipe:
         wires_validator.validate_wires(self.wires.values())
 
     def _send_initial_log(self):
+        flows_routines = []
+
         for flow in self.flows.values():
             for routine_name in flow.routines.keys():
                 events = set(flow.routines.get(routine_name).get_events().keys())
                 events_without_internal_events = events.difference(INTERNAL_EVENT_NAMES)
 
-                self.flows_routines.append({
+                flows_routines.append({
                     "flow_name": flow.name,
                     "routine_name": routine_name,
                     "events": list(events_without_internal_events)
                 })
 
         creation_log = {
-            'Routines': self.flows_routines,
+            'Routines': flows_routines,
             'Events': [START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME]
         }
 
