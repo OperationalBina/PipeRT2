@@ -41,7 +41,6 @@ class Pipe:
         self.network = network
         self.logger = logger
         self.flows = {}
-        self.flows_routines = []
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
         self.flows = {}

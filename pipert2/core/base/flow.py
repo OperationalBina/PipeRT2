@@ -53,10 +53,8 @@ class Flow(BaseEventExecutor):
         """
 
         if event.specific_routine is not None:
-            required_routine = self.routines.get(event.specific_routine)
-
-            if required_routine is not None:
-                required_routine.execute_event(event)
+            if self.routines.get(event.specific_routine) is not None:
+                self.routines.get(event.specific_routine).execute_event(event)
         else:
             if event.is_applied_on_flow(self.name):
                 if event.is_applied_on_specific_routines(self.name):
