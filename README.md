@@ -161,7 +161,7 @@ Arguments to pipe events are passed in a JSON format:
        So in short, you will not send anything to the next routine in line.
 .
     
-    Q: What happens if exception is raised within the Pipe (main_logic, setup, cleanup)?
+    Q: What happens if an exception is raised within the Pipe (main_logic, setup, cleanup)?
     A: setup and cleanup methods - The routine Thread will crash.
                                    It will cause the routine to stop working untill you 
                                    stop and start again.
