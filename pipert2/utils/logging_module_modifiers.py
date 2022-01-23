@@ -2,7 +2,6 @@ import os
 import sys
 import logging
 from dotenv import load_dotenv
-
 from pipert2.utils.consts.emit_socket_names import LOG_NAME
 from pipert2.utils.socketio_logger.socket_logger import SocketLogger
 from pipert2.utils.socketio_logger.socket_handler import SocketHandler
