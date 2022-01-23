@@ -9,8 +9,8 @@ from pipert2.core.managers.event_board import EventBoard
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
-from pipert2.utils.consts.emit_socket_names import CREATION_LOG_NAME, LOG_NAME
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
+from pipert2.utils.consts.emit_socket_names import CREATION_LOG_NAME, LOG_NAME
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME, INTERNAL_EVENT_NAMES
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
@@ -41,7 +41,7 @@ class Pipe:
         self.network = network
         self.logger = logger
         self.flows = {}
-        self.routines_dict = {}
+        self.flows_routines = []
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
         self.flows = {}
@@ -108,9 +108,13 @@ class Pipe:
             self.network.link(source=wire.source, destinations=wire.destinations, data_transmitter=data_transmitter)
 
         for flow in self.flows.values():
-            self.routines_dict = {self.logger.name: {}}
             flow.build()
-            self.routines_dict[self.logger.name][flow.name] = list(flow.routines.keys())
+
+            for routine_name in flow.routines.keys():
+                self.flows_routines.append({
+                    "flow_name": flow.name,
+                    "routine_name": routine_name
+                })
 
         if self.routine_synchroniser is not None:
             self.routine_synchroniser.wires = self.wires
@@ -179,7 +183,7 @@ class Pipe:
         events_without_internal_events = events_without_duplications.difference(INTERNAL_EVENT_NAMES)
 
         creation_log = {
-            'Pipe structure': self.routines_dict,
+            'Routines': self.flows_routines,
             'Events': list(events_without_internal_events)
         }
 

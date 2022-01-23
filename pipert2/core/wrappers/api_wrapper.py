@@ -1,8 +1,8 @@
 import flask
 from flask import Flask
-from pipert2 import Pipe
 from flask import Response
 from flask_cors import CORS
+from pipert2.core.base import Pipe
 from multiprocessing import Process
 from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 
@@ -23,7 +23,17 @@ class APIWrapper:
         self.app.add_url_rule("/start", "start", self.start, methods=['POST'])
         self.app.add_url_rule("/pause", "pause", self.pause, methods=['POST'])
         self.app.add_url_rule("/kill", "kill", self.kill, methods=['POST'])
-        self.app.add_url_rule("/execute/<event_name>", "execute", self.execute, methods=['POST'])
+
+        self.app.add_url_rule("/routines/<routine_name>/events/<event_name>/execute/",
+                              "routine_execute",
+                              self.routine_execute,
+                              methods=['POST'])
+
+        self.app.add_url_rule("/routines/events/<event_name>/execute/",
+                              "routines_execute",
+                              self.routines_execute,
+                              methods=['POST'])
+
         self.api_process = Process(target=self.app.run, args=(host, port))
 
         CORS(self.app)
@@ -71,7 +81,7 @@ class APIWrapper:
 
         return Response(status=200)
 
-    def execute(self, event_name):
+    def routine_execute(self, routine_name, event_name):
         """Execute custom event. Should get request with 'event_name' and with optional keys parameters.
 
         Returns:
@@ -80,9 +90,23 @@ class APIWrapper:
         """
 
         params = flask.request.json
-        specific_flow_routines = params.get("specific_flow_routines", None)
         extra_args = params.get("extra_args", {})
 
-        self.notify_callback(event_name, specific_flow_routines, **extra_args)
+        self.notify_callback(event_name, specific_routine=routine_name, **extra_args)
+
+        return Response(status=200)
+
+    def routines_execute(self, event_name):
+        """Execute custom event. Should get request with 'event_name' and with optional keys parameters.
+
+        Returns:
+            Status 200 when succeed.
+
+        """
+
+        params = flask.request.json
+        extra_args = params.get("extra_args", {})
+
+        self.notify_callback(event_name, **extra_args)
 
         return Response(status=200)

@@ -138,10 +138,10 @@ You can easily connect to the RPC server via Python and CLI following the exampl
 
 In order to execute pipe events you need to run the `execute` function of the server.
 Arguments to pipe events are passed in a JSON format:
-- for example via python: 
+- for example via python:
     ```Python
-    client.execute('start') # no arguments example
-    client.execute('join', '{"to_kill":true}') # including arguments example
+    client.routine_execute('start') # no arguments example
+    client.routine_execute('join', '{"to_kill":true}') # including arguments example
     ```
 - for example via CLI:\
     `zerorpc tcp://0.0.0.0:1234 execute start`\
