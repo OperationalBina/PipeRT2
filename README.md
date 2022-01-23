@@ -155,7 +155,7 @@ Arguments to pipe events are passed in a JSON format:
 
 # FAQ 
     
-    Q: What will happen when returning nothing from main logic?
+    Q: What will happen when nothing is returned from the main logic?
     A: Not returning anything from a function will return None.
        We detect when None is returned and just ignore it.
        So in short, you will not send anything to the next routine in line.
