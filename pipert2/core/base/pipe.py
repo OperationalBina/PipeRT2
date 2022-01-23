@@ -11,7 +11,7 @@ from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.utils.consts.emit_socket_names import CREATION_LOG_NAME, LOG_NAME
-from pipert2.utils.consts.event_names import KILL_EVENT_NAME, INTERNAL_EVENT_NAMES
+from pipert2.utils.consts.event_names import KILL_EVENT_NAME, INTERNAL_EVENT_NAMES, STOP_EVENT_NAME, START_EVENT_NAME
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 
@@ -110,12 +110,6 @@ class Pipe:
         for flow in self.flows.values():
             flow.build()
 
-            for routine_name in flow.routines.keys():
-                self.flows_routines.append({
-                    "flow_name": flow.name,
-                    "routine_name": routine_name
-                })
-
         if self.routine_synchroniser is not None:
             self.routine_synchroniser.wires = self.wires
             self.routine_synchroniser.build()
@@ -173,18 +167,20 @@ class Pipe:
         wires_validator.validate_wires(self.wires.values())
 
     def _send_initial_log(self):
-        events = []
-
         for flow in self.flows.values():
-            for routine in flow.routines.values():
-                events += routine.get_events().keys()
+            for routine_name in flow.routines.keys():
+                events = set(flow.routines.get(routine_name).get_events().keys())
+                events_without_internal_events = events.difference(INTERNAL_EVENT_NAMES)
 
-        events_without_duplications = set(events)
-        events_without_internal_events = events_without_duplications.difference(INTERNAL_EVENT_NAMES)
+                self.flows_routines.append({
+                    "flow_name": flow.name,
+                    "routine_name": routine_name,
+                    "events": list(events_without_internal_events)
+                })
 
         creation_log = {
             'Routines': self.flows_routines,
-            'Events': list(events_without_internal_events)
+            'Events': [START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME]
         }
 
         self.logger.handlers[0].log_event_name = CREATION_LOG_NAME
