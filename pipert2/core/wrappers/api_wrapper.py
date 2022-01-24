@@ -90,7 +90,11 @@ class APIWrapper:
         """
 
         params = flask.request.json
-        extra_args = params.get("extra_args", {})
+
+        if params is not None:
+            extra_args = params.get("extra_args", {})
+        else:
+            extra_args = {}
 
         self.notify_callback(event_name, specific_routine=routine_name, **extra_args)
 
