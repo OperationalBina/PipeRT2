@@ -1,9 +1,9 @@
+import os
 import time
 import cv2
 import numpy as np
 from pipert2.core.base.data import FrameData
 from pipert2.core.wrappers.api_wrapper import APIWrapper
-from pipert2.utils.consts import LOG_DATA
 from pipert2.utils.logging_module_modifiers import get_socket_logger
 from pipert2 import SourceRoutine, Data, MiddleRoutine, DestinationRoutine, Pipe, START_EVENT_NAME
 
@@ -57,7 +57,9 @@ class Dst(DestinationRoutine):
         print("Get to destination")
 
 
-src = Src(name="SRC", video_path="/home/bina3/seg_2/Record_2020_09_10_11_37_24_short3.mp4")
+video_path = os.environ.get("VIDEO_PATH")
+
+src = Src(name="SRC", video_path=video_path)
 mid = Mid(name="MID")
 dst = Dst(name="DST")
 
