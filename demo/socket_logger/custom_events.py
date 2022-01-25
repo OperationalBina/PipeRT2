@@ -12,11 +12,11 @@ class Src(SourceRoutine):
 
     @events("Hello")
     def hello(self):
-        print(f"Hello in {self.name}")
+        self._logger.info(f"Get to hello in {self.name}")
 
     @events("Param")
     def param(self, param):
-        print(f"Param in {self.name}: {param}")
+        self._logger.info(f"Param in {self.name}: {param}")
 
 
 class Dst(DestinationRoutine):
@@ -27,15 +27,15 @@ class Dst(DestinationRoutine):
 
     @events("Hello")
     def hello(self):
-        print(f"Hello in {self.name}")
+        self._logger.info(f"Get to hello in {self.name}")
 
     @events("Param")
     def param(self, param):
-        print(f"Param in {self.name}: {param}")
+        self._logger.info(f"Param in {self.name}: {param}")
 
     @events("Dst only")
     def dst(self, param):
-        print(f"Dst in {self.name}: {param}")
+        self._logger.info(f"Dst in {self.name}: {param}")
 
 
 src = Src(name="SRC")
@@ -44,8 +44,6 @@ dst = Dst(name="DST")
 pipe = Pipe(logger=get_socket_logger("socket", 5))
 pipe.create_flow("Flow", True, src, dst)
 pipe.build()
-
-pipe.notify_event("Hello")
 
 api_wrapper = APIWrapper("localhost", 4000, pipe)
 api_wrapper.run()

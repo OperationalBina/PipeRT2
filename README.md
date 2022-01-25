@@ -322,12 +322,7 @@ In order to execute pipe events you need to execute `GET` http calls for `your_h
     "param1": value, "param2": value
   } 
 }
-  
-- To call specific routines in flows use execute route and add `specific_flows_routine` parameters in the url: `url/execute?event_name=custom_event_name&specific_flow_routines={"flow_name": ["r1", "r2", ...], ...}`
-
-- To add external parameters use execute route and add them to the url: `url/execute?event_name=custom_event_name&param1=0&param2=0&...`
-
-
+```
 # FAQ 
     
     Q: What will happen when nothing is returned from the main logic?

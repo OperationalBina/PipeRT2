@@ -54,7 +54,7 @@ class Mid(MiddleRoutine):
 
 class Dst(DestinationRoutine):
     def main_logic(self, data: Data) -> None:
-        print("Get to destination")
+        self._logger.info("Get to destination")
 
 
 video_path = os.environ.get("VIDEO_PATH")
@@ -69,6 +69,3 @@ pipe.build()
 
 api_wrapper = APIWrapper("localhost", 4000, pipe)
 api_wrapper.run()
-
-time.sleep(5)
-pipe.notify_event(START_EVENT_NAME)
