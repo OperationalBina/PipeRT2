@@ -311,7 +311,7 @@ In order to execute pipe events you need to execute `GET` http calls for `your_h
    - Stop: `<your_host>:<your_port>/routines/<routine_name>/events/<stop>/execute` 
 
 
-- For custom events for all routines, use route: `<your_host>:<your_port>/routines/events/<event_name>/execute` 
+- To trigger a custom event for all of the routines, use route:`<your_host>:<your_port>/routines/events/<event_name>/execute` 
 
 - For start/stop specific routines, use route: `<your_host>:<your_port>/routines/<routine_name>/events/<custom_event>/execute` 
 
