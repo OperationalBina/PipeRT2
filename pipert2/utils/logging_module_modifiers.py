@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 from dotenv import load_dotenv
+from pipert2.utils.consts.emit_socket_names import LOG_NAME
 from pipert2.utils.socketio_logger.socket_logger import SocketLogger
 from pipert2.utils.socketio_logger.socket_handler import SocketHandler
 
@@ -54,7 +55,7 @@ def get_socket_logger(logger_name, level):
     logger: SocketLogger = logging.getLogger(logger_name)
 
     logger.set_url(os.getenv("SOCKET_LOGGER_URL"))
-    logger.set_log_event_name(os.getenv("LOG_EVENT_NAME", "log"))
+    logger.set_log_event_name(LOG_NAME)
     logger.propagate = False
     logger.setLevel(level)
 

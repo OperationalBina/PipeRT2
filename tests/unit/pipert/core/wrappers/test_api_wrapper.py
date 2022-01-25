@@ -44,48 +44,48 @@ def test_kill(api_wrapper_with_mock_notify, mocker):
         api_wrapper_with_mock_notify.notify_callback.assert_called_with(KILL_EVENT_NAME)
 
 
-def test_execute_without_kwargs(api_wrapper_with_mock_notify, mocker: MockerFixture):
+def test_routine_execute_without_kwargs(api_wrapper_with_mock_notify, mocker: MockerFixture):
 
     request_mock = mocker.MagicMock()
-
-    args = MultiDict()
-    args.add("event_name", "test")
-
-    request_mock.args = args
+    request_mock.json = {}
 
     with mock.patch("flask.request", request_mock):
-        api_wrapper_with_mock_notify.execute()
-        api_wrapper_with_mock_notify.notify_callback.assert_called_with(event_name="test")
+        api_wrapper_with_mock_notify.routine_execute("test_routine", "test")
+        api_wrapper_with_mock_notify.notify_callback.assert_called_with("test", specific_routine="test_routine")
 
 
-def test_execute_with_kwargs(api_wrapper_with_mock_notify, mocker: MockerFixture):
-
+def test_routine_execute_with_kwargs(api_wrapper_with_mock_notify, mocker: MockerFixture):
     request_mock = mocker.MagicMock()
-
-    args = MultiDict()
-    args.add("event_name", "test")
-    args.add("external_params", "param")
-
-    request_mock.args = args
+    request_mock.json = {"extra_args": {
+        "param": "test"
+    }}
 
     with mock.patch("flask.request", request_mock):
-        api_wrapper_with_mock_notify.execute()
-        api_wrapper_with_mock_notify.notify_callback.assert_called_with(event_name="test", external_params="param")
+        api_wrapper_with_mock_notify.routine_execute("test_routine", "test")
+
+        api_wrapper_with_mock_notify.notify_callback.assert_called_with("test",
+                                                                        specific_routine="test_routine",
+                                                                        param="test")
 
 
-def test_execute_with_kwargs_and_specific_flow_routines(api_wrapper_with_mock_notify, mocker: MockerFixture):
-
+def test_routines_execute_without_kwargs(api_wrapper_with_mock_notify, mocker: MockerFixture):
     request_mock = mocker.MagicMock()
-
-    args = MultiDict()
-    args.add("event_name", "test")
-    args.add("external_params", "param")
-    args.add("specific_flow_routines", "{\"a1\": [\"a2, a3\"]}")
-
-    request_mock.args = args
+    request_mock.json = {}
 
     with mock.patch("flask.request", request_mock):
-        api_wrapper_with_mock_notify.execute()
-        api_wrapper_with_mock_notify.notify_callback.assert_called_with(event_name="test",
-                                                                        external_params="param",
-                                                                        specific_flow_routines={"a1": ["a2, a3"]})
+        api_wrapper_with_mock_notify.routines_execute("test")
+
+        api_wrapper_with_mock_notify.notify_callback.assert_called_with("test")
+
+
+def test_routines_execute_with_kwargs(api_wrapper_with_mock_notify, mocker: MockerFixture):
+    request_mock = mocker.MagicMock()
+    request_mock.json = {"extra_args": {
+        "param": "test"
+    }}
+
+    with mock.patch("flask.request", request_mock):
+        api_wrapper_with_mock_notify.routines_execute("test")
+
+        api_wrapper_with_mock_notify.notify_callback.assert_called_with("test",
+                                                                        param="test")

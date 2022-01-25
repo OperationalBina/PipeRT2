@@ -52,17 +52,21 @@ class Flow(BaseEventExecutor):
 
         """
 
-        if event.is_applied_on_flow(self.name):
-            if event.is_applied_on_specific_routines(self.name):
-                routines = event.specific_flow_routines.get(self.name)
-                for routine in routines:
-                    if routine in self.routines.keys():
-                        self.routines.get(routine).execute_event(event)
-            else:
-                for routine in self.routines.values():
-                    routine.execute_event(event)
+        if event.specific_routine is not None:
+            if event.specific_routine in self.routines:
+                self.routines.get(event.specific_routine).execute_event(event)
+        else:
+            if event.is_applied_on_flow(self.name):
+                if event.is_applied_on_specific_routines(self.name):
+                    routines = event.specific_flow_routines.get(self.name)
+                    for routine in routines:
+                        if routine in self.routines.keys():
+                            self.routines.get(routine).execute_event(event)
+                else:
+                    for routine in self.routines.values():
+                        routine.execute_event(event)
 
-            EventExecutorInterface.execute_event(self, event)
+                EventExecutorInterface.execute_event(self, event)
 
     def _after_join(self):
         """Block until the flow process terminates.

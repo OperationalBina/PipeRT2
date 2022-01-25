@@ -7,6 +7,7 @@ from pipert2 import dataclass, field
 class Method:
     event_name: str
     specific_flow_routines: Dict[str, Optional[list]] = field(default_factory=lambda: defaultdict(list))
+    specific_routine: str = None
     params: dict = field(default_factory=lambda: {})
 
     def is_applied_on_flow(self, flow_name_to_validate: str):

@@ -306,20 +306,23 @@ In order to execute pipe events you need to execute `GET` http calls for `your_h
 
 - To kill the pipe and kill the API server, use route: `your_host:your_port/kill`
 
-- For start/stop specific flows, add it as dictionary to `specific_flows_routine` parameter in the url. 
-For example, use route: `your_host:your_port/execute?event_name=start/stop&specific_flows_routine={"flow_name": []}` 
-
-For custom requests:
-
-- To call custom event use execute route and add `event_name` parameter in the url: `url/execute?event_name=custom_event_name`
-
-- To call a specific flows use execute route and add `specific_flows_routine` parameters in the url: `url/execute?event_name=custom_event_name&specific_flow_routines={"flow_name": [], ...}`
-
-- To call specific routines in flows use execute route and add `specific_flows_routine` parameters in the url: `url/execute?event_name=custom_event_name&specific_flow_routines={"flow_name": ["r1", "r2", ...], ...}`
-
-- To add external parameters use execute route and add them to the url: `url/execute?event_name=custom_event_name&param1=0&param2=0&...`
+- To start or stop a specific routine, use route: 
+   - Start: `<your_host>:<your_port>/routines/<routine_name>/events/<start>/execute` 
+   - Stop: `<your_host>:<your_port>/routines/<routine_name>/events/<stop>/execute` 
 
 
+- To trigger a custom event for all of the routines, use route:`<your_host>:<your_port>/routines/events/<event_name>/execute` 
+
+- To trigger a custom event on a specific routine, use route:`<your_host>:<your_port>/routines/<routine_name>/events/<custom_event>/execute` 
+
+- For add additional arguments, add it to the body of the request as json as:
+```JSON
+{
+  "extra_args": {
+    "param1": value, "param2": value
+  } 
+}
+```
 # FAQ 
     
     Q: What will happen when nothing is returned from the main logic?
