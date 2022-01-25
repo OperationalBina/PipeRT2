@@ -316,11 +316,12 @@ In order to execute pipe events you need to execute `GET` http calls for `your_h
 - To trigger a custom event on a specific routine, use route:`<your_host>:<your_port>/routines/<routine_name>/events/<custom_event>/execute` 
 
 - For add additional arguments, add it to the body of the request as json as:
-`{
+```JSON
+{
   "extra_args": {
     "param1": value, "param2": value
   } 
-  }`
+}
   
 - To call specific routines in flows use execute route and add `specific_flows_routine` parameters in the url: `url/execute?event_name=custom_event_name&specific_flow_routines={"flow_name": ["r1", "r2", ...], ...}`
 
