@@ -306,7 +306,10 @@ In order to execute pipe events you need to execute `GET` http calls for `your_h
 
 - To kill the pipe and kill the API server, use route: `your_host:your_port/kill`
 
-- For start/stop specific routines, use route: `<your_host>:<your_port>/routines/<routine_name>/events/<start_or_stop>/execute` 
+- To start or stop a specific routine, use route: 
+   - Start: `<your_host>:<your_port>/routines/<routine_name>/events/<start>/execute` 
+   - Stop: `<your_host>:<your_port>/routines/<routine_name>/events/<stop>/execute` 
+
 
 - For custom events for all routines, use route: `<your_host>:<your_port>/routines/events/<event_name>/execute` 
 
