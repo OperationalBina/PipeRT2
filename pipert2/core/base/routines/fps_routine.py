@@ -6,6 +6,7 @@ from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.consts import NOTIFY_ROUTINE_DURATIONS_NAME, UPDATE_FPS_NAME, START_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.utils.consts.synchronise_routines import FPS_MULTIPLIER, ROUTINE_NOTIFY_DURATIONS_INTERVAL, NULL_FPS, \
     DURATIONS_MAX_SIZE
+import cProfile, pstats, io
 
 
 class FPSRoutine(Routine, metaclass=ABCMeta):
@@ -21,6 +22,11 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
         self.notifier = None
 
         self.last_duration = None
+        self.counter = 0
+        self.pr = cProfile.Profile()
+        self.put_logic_counter = 0
+        self.put_and_logic_start = None
+        self.put_and_logic_fps = None
 
     def initialize(self, message_handler, event_notifier, **kwargs):
         """Initialize FPSRoutine and initialize the base class.

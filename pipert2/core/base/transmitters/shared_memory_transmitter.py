@@ -3,6 +3,7 @@ from pipert2 import fields
 from pipert2.core.base.data import Data
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.utils.shared_memory_manager import SharedMemoryManager
+import time
 
 
 class SharedMemoryTransmitter(DataTransmitter):

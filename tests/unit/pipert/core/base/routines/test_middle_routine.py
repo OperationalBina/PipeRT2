@@ -39,7 +39,7 @@ def test_routine_execution(mocker, dummy_routine):
 
     assert dummy_routine.stop_event.is_set()
 
-    dummy_routine.start()
+    dummy_routine.put_and_logic_start()
 
     assert not dummy_routine.stop_event.is_set()
 
