@@ -1,9 +1,8 @@
-import types
 from typing import Dict
 from logging import Logger
 from collections import defaultdict
 from pipert2.core.base.flow import Flow
-from pipert2.core.base.routines.runner_factory import FINAL_EXTENDED_RUN, GENERATOR_EXTENDED_RUN, INNER_EXTENDED_RUN, RunnerFactory
+from pipert2.core.base.routines.runner_factory import RunnerFactory
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
@@ -16,7 +15,7 @@ from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
-from pipert2.utils.routine_graph_identifier import solve_graph
+from pipert2.utils.routine_inference import infer_routines_types
 
 add_pipe_log_level()
 
@@ -126,7 +125,7 @@ class Pipe:
         # Do not place this code after flow creation because it is not possible
         # to perform this action on different processes
         runnerFactory = RunnerFactory()
-        for routine_type, routines in solve_graph(self.wires.values()).items():
+        for routine_type, routines in infer_routines_types(self.wires.values()).items():
             for routine in routines:
                 routine._extended_run = runnerFactory.get_runner_for_type(
                     routine_type, routine)

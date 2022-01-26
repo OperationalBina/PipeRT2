@@ -4,7 +4,7 @@ from pipert2.core.base.routines.runner_factory import FINAL_EXTENDED_RUN, GENERA
 from pipert2.core.base.wire import Wire
 
 
-def solve_graph(wires: List[Wire]) -> Dict[str, Set[Routine]]:
+def infer_routines_types(wires: List[Wire]) -> Dict[str, Set[Routine]]:
     sources = set()
     destinations = set()
 
