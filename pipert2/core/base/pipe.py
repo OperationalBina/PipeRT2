@@ -11,9 +11,9 @@ from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.utils.consts.emit_socket_names import CREATION_LOG_NAME, LOG_NAME
-from pipert2.utils.consts.event_names import KILL_EVENT_NAME, INTERNAL_EVENT_NAMES, STOP_EVENT_NAME, START_EVENT_NAME
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
+from pipert2.utils.consts.event_names import KILL_EVENT_NAME, INTERNAL_EVENT_NAMES, STOP_EVENT_NAME, START_EVENT_NAME
 
 add_pipe_log_level()
 
@@ -36,7 +36,9 @@ class Pipe:
             logger: Logger object for logging the pipe actions.
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             auto_pacing_mechanism: True if the user want to use auto pacing mechanism.
+
         """
+
         self.event_board = event_board
         self.network = network
         self.logger = logger
@@ -57,7 +59,9 @@ class Pipe:
 
         Returns:
             Callable for the event notify function.
+
         """
+
         return self.event_board.get_event_notifier()
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
@@ -100,6 +104,7 @@ class Pipe:
         """Build the pipe to be ready to start working.
 
         """
+
         self._validate_pipe()
 
         for wire in self.wires.values():
@@ -127,7 +132,7 @@ class Pipe:
                 For all of the routines in a specific flow, each element needs to be in this format - "flow_name" - []
             **event_parameters: Parameters for the event to be executed
 
-            """
+        """
 
         self.event_board.notify_event(event_name, specific_flow_routines, **event_parameters)
 
@@ -160,6 +165,7 @@ class Pipe:
         Raises:
             FloatingRoutine: If flows contain a routine that don't link to any other routine.
             WiresValidation: If wires are not valid.
+
         """
 
         flow_validator.validate_flow(self.flows, self.wires)
