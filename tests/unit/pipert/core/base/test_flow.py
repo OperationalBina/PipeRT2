@@ -42,6 +42,7 @@ def dummy_method_without_specific_flow(mocker: MockerFixture):
     TEST_METHOD = mocker.MagicMock()
     TEST_METHOD.is_applied_on_flow.return_value = True
     TEST_METHOD.is_applied_on_specific_routines.return_value = False
+    TEST_METHOD.specific_routine = None
 
     return TEST_METHOD
 
@@ -52,19 +53,26 @@ def dummy_method_with_specific_flow_and_routines(mocker: MockerFixture):
     TEST_METHOD.is_applied_on_flow.return_value = True
     TEST_METHOD.is_applied_on_specific_routines.return_value = True
     TEST_METHOD.specific_flow_routines = {"Flow1": [SECOND_ROUTINE_NAME]}
+    TEST_METHOD.specific_routine = None
+
+    return TEST_METHOD
+
+
+@pytest.fixture()
+def dummy_method_with_specific_routine(mocker: MockerFixture):
+    TEST_METHOD = mocker.MagicMock()
+    TEST_METHOD.is_applied_on_flow.return_value = True
+    TEST_METHOD.is_applied_on_specific_routines.return_value = True
+    TEST_METHOD.specific_routine = "R1"
 
     return TEST_METHOD
 
 
 def test_run(mocker, dummy_flow_with_two_routines: Flow):
     start_event_callback_mock = mocker.MagicMock()
-    # start_event_callback_mock.specific_flow_routines.get.return_value = {}
-
     dummy_flow_with_two_routines.get_events()[START_EVENT_NAME] = {start_event_callback_mock}
 
     stop_event_callback_mock = mocker.MagicMock()
-    # stop_event_callback_mock.specific_flow_routines.get.return_value = {}
-
     dummy_flow_with_two_routines.get_events()[STOP_EVENT_NAME] = {stop_event_callback_mock}
 
     routine = dummy_flow_with_two_routines.routines[FIRST_ROUTINE_NAME]
@@ -84,6 +92,13 @@ def test_execute_event(dummy_flow_with_two_routines: Flow, dummy_method_without_
     routine_mocker = dummy_flow_with_two_routines.routines[FIRST_ROUTINE_NAME]
 
     routine_mocker.execute_event.assert_called_with(dummy_method_without_specific_flow)
+
+
+def test_execute_event_with_specific_routine(dummy_flow_with_two_routines, dummy_method_with_specific_routine):
+    dummy_flow_with_two_routines.execute_event(dummy_method_with_specific_routine)
+    routine_mocker = dummy_flow_with_two_routines.routines[FIRST_ROUTINE_NAME]
+
+    routine_mocker.execute_event.assert_called_with(dummy_method_with_specific_routine)
 
 
 def test_execute_all_routine_in_specific_flow(dummy_flow_with_two_routines: Flow,

@@ -1,4 +1,5 @@
 import pytest
+from mock import MagicMock
 from collections import deque
 from functools import partial
 from pipert2 import MiddleRoutine
@@ -95,3 +96,16 @@ def test_update_delay_time(dummy_routine: MiddleRoutine):
     dummy_routine.update_delay_time(**{"fps": 10})
 
     assert dummy_routine._fps == 20
+
+
+def test_join(dummy_routine: MiddleRoutine, mocker: MagicMock):
+
+    logger = mocker.MagicMock()
+    handler = mocker.MagicMock()
+    logger.handlers = [handler]
+
+    dummy_routine.set_logger(logger)
+
+    dummy_routine.join()
+
+    handler.close.assert_called()

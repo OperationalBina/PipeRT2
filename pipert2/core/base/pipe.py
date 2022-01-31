@@ -6,13 +6,14 @@ from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
 from pipert2.core.managers.event_board import EventBoard
-from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
+from pipert2.utils.consts.emit_socket_names import CREATION_LOG_NAME, LOG_NAME
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
+from pipert2.utils.consts.event_names import KILL_EVENT_NAME, INTERNAL_EVENT_NAMES, STOP_EVENT_NAME, START_EVENT_NAME
 
 add_pipe_log_level()
 
@@ -25,40 +26,43 @@ class Pipe:
 
     """
 
-    def __init__(self, network: Network = QueueNetwork(),
+    def __init__(self, event_board: EventBoard = EventBoard(), network: Network = QueueNetwork(),
                  logger: Logger = get_default_print_logger("Pipe"),
-                 data_transmitter: DataTransmitter = BasicTransmitter(),
-                 auto_pacing_mechanism: bool = False):
+                 data_transmitter: DataTransmitter = BasicTransmitter(), auto_pacing_mechanism: bool = False):
         """
         Args:
+            event_board (EventBoard): The EventBoard of the pipe.
             network: Network object responsible for the routine's communication.
             logger: Logger object for logging the pipe actions.
             data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
             auto_pacing_mechanism: True if the user want to use auto pacing mechanism.
 
-        Attributes:
-            network: Network object responsible for the routine's communication.
-            logger: Logger object for logging the pipe actions.
-            data_transmitter: DataTransmitter object to indicate how data flows through the pipe by default.
-            flows (dict[str, Flow]): Dictionary mapping the pipe flows to their name.
-            event_board (EventBoard): EventBoard object responsible for the pipe events.
-            routine_synchroniser (RoutinesSynchroniser): Routine synchroniser if auto_pacing_mechanism is true, else None.
-
         """
 
+        self.event_board = event_board
         self.network = network
         self.logger = logger
         self.flows = {}
         self.event_board = EventBoard()
         self.default_data_transmitter = data_transmitter
+        self.flows = {}
         self.wires: Dict[tuple, Wire] = {}
 
         if auto_pacing_mechanism:
             self.routine_synchroniser = RoutinesSynchroniser(event_board=self.event_board,
-                                                             logger=self.logger,
                                                              notify_callback=self.event_board.get_event_notifier())
         else:
             self.routine_synchroniser = None
+
+    def get_event_notify(self) -> callable:
+        """Get callable for the event notify function.
+
+        Returns:
+            Callable for the event notify function.
+
+        """
+
+        return self.event_board.get_event_notifier()
 
     def create_flow(self, flow_name: str, auto_wire: bool, *routines: Routine,
                     data_transmitter: DataTransmitter = None):
@@ -114,6 +118,7 @@ class Pipe:
             self.routine_synchroniser.wires = self.wires
             self.routine_synchroniser.build()
 
+        self._send_initial_log()
         self.event_board.build()
 
     def notify_event(self, event_name: str, specific_flow_routines: dict = defaultdict(list),
@@ -127,7 +132,7 @@ class Pipe:
                 For all of the routines in a specific flow, each element needs to be in this format - "flow_name" - []
             **event_parameters: Parameters for the event to be executed
 
-            """
+        """
 
         self.event_board.notify_event(event_name, specific_flow_routines, **event_parameters)
 
@@ -151,13 +156,42 @@ class Pipe:
             self.routine_synchroniser.join()
             self.logger.plog("Joined synchroniser")
 
+        for handler in self.logger.handlers:
+            handler.close()
+
     def _validate_pipe(self):
         """Validate routines and wires in current pipeline.
 
         Raises:
             FloatingRoutine: If flows contain a routine that don't link to any other routine.
             WiresValidation: If wires are not valid.
+
         """
 
         flow_validator.validate_flow(self.flows, self.wires)
         wires_validator.validate_wires(self.wires.values())
+
+    def _send_initial_log(self):
+        flows_routines = []
+
+        for flow in self.flows.values():
+            for routine_name in flow.routines.keys():
+                events = set(flow.routines.get(routine_name).get_events().keys())
+                events_without_internal_events = events.difference(INTERNAL_EVENT_NAMES)
+
+                flows_routines.append({
+                    "flow_name": flow.name,
+                    "routine_name": routine_name,
+                    "events": list(events_without_internal_events)
+                })
+
+        creation_log = {
+            'Routines': flows_routines,
+            'Events': [START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME]
+        }
+
+        self.logger.handlers[0].log_event_name = CREATION_LOG_NAME
+        self.logger.info(creation_log)
+
+        # After sending the pipe creation log, the other logs will emit on topic 'log'
+        self.logger.handlers[0].log_event_name = LOG_NAME

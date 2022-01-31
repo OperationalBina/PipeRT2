@@ -32,6 +32,12 @@ jobs:
         pip install numpy
         pip install mock
         pip install coverage
+        pip install python-socketio
+        pip install python-dotenv
+        pip install opencv-python
+        pip install zerorpc
+        pip install Flask
+        pip install Flask-Cors
         coverage run --concurrency=multiprocessing -m pytest --timeout=15
         coverage combine
     - name: Upload Coverage to Codecov

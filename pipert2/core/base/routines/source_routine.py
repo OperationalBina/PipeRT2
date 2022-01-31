@@ -1,3 +1,4 @@
+import logging
 from functools import partial
 from abc import ABCMeta, abstractmethod
 from pipert2.core.base.data import Data
@@ -25,6 +26,7 @@ class SourceRoutine(FPSRoutine, metaclass=ABCMeta):
         try:
             main_logic_callable = partial(self.main_logic)
             output_data = self._run_main_logic_with_durations_updating(main_logic_callable)
+
         except Exception as error:
             self._logger.exception(f"The routine has crashed: {error}")
         else:
