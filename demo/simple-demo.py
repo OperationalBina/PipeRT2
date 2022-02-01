@@ -32,7 +32,7 @@ class DummyDest(FPSRoutine):
 
 
 def create_test_pipe():
-    in_pipe = Pipe(data_transmitter=BasicTransmitter(), auto_pacing_mechanism=False)
+    in_pipe = Pipe(data_transmitter=BasicTransmitter(), auto_pacing_mechanism=True)
 
     source = DummyCount()
     middle = DummyMiddle()

@@ -14,7 +14,7 @@ from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.wrappers.rpc_pipe_wrapper import RPCPipeWrapper
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
 from pipert2.core.base.routines.extended_run_factory import get_runner_for_type
-from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
+from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchronizer
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
 
 add_pipe_log_level()
@@ -59,7 +59,7 @@ class Pipe:
             self.rpc_server = None
 
         if auto_pacing_mechanism:
-            self.routine_synchroniser = RoutinesSynchroniser(event_board=self.event_board,
+            self.routine_synchroniser = RoutinesSynchronizer(event_board=self.event_board,
                                                              notify_callback=self.event_board.get_event_notifier())
         else:
             self.routine_synchroniser = None
