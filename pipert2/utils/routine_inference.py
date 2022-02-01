@@ -1,6 +1,6 @@
 from typing import Dict, List, Set, Tuple
 from pipert2.core.base.routine import Routine
-from pipert2.core.base.routines.runner_factory import FINAL_EXTENDED_RUN, GENERATOR_EXTENDED_RUN, INNER_EXTENDED_RUN
+from pipert2.core.base.routines.extended_run_factory import FINAL_EXTENDED_RUN, GENERATOR_EXTENDED_RUN, INNER_EXTENDED_RUN
 from pipert2.core.base.wire import Wire
 
 

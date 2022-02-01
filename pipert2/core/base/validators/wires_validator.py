@@ -1,8 +1,6 @@
 from typing import List
 from pipert2.core.base.wire import Wire
 from pipert2.utils.exceptions.wires_validation import WiresValidation
-from pipert2.core.base.routines import DestinationRoutine, MiddleRoutine, SourceRoutine
-
 
 def validate_wires(wires: List[Wire]):
     """Validate wires by logical rules: contain source and destination,
