@@ -67,16 +67,18 @@ class EventBoard:
 
         """
 
-        def notify_event(output_event_queue, event_name, specific_flow_routines: dict = defaultdict(list), **params):
+        def notify_event(output_event_queue, event_name, specific_flow_routines: dict = defaultdict(list), specific_routine=None, **params):
             output_event_queue.put(Method(event_name,
                                           specific_flow_routines=specific_flow_routines,
+                                          specific_routine=specific_routine,
                                           params=params))
 
         return partial(notify_event, self.new_events_queue)
 
-    def notify_event(self, event_name, specific_flow_routines: dict = defaultdict(list), **params):
+    def notify_event(self, event_name, specific_flow_routines: dict = defaultdict(list), specific_routine=None, **params):
         self.new_events_queue.put(Method(event_name=event_name,
                                          specific_flow_routines=specific_flow_routines,
+                                         specific_routine=specific_routine,
                                          params=params))
 
     def join(self):

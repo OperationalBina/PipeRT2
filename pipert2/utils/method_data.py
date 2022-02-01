@@ -6,6 +6,7 @@ from pipert2 import dataclass, field
 @dataclass
 class Method:
     event_name: str
+    specific_routine: str = None
     specific_flow_routines: Dict[str, Optional[list]] = field(default_factory=lambda: defaultdict(list))
     params: dict = field(default_factory=lambda: {})
 
@@ -17,6 +18,7 @@ class Method:
 
         Returns:
             True if flow can run, false otherwise.
+
         """
 
         if self.specific_flow_routines is not None and any(self.specific_flow_routines):

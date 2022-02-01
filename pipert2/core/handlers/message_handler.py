@@ -1,10 +1,9 @@
 from logging import Logger
 from typing import Optional
 from abc import ABC, abstractmethod
-
-from pipert2.core.base.data.frame_data import FrameData
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.base.message import Message
+from pipert2.core.base.data.frame_data import FrameData
 from pipert2.utils.socketio_logger.frame_utils import numpy_frame_to_base64
 
 
