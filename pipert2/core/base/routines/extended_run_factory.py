@@ -1,9 +1,6 @@
-from functools import partial
-import types
 from typing import Callable
+from functools import partial
 from pipert2.core.base.message import Message
-from pipert2.core.base.routine import Routine
-
 
 GENERATOR_EXTENDED_RUN = "generator_extended_run"
 INNER_EXTENDED_RUN = "inner_extended_run"
@@ -18,14 +15,13 @@ class RunnerFactory:
             FINAL_EXTENDED_RUN: _final_extended_run
         }
 
-    def get_runner_for_type(self, type: str, routine: Routine) -> Callable:
-        # Bounding method to class instance
-        return types.MethodType(self.runner_mappings[type], routine)
+    def get_runner_for_type(self, routine_type: str) -> Callable:
+        return self.runner_mappings[routine_type]
 
 
 def _generator_extended_run(self):
     try:
-        main_logic_callable = partial(self.main_logic)
+        main_logic_callable = partial(self.main_logic, None)
         output_data = self._run_main_logic_with_durations_updating(
             main_logic_callable)
 
