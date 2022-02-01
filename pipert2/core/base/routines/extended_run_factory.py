@@ -2,16 +2,16 @@ from typing import Callable
 from functools import partial
 from pipert2.core.base.message import Message
 
-GENERATOR_EXTENDED_RUN = "generator_extended_run"
-INNER_EXTENDED_RUN = "inner_extended_run"
-FINAL_EXTENDED_RUN = "final_extended_run"
+GENERATOR_ROUTINE = "generator_extended_run"
+INNER_ROUTINE = "inner_extended_run"
+FINAL_ROUTINE = "final_extended_run"
 
 
 def get_runner_for_type(routine_type: str) -> Callable:
     runner_mappings = {
-        GENERATOR_EXTENDED_RUN: _generator_extended_run,
-        INNER_EXTENDED_RUN: _inner_extended_run,
-        FINAL_EXTENDED_RUN: _final_extended_run
+        GENERATOR_ROUTINE: _generator_extended_run,
+        INNER_ROUTINE: _inner_extended_run,
+        FINAL_ROUTINE: _final_extended_run
     }
     return runner_mappings[routine_type]
 

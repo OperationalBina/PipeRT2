@@ -1,7 +1,7 @@
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set
 from pipert2.core.base.routine import Routine
-from pipert2.core.base.routines.extended_run_factory import FINAL_EXTENDED_RUN, GENERATOR_EXTENDED_RUN, \
-    INNER_EXTENDED_RUN
+from pipert2.core.base.routines.extended_run_factory import FINAL_ROUTINE, GENERATOR_ROUTINE, \
+    INNER_ROUTINE
 from pipert2.core.base.wire import Wire
 
 
@@ -19,6 +19,7 @@ def infer_routines_types(wires: List[Wire]) -> Dict[str, Set[Routine]]:
     inner = sources.intersection(destinations)
     final = destinations - sources
 
-    return {GENERATOR_EXTENDED_RUN: generator,
-            INNER_EXTENDED_RUN: inner,
-            FINAL_EXTENDED_RUN: final}
+    return {GENERATOR_ROUTINE: generator,
+            INNER_ROUTINE: inner,
+            FINAL_ROUTINE: final}
+

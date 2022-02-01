@@ -3,12 +3,15 @@ import threading
 from typing import Dict
 import multiprocessing as mp
 from statistics import median
+
+from pipert2.core.base.routines.extended_run_factory import GENERATOR_ROUTINE
 from pipert2.utils.dummy_object import Dummy
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.core.base.synchronise_routines.synchroniser_node import SynchroniserNode
 from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTINE_DURATIONS_NAME, NULL_FPS, \
     SYNCHRONISER_UPDATE_INTERVAL, STOP_EVENT_NAME
+from pipert2.utils.routine_type_identifier import infer_routines_types
 
 
 class RoutinesSynchronizer(BaseEventExecutor):
@@ -45,6 +48,8 @@ class RoutinesSynchronizer(BaseEventExecutor):
         synchronize_graph = {}
         synchronizer_nodes = {}
 
+        routines_with_type = infer_routines_types(self.wires.values())
+
         for wire in self.wires.values():
             for wire_destination_routine in wire.destinations:
                 if wire_destination_routine.name not in synchronizer_nodes:
@@ -66,7 +71,7 @@ class RoutinesSynchronizer(BaseEventExecutor):
                     destinations_synchronizer_nodes
                 )
 
-                if isinstance(wire.source, SourceRoutine):
+                if wire.source in routines_with_type[GENERATOR_ROUTINE]:
                     synchronize_graph[source_node.name] = source_node
 
         return synchronize_graph
