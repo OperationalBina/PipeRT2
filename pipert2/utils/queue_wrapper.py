@@ -1,5 +1,6 @@
 from threading import Thread
 from multiprocessing import Queue as mpQueue
+from pipert2.core.base.message import Message
 from queue import Queue as thQueue, Full, Empty
 
 
@@ -17,6 +18,7 @@ class QueueWrapper:
     """
 
     def __init__(self, max_queue_size=1):
+        self.receive = None
         self.mp_queue: mpQueue = None
         self.max_queue_size = max_queue_size
         self.out_queue = thQueue(maxsize=max_queue_size)
@@ -84,7 +86,13 @@ class QueueWrapper:
 
         for item in iter(self.mp_queue.get, None):
             try:
-                self.out_queue.put(item, block=True, timeout=1)
+                message = Message.decode(item)
+
+                if callable(self.receive):
+                    received_data = self.receive(message.payload.data)
+                    message.update_data(received_data)
+
+                self.out_queue.put(message, block=True, timeout=1)
             except Full:
                 pass
 

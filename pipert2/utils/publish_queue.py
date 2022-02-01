@@ -1,4 +1,5 @@
 from queue import Full, Empty, Queue
+from pipert2.core.base.message import Message
 
 
 class PublishQueue(object):
@@ -7,33 +8,52 @@ class PublishQueue(object):
     """
 
     def __init__(self):
+        self._mp_queues = []
         self._queues = []
+        self.transmit = None
 
     def register(self, queue: Queue):
         """Register a new queue to publish to.
 
         """
 
-        self._queues.append(queue)
+        if isinstance(queue, Queue):
+            self._queues.append(queue)
+        else:
+            self._mp_queues.append(queue)
 
-    def put(self, value, block=False, timeout=1):
+    def put(self, message, block=False, timeout=1):
         """Publish a value to every registered queue.
 
         Args:
-            value: The value to push to every registered queue.
+            message: The value to push to every registered queue.
             block: Whether or not to block each queue when putting a message.
             timeout: How long to wait for each queue if block is true.
 
         """
 
         for q in self._queues:
-            if not block:
-                force_push_to_queue(q, value)
-            else:
-                try:
-                    q.put(value, block, timeout)
-                except Full as e:
-                    raise e
+            print("Sending via threading queue")
+            _push_to_queue(q, message, block, timeout)
+
+        if len(self._mp_queues) > 0:
+            print("Sending via multiprocessing queue")
+            transmitted_value = self.transmit(message.payload.data)
+            message.update_data(transmitted_value)
+            multiprocessing_message = Message.encode(message)
+
+            for q in self._mp_queues:
+                _push_to_queue(q, multiprocessing_message, block, timeout)
+
+
+def _push_to_queue(q, value, block, timeout):
+    if not block:
+        force_push_to_queue(q, value)
+    else:
+        try:
+            q.put(value, block, timeout)
+        except Full as e:
+            raise e
 
 
 def force_push_to_queue(queue: Queue, value):

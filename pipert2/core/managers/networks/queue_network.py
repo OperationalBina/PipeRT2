@@ -60,7 +60,7 @@ class QueueNetwork(Network):
             else:
                 publish_queue.register(destination_routine.message_handler.input_queue.get_queue(process_safe=True))
 
-            destination_routine.message_handler.receive = data_transmitter.receive()
+            destination_routine.message_handler.input_queue.receive = data_transmitter.receive()
 
         source.message_handler.output_queue = publish_queue
-        source.message_handler.transmit = data_transmitter.transmit()
+        source.message_handler.output_queue.transmit = data_transmitter.transmit()

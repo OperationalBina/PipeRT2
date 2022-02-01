@@ -1,4 +1,6 @@
 from queue import Full, Empty
+from pipert2.core.base.data import FrameData
+from pipert2.core.base.message import Message
 from pipert2.utils.queue_wrapper import QueueWrapper
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.exceptions.queue_not_initialized import QueueNotInitialized
@@ -22,7 +24,7 @@ class QueueHandler(MessageHandler):
         self.get_block = get_block
         self.timeout = timeout
 
-    def _get(self) -> bytes:
+    def _get(self) -> Message:
         """Get a message from the input queue.
         If blocking is true, wait the set timeout for a message to arrive,
         otherwise do nothing if the queue is empty.
@@ -41,7 +43,7 @@ class QueueHandler(MessageHandler):
 
         return message
 
-    def _put(self, message: bytes):
+    def _put(self, message: Message):
         """Put a message into the output queue.
         If blocking is true, try to push the message into the queue if it not full,
         otherwise push the message forcibly into the queue.
@@ -61,3 +63,28 @@ class QueueHandler(MessageHandler):
 
     def teardown(self):
         self.input_queue.kill_queue_worker()
+
+    def get(self) -> Message:
+        message = self._get()
+
+        if message is not None:
+            if isinstance(message, Message):
+                if self.send_data and isinstance(message.payload.data, FrameData):
+                    self.log_frame("input", message)
+
+                message.record_entry(self.routine_name)
+
+        return message
+
+    def put(self, message: Message):
+        """Encodes a given message and calls the implemented put method.
+
+        Args:
+            message: The message to be sent.
+
+        """
+
+        if self.send_data and isinstance(message.payload.data, FrameData):
+            self.log_frame("output", message)
+
+        self._put(message)
