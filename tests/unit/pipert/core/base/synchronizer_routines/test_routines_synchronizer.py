@@ -3,30 +3,31 @@ import time
 import pytest
 import multiprocessing as mp
 from pytest_mock import MockerFixture
-from pipert2 import SourceRoutine, DestinationRoutine, MiddleRoutine, Wire
+from pipert2 import Wire
+from pipert2.core.base.routines import FPSRoutine
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchronizer
 from pipert2.utils.consts import NULL_FPS
 
 
 @pytest.fixture
 def complex_synchroniser(mocker: MockerFixture):
-    source1_routine = mocker.MagicMock(spec=SourceRoutine)
+    source1_routine = mocker.MagicMock(spec=FPSRoutine)
     source1_routine.name = "source1"
     source1_routine.flow_name = "f1"
 
-    source2_routine = mocker.MagicMock(spec=SourceRoutine)
+    source2_routine = mocker.MagicMock(spec=FPSRoutine)
     source2_routine.name = "source2"
     source2_routine.flow_name = "f1"
 
-    middle1_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle1_routine = mocker.MagicMock(spec=FPSRoutine)
     middle1_routine.name = "m1"
     middle1_routine.flow_name = "f1"
 
-    middle2_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle2_routine = mocker.MagicMock(spec=FPSRoutine)
     middle2_routine.name = "m2"
     middle2_routine.flow_name = "f1"
 
-    destination_routine = mocker.MagicMock(spec=DestinationRoutine)
+    destination_routine = mocker.MagicMock(spec=FPSRoutine)
     destination_routine.name = "destination"
     destination_routine.flow_name = "f1"
 

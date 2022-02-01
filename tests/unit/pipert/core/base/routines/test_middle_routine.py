@@ -2,8 +2,9 @@ import pytest
 from mock import MagicMock
 from collections import deque
 from functools import partial
-from pipert2 import MiddleRoutine
 from pytest_mock import MockerFixture
+
+from pipert2.core.base.routines import FPSRoutine
 from pipert2.utils.dummy_object import Dummy
 from tests.unit.pipert.core.utils.functions_test_utils import timeout_wrapper
 from tests.unit.pipert.core.utils.dummy_routines.dummy_middle_routine import DummyMiddleRoutine, DUMMY_ROUTINE_EVENT, \
@@ -59,7 +60,6 @@ def test_routine_execution(mocker, dummy_routine):
 
 
 def test_routine_execution_catch_exception(mocker, dummy_routine):
-
     dummy_routine = DummyMiddleRoutineException()
     mock_message_handler = mocker.MagicMock()
     dummy_routine.initialize(mock_message_handler, event_notifier=Dummy())
@@ -79,8 +79,7 @@ def test_routine_execution_catch_exception(mocker, dummy_routine):
     assert message_handler.put.call_count == 0
 
 
-def test_run_main_logic_with_time_measurement_full_duration_queue(mocker: MockerFixture, dummy_routine: MiddleRoutine):
-
+def test_run_main_logic_with_time_measurement_full_duration_queue(mocker: MockerFixture, dummy_routine: FPSRoutine):
     dummy_routine.durations = deque(maxlen=1)
     dummy_routine.durations.append(1)
 
@@ -89,8 +88,7 @@ def test_run_main_logic_with_time_measurement_full_duration_queue(mocker: Mocker
     dummy_routine._run_main_logic_with_durations_updating(callback)
 
 
-def test_update_delay_time(dummy_routine: MiddleRoutine):
-
+def test_update_delay_time(dummy_routine: FPSRoutine):
     dummy_routine.fps_multiplier = 2
 
     dummy_routine.update_delay_time(**{"fps": 10})
@@ -98,8 +96,7 @@ def test_update_delay_time(dummy_routine: MiddleRoutine):
     assert dummy_routine._fps == 20
 
 
-def test_join(dummy_routine: MiddleRoutine, mocker: MagicMock):
-
+def test_join(dummy_routine: FPSRoutine, mocker: MagicMock):
     logger = mocker.MagicMock()
     handler = mocker.MagicMock()
     logger.handlers = [handler]

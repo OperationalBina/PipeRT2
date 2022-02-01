@@ -1,29 +1,29 @@
 import pytest
 from pytest_mock import MockerFixture
-from pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
 from pipert2 import Wire
+from pipert2.core.base.routines import FPSRoutine
 from pipert2.core.base.validators import wires_validator
 from pipert2.utils.exceptions import WiresValidation
 
 
 @pytest.fixture()
 def valid_wires(mocker: MockerFixture):
-    source_routine = mocker.MagicMock(spec=SourceRoutine)
+    source_routine = mocker.MagicMock(spec=FPSRoutine)
     source_routine.name = "source_routine"
 
-    middle1_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle1_routine = mocker.MagicMock(spec=FPSRoutine)
     middle1_routine.name = "middle1_routine"
 
-    middle2_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle2_routine = mocker.MagicMock(spec=FPSRoutine)
     middle2_routine.name = "middle2_routine"
 
-    middle3_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle3_routine = mocker.MagicMock(spec=FPSRoutine)
     middle3_routine.name = "middle3_routine"
 
-    middle4_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle4_routine = mocker.MagicMock(spec=FPSRoutine)
     middle4_routine.name = "middle4_routine"
 
-    destination_routine = mocker.MagicMock(spec=DestinationRoutine)
+    destination_routine = mocker.MagicMock(spec=FPSRoutine)
     destination_routine.name = "destination_routine"
 
     wires = [
@@ -42,8 +42,8 @@ def test_validate_existing_source_and_destination_routines_valid_wires(valid_wir
 
 
 def test_validate_existing_source_and_destination_routines_missing_source_routine_raises_error(mocker: MockerFixture):
-    middle_routine = mocker.MagicMock(spec=MiddleRoutine)
-    destination_routine = mocker.MagicMock(spec=DestinationRoutine)
+    middle_routine = mocker.MagicMock(spec=FPSRoutine)
+    destination_routine = mocker.MagicMock(spec=FPSRoutine)
 
     wires = [
         Wire(source=middle_routine, destinations=(destination_routine,)),
@@ -53,9 +53,10 @@ def test_validate_existing_source_and_destination_routines_missing_source_routin
         wires_validator.validate_existing_source_and_destination_routines(wires)
 
 
-def test_validate_existing_source_and_destination_routines_missing_destination_routine_raises_error(mocker: MockerFixture):
-    source_routine = mocker.MagicMock(spec=SourceRoutine)
-    middle_routine = mocker.MagicMock(spec=MiddleRoutine)
+def test_validate_existing_source_and_destination_routines_missing_destination_routine_raises_error(
+        mocker: MockerFixture):
+    source_routine = mocker.MagicMock(spec=FPSRoutine)
+    middle_routine = mocker.MagicMock(spec=FPSRoutine)
 
     wires = [
         Wire(source=source_routine, destinations=(middle_routine,)),
@@ -70,13 +71,13 @@ def test_validate_order_links_valid_wires(valid_wires):
 
 
 def test_validate_order_links_connect_destination_to_middle_routine_raises_error(mocker: MockerFixture):
-    source_routine = mocker.MagicMock(spec=SourceRoutine)
+    source_routine = mocker.MagicMock(spec=FPSRoutine)
     source_routine.name = "source"
 
-    middle_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle_routine = mocker.MagicMock(spec=FPSRoutine)
     middle_routine.name = "middle"
 
-    destination_routine = mocker.MagicMock(spec=DestinationRoutine)
+    destination_routine = mocker.MagicMock(spec=FPSRoutine)
     destination_routine.name = "destination"
 
     wires = [
@@ -89,13 +90,13 @@ def test_validate_order_links_connect_destination_to_middle_routine_raises_error
 
 
 def test_validate_order_links_connect_middle_to_source_routine_raises_error(mocker: MockerFixture):
-    source_routine = mocker.MagicMock(spec=SourceRoutine)
+    source_routine = mocker.MagicMock(spec=FPSRoutine)
     source_routine.name = "source"
 
-    middle1_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle1_routine = mocker.MagicMock(spec=FPSRoutine)
     middle1_routine.name = "m1"
 
-    middle2_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle2_routine = mocker.MagicMock(spec=FPSRoutine)
     middle2_routine.name = "m2"
 
     wires = [
@@ -113,13 +114,13 @@ def test_validate_middle_routines_valid_wires(valid_wires):
 
 
 def test_validate_middle_routines_without_producing_middle_routine_routine_raises_error(mocker: MockerFixture):
-    source_routine = mocker.MagicMock(spec=SourceRoutine)
+    source_routine = mocker.MagicMock(spec=FPSRoutine)
     source_routine.name = "source"
 
-    middle1_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle1_routine = mocker.MagicMock(spec=FPSRoutine)
     middle1_routine.name = "middle"
 
-    destination_routine = mocker.MagicMock(spec=DestinationRoutine)
+    destination_routine = mocker.MagicMock(spec=FPSRoutine)
     destination_routine.name = "destination"
 
     wires = [
@@ -132,13 +133,13 @@ def test_validate_middle_routines_without_producing_middle_routine_routine_raise
 
 
 def test_validate_middle_routines_without_consuming_middle_routine_routine_raises_error(mocker: MockerFixture):
-    source_routine = mocker.MagicMock(spec=SourceRoutine)
+    source_routine = mocker.MagicMock(spec=FPSRoutine)
     source_routine.name = "source"
 
-    middle1_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle1_routine = mocker.MagicMock(spec=FPSRoutine)
     middle1_routine.name = "middle"
 
-    destination_routine = mocker.MagicMock(spec=DestinationRoutine)
+    destination_routine = mocker.MagicMock(spec=FPSRoutine)
     destination_routine.name = "destination"
 
     wires = [

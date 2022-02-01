@@ -1,10 +1,11 @@
 import time
 import multiprocessing as mp
-from pipert2 import DestinationRoutine
+
+from pipert2.core.base.routines import FPSRoutine
 from pipert2.utils.consts import NULL_FPS
 
 
-class DestinationCounterRoutine(DestinationRoutine):
+class DestinationCounterRoutine(FPSRoutine):
     def __init__(self, fps, name):
         super().__init__(name)
         self.routine_fps = fps

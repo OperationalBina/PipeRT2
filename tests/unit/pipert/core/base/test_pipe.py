@@ -4,7 +4,7 @@ from mock import patch, Mock
 from collections import defaultdict
 from pytest_mock import MockerFixture
 from pipert2.core.base.pipe import Pipe
-from pipert2 import MiddleRoutine, DestinationRoutine, SourceRoutine
+from pipert2.core.base.routines import FPSRoutine
 
 
 @pytest.fixture
@@ -19,15 +19,15 @@ def dummy_pipe():
 def dummy_pipe_with_flows(dummy_pipe: Pipe, mocker: MockerFixture):
     FLOW_NAMES = ["f1", "f2", "f3"]
 
-    source_routine = mocker.MagicMock(spec=SourceRoutine)
+    source_routine = mocker.MagicMock(spec=FPSRoutine)
     source_routine.name = "source"
     source_routine.flow_name = "Flow"
 
-    middle_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle_routine = mocker.MagicMock(spec=FPSRoutine)
     middle_routine.name = "middle_routine"
     middle_routine.flow_name = "Flow"
 
-    destination_routine = mocker.MagicMock(spec=DestinationRoutine)
+    destination_routine = mocker.MagicMock(spec=FPSRoutine)
     destination_routine.name = "destination_routine"
     destination_routine.flow_name = "Flow"
 
@@ -52,15 +52,15 @@ def test_create_flow_auto_wire_false(dummy_pipe: Pipe):
 
 
 def test_link_link_new_wires_should_add_to_dictionary(dummy_pipe: Pipe, mocker: MockerFixture):
-    source_routine = mocker.MagicMock(spec=SourceRoutine)
+    source_routine = mocker.MagicMock(spec=FPSRoutine)
     source_routine.name = "source"
     source_routine.flow_name = "Flow"
 
-    middle_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle_routine = mocker.MagicMock(spec=FPSRoutine)
     middle_routine.name = "middle_routine"
     middle_routine.flow_name = "Flow"
 
-    destination_routine = mocker.MagicMock(spec=DestinationRoutine)
+    destination_routine = mocker.MagicMock(spec=FPSRoutine)
     destination_routine.name = "destination_routine"
 
     source_to_middle_wire = Wire(source_routine, middle_routine)
@@ -76,14 +76,14 @@ def test_link_link_new_wires_should_add_to_dictionary(dummy_pipe: Pipe, mocker: 
 
 def test_link_link_existing_wires_sources_should_override_existing_in_dictionary(dummy_pipe: Pipe,
                                                                                  mocker: MockerFixture):
-    source_routine = mocker.MagicMock(spec=SourceRoutine)
+    source_routine = mocker.MagicMock(spec=FPSRoutine)
     source_routine.name = "source"
     source_routine.flow_name = "Flow"
 
-    middle_routine = mocker.MagicMock(spec=MiddleRoutine)
+    middle_routine = mocker.MagicMock(spec=FPSRoutine)
     middle_routine.name = "middle_routine"
 
-    destination_routine = mocker.MagicMock(spec=DestinationRoutine)
+    destination_routine = mocker.MagicMock(spec=FPSRoutine)
     destination_routine.name = "destination_routine"
 
     source_to_middle_wire = Wire(source_routine, middle_routine)

@@ -1,9 +1,10 @@
 from multiprocessing import Event
+
+from pipert2.core.base.routines import FPSRoutine
 from tests.unit.pipert.core.utils.events_utils import STOP_EVENT
-from pipert2.core.base.routines.source_routine import SourceRoutine
 
 
-class UserInputSourceRoutine(SourceRoutine):
+class UserInputSourceRoutine(FPSRoutine):
 
     def __init__(self, name="dummy_start_routine", data_to_send=None):
         super(UserInputSourceRoutine, self).__init__(name=name)
@@ -11,7 +12,7 @@ class UserInputSourceRoutine(SourceRoutine):
         self.does_data_sent = Event()
         self.index = 0
 
-    def main_logic(self) -> any:
+    def main_logic(self, data) -> any:
         if self.index < len(self.data):
             self.index += 1
             return self.data[self.index - 1]
