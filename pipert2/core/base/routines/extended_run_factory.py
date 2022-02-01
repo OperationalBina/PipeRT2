@@ -7,16 +7,13 @@ INNER_EXTENDED_RUN = "inner_extended_run"
 FINAL_EXTENDED_RUN = "final_extended_run"
 
 
-class RunnerFactory:
-    def __init__(self) -> None:
-        self.runner_mappings = {
-            GENERATOR_EXTENDED_RUN: _generator_extended_run,
-            INNER_EXTENDED_RUN: _inner_extended_run,
-            FINAL_EXTENDED_RUN: _final_extended_run
-        }
-
-    def get_runner_for_type(self, routine_type: str) -> Callable:
-        return self.runner_mappings[routine_type]
+def get_runner_for_type(routine_type: str) -> Callable:
+    runner_mappings = {
+        GENERATOR_EXTENDED_RUN: _generator_extended_run,
+        INNER_EXTENDED_RUN: _inner_extended_run,
+        FINAL_EXTENDED_RUN: _final_extended_run
+    }
+    return runner_mappings[routine_type]
 
 
 def _generator_extended_run(self):

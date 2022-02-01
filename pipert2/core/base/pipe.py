@@ -2,20 +2,20 @@ from typing import Dict
 from logging import Logger
 from collections import defaultdict
 from pipert2.core.base.flow import Flow
-from pipert2.core.base.routines.runner_factory import RunnerFactory
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
+from pipert2.core.base.validators import flow_validator
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
+from pipert2.utils.routine_inference import infer_routines_types
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.wrappers.rpc_pipe_wrapper import RPCPipeWrapper
-from pipert2.core.base.validators import wires_validator, flow_validator
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
+from pipert2.core.base.routines.extended_run_factory import get_runner_for_type
 from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchroniser
 from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
-from pipert2.utils.routine_inference import infer_routines_types
 
 add_pipe_log_level()
 
@@ -124,11 +124,9 @@ class Pipe:
         # @@@@@@@!!Important!! @@@@@@@@@
         # Do not place this code after flow creation because it is not possible
         # to perform this action on different processes
-        runnerFactory = RunnerFactory()
         for routine_type, routines in infer_routines_types(self.wires.values()).items():
             for routine in routines:
-                routine._extended_run = runnerFactory.get_runner_for_type(
-                    routine_type, routine)
+                routine.extended_run_strategy = get_runner_for_type(routine_type)
 
         for wire in self.wires.values():
             data_transmitter = wire.data_transmitter if wire.data_transmitter is not None else self.default_data_transmitter

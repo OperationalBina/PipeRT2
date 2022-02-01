@@ -56,6 +56,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
+        self.extended_run_strategy: Callable = Callable
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -102,7 +103,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """Wrapper method for executing the entire routine logic
 
         """
-        raise NotImplementedError
+        self.extended_run_strategy(self)
 
     def main_logic(self, data: Optional[Data]) -> Data:
         """Process the given data to the routine.
