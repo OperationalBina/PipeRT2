@@ -9,7 +9,7 @@ from pipert2.core.base.validators import flow_validator
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
 from pipert2.core.base.data_transmitter import DataTransmitter
-from pipert2.utils.routine_inference import infer_routines_types
+from pipert2.utils.graph_solver import infer_routines_types
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.core.base.wrappers.rpc_pipe_wrapper import RPCPipeWrapper
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
