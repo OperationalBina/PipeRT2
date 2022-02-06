@@ -26,8 +26,10 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Using The Cockpit](#using-the-cockpit)
 - [Running via RPC CLI](#running-via-rpc-cli)
 - [Running via API](#running-via-api)
+- [Synchroniser](#synchroniser)
 - [FAQ](#faq)
 - [Contributing](#contributing)
+
 
 # Requirements
 
@@ -323,6 +325,21 @@ In order to execute pipe events you need to execute `GET` http calls for `your_h
   } 
 }
 ```
+
+# Synchroniser
+
+In the pipe there is synchronising mechanism which used to synchronise the routines FPS.
+This mechanism force routines to rest if their FPS significantly higher than the bottlenecks routines.
+It saves resources and should not affect the number of the processed routines. 
+
+The common use for using the synchronising mechanism is the case there are fast routines, 
+and their next routines in the flow have lower FPS routines.
+
+To activate this mechanism, create the pipe should with `auto_pacing_mechanism` parameter as true, for example: 
+```Python
+pipe = Pipe(auto_pacing_mechanism=True)
+```
+
 # FAQ 
     
     Q: What will happen when nothing is returned from the main logic?
