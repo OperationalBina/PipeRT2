@@ -329,7 +329,7 @@ In order to execute pipe events you need to execute `GET` http calls for `your_h
 # Synchroniser
 
 In the pipe there is a synchronising mechanism which is used to synchronise the routine's FPS.
-This mechanism force routines to rest if their FPS significantly higher than the bottlenecks routines.
+This mechanism forces routines to rest, if their FPS is significantly higher than that of the bottlenecks routines.
 It saves resources and should not affect the number of the processed routines. 
 
 The common use for using the synchronising mechanism is the case there are fast routines, 
