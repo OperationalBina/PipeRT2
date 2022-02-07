@@ -332,8 +332,8 @@ In the pipe there is a synchronising mechanism which is used to synchronise the 
 This mechanism forces routines to rest, if their FPS is significantly higher than that of the bottlenecks routines.
 It saves resources, and should not affect the number of the processed routines. 
 
-The common use for using the synchronising mechanism is the case there are fast routines, 
-and their next routines in the flow have lower FPS routines.
+The best example of a case where the synchronising mechanism would be useful, is when there are fast routines
+followed by routines with lower FPS.
 
 To activate this mechanism, create the pipe should with `auto_pacing_mechanism` parameter as true, for example: 
 ```Python
