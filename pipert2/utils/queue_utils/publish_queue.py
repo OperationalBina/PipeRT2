@@ -9,9 +9,9 @@ class PublishQueue(object):
     """
 
     def __init__(self):
+        self.transmit = None
         self._mp_queues = []
         self._queues = []
-        self.transmit = None
 
     def register(self, queue: Queue):
         """Register a new queue to publish to.
@@ -54,6 +54,7 @@ def _push_to_queue(q, value, block, timeout):
         except Full as e:
             raise e
 
+    # Without this line fps drops tremendously
     time.sleep(0.000001)
 
 

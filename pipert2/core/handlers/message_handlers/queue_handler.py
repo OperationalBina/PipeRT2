@@ -1,7 +1,7 @@
 from queue import Full, Empty
 from pipert2.core.base.data import FrameData
 from pipert2.core.base.message import Message
-from pipert2.utils.queue_wrapper import QueueWrapper
+from pipert2.utils.queue_utils.queue_wrapper import QueueWrapper
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.exceptions.queue_not_initialized import QueueNotInitialized
 
