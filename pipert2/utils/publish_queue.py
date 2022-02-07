@@ -1,3 +1,4 @@
+import time
 from queue import Full, Empty, Queue
 from pipert2.core.base.message import Message
 
@@ -33,11 +34,9 @@ class PublishQueue(object):
         """
 
         for q in self._queues:
-            print("Sending via threading queue")
             _push_to_queue(q, message, block, timeout)
 
         if len(self._mp_queues) > 0:
-            print("Sending via multiprocessing queue")
             transmitted_value = self.transmit(message.payload.data)
             message.update_data(transmitted_value)
             multiprocessing_message = Message.encode(message)
@@ -54,6 +53,8 @@ def _push_to_queue(q, value, block, timeout):
             q.put(value, block, timeout)
         except Full as e:
             raise e
+
+    time.sleep(0.000001)
 
 
 def force_push_to_queue(queue: Queue, value):
