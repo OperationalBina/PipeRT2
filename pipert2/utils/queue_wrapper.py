@@ -1,6 +1,7 @@
 from threading import Thread
 from multiprocessing import Queue as mpQueue
 from pipert2.core.base.message import Message
+from pipert2.utils.publish_queue import force_push_to_queue
 from queue import Queue as thQueue, Full, Empty
 
 
@@ -92,7 +93,7 @@ class QueueWrapper:
                     received_data = self.receive(message.payload.data)
                     message.update_data(received_data)
 
-                self.out_queue.put(message, block=True, timeout=1)
+                force_push_to_queue(self.out_queue, message)
             except Full:
                 pass
 
