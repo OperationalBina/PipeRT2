@@ -24,6 +24,7 @@ ignore:
   - "pipert2/core/base/data_transmitter.py"
   - "pipert2/utils/logging_module_modifiers.py"
   - "pipert2/utils/socketio_logger/"
+  - "pipert2/core/handlers/message_handler.py"
 
 flags:
   # filter the folder(s) you wish to measure by that flag
