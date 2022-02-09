@@ -1,5 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
+
+from pipert2.core.base.routines.extended_run_factory import get_runner_for_type, FINAL_ROUTINE
 from pipert2.utils.dummy_object import Dummy
 from tests.unit.pipert.core.utils.dummy_routines.dummy_destination_routine import DummyDestinationRoutine, \
     DummyDestinationRoutineException
@@ -10,6 +12,7 @@ MAX_TIMEOUT_WAITING = 3
 @pytest.fixture()
 def dummy_routine(mocker: MockerFixture):
     dummy_routine = DummyDestinationRoutine()
+    dummy_routine.extended_run_strategy = get_runner_for_type(FINAL_ROUTINE)
     mock_message_handler = mocker.MagicMock()
     dummy_routine.initialize(mock_message_handler, event_notifier=Dummy())
     return dummy_routine
@@ -35,6 +38,7 @@ def test_routine_execution(dummy_routine):
 def test_routine_execution_catch_exception(mocker, dummy_routine):
 
     dummy_routine = DummyDestinationRoutineException()
+    dummy_routine.extended_run_strategy = get_runner_for_type(FINAL_ROUTINE)
     mock_message_handler = mocker.MagicMock()
     dummy_routine.initialize(mock_message_handler, event_notifier=Dummy())
 

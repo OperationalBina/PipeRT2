@@ -5,6 +5,7 @@ from functools import partial
 from pytest_mock import MockerFixture
 
 from pipert2.core.base.routines import FPSRoutine
+from pipert2.core.base.routines.extended_run_factory import get_runner_for_type, INNER_ROUTINE
 from pipert2.utils.dummy_object import Dummy
 from tests.unit.pipert.core.utils.functions_test_utils import timeout_wrapper
 from tests.unit.pipert.core.utils.dummy_routines.dummy_middle_routine import DummyMiddleRoutine, DUMMY_ROUTINE_EVENT, \
@@ -16,6 +17,7 @@ MAX_TIMEOUT_WAITING = 3
 @pytest.fixture()
 def dummy_routine(mocker: MockerFixture):
     dummy_routine = DummyMiddleRoutine()
+    dummy_routine.extended_run_strategy = get_runner_for_type(INNER_ROUTINE)
     mock_message_handler = mocker.MagicMock()
     dummy_routine.initialize(mock_message_handler, event_notifier=Dummy())
     return dummy_routine
