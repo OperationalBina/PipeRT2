@@ -2,8 +2,6 @@ import logging
 import socketio
 from socketio.exceptions import SocketIOError
 
-from pipert2.utils.consts.emit_socket_names import LOG_NAME
-
 
 class SocketHandler(logging.Handler):
     def __init__(self, url, log_event_name):

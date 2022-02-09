@@ -1,5 +1,3 @@
-from typing import Optional
-
 import flask
 from flask import Flask
 from flask import Response
