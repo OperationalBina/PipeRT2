@@ -266,7 +266,7 @@ After that your pipe will send its logs to the cockpit!
 
 # Running via RPC CLI
 
-Firstly, you need to install the zerorpc python package via `pip3 install zerorpc`
+Firstly, in order to use this capability, you need to install the optional package via `pip install PipeRT[rpc]`  
 
 The next step is running the RPC Server:
 ```Python
@@ -290,6 +290,7 @@ Arguments to pipe events are passed in a JSON format:
  
 
 # Running via API
+Firstly, in order to use this capability, you need to install the optional package via `pip install PipeRT[api]`  
 
 After creating a pipeline, you need to call run_api_wrapper with your host and port:
 ```Python
