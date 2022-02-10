@@ -27,7 +27,7 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Running via RPC CLI](#running-via-rpc-cli)
 - [Running via API](#running-via-api)
 - [Synchroniser](#synchroniser)
-- [Constant FPS](#const-fps)
+- [Constant FPS](#constant-fps)
 - [FAQ](#faq)
 - [Contributing](#contributing)
 
