@@ -151,7 +151,7 @@ def test_pipe_structure(mocker: MockerFixture):
                 'events': list({'kill', 'start', 'stop'})
             }
         ],
-        'Events': list({'start', 'stop', 'kill'})
+        'Events': ['start', 'stop', 'kill']
     }
 
     assert pipe_structure == expected_result

@@ -203,7 +203,7 @@ class Pipe:
 
         creation_log = {
             'Routines': flows_routines,
-            'Events': list({START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME})
+            'Events': [START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME]
         }
 
         return creation_log
