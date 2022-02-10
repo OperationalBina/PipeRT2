@@ -18,7 +18,7 @@ def api_wrapper_with_mock_notify(mocker: MockerFixture):
 
 
 def test_get_pipe_structure(api_wrapper_with_mock_notify):
-    api_wrapper_with_mock_notify.get_pipe_structure()
+    _ = api_wrapper_with_mock_notify.get_pipe_structure()
 
     api_wrapper_with_mock_notify.pipe.get_pipe_structure.assert_called_once()
 
