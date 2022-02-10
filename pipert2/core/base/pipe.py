@@ -193,12 +193,12 @@ class Pipe:
         for flow in self.flows.values():
             for routine_name in flow.routines.keys():
                 events = set(flow.routines.get(routine_name).get_events().keys())
-                events_without_internal_events = list(events.difference(INTERNAL_EVENT_NAMES))
+                events_without_internal_events = events.difference(INTERNAL_EVENT_NAMES)
 
                 flows_routines.append({
                     "flow_name": flow.name,
                     "routine_name": routine_name,
-                    "events": events_without_internal_events
+                    "events": list(events_without_internal_events)
                 })
 
         creation_log = {
