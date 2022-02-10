@@ -2,7 +2,7 @@ import os
 import mmap
 import posix_ipc
 from typing import Optional
-from pipert2.utils.shared_memory.shared_memory import SharedMemory
+from pipert2.utils.shared_memory.posix_ipc.shared_memory import SharedMemory
 from pipert2.utils.shared_memory.memory_id_iterator import MemoryIdIterator
 
 

@@ -1,6 +1,6 @@
 from pipert2.utils.singleton import Singleton
-# if sys.version_info.minor <= 7:
-from pipert2.utils.shared_memory.shared_memory_generator import SharedMemoryGenerator, get_shared_memory_object
+from pipert2.utils.shared_memory.posix_ipc.shared_memory_generator import SharedMemoryGenerator, \
+    get_shared_memory_object
 
 
 class SharedMemoryManager(metaclass=Singleton):
