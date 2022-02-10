@@ -1,6 +1,6 @@
 import pytest
 from queue import Full, Queue
-from pipert2.utils.publish_queue import PublishQueue
+from pipert2.utils.queue_utils.publish_queue import PublishQueue
 
 
 @pytest.fixture()

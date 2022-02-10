@@ -1,7 +1,7 @@
 import pytest
 from mock import Mock
-from pipert2.utils.publish_queue import PublishQueue
-from pipert2.utils.queue_wrapper import QueueWrapper
+from pipert2.utils.queue_utils.publish_queue import PublishQueue
+from pipert2.utils.queue_utils.queue_wrapper import QueueWrapper
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 
 
@@ -31,7 +31,8 @@ def test_link_single_destination(dummy_queue_network):
     dummy_queue_network.link(source_routine, destination_routines, data_transmitter)
 
     assert type(source_routine.message_handler.output_queue) == PublishQueue
-    assert source_routine.message_handler.output_queue._queues[0] == destination_routines[0].message_handler.input_queue.get_queue(False)
+    assert source_routine.message_handler.output_queue._mp_queues[0] == destination_routines[
+        0].message_handler.input_queue.get_queue(False)
 
 
 def test_link_multiple_destinations(dummy_queue_network):
@@ -46,7 +47,8 @@ def test_link_multiple_destinations(dummy_queue_network):
     assert type(source_routine.message_handler.output_queue) == PublishQueue
 
     for index, routine in enumerate(destination_routines):
-        assert source_routine.message_handler.output_queue._queues[index] == routine.message_handler.input_queue.get_queue(False)
+        assert source_routine.message_handler.output_queue._mp_queues[
+                   index] == routine.message_handler.input_queue.get_queue(False)
 
 
 def test_link_multiple_sources(dummy_queue_network):
@@ -60,8 +62,10 @@ def test_link_multiple_sources(dummy_queue_network):
     dummy_queue_network.link(source_routine2, destination_routines, data_transmitter)
 
     for index, routine in enumerate(destination_routines):
-        assert source_routine1.message_handler.output_queue._queues[index] == routine.message_handler.input_queue.get_queue(False)
-        assert source_routine2.message_handler.output_queue._queues[index] == routine.message_handler.input_queue.get_queue(False)
+        assert source_routine1.message_handler.output_queue._mp_queues[
+                   index] == routine.message_handler.input_queue.get_queue(False)
+        assert source_routine2.message_handler.output_queue._mp_queues[
+                   index] == routine.message_handler.input_queue.get_queue(False)
 
 
 def test_link_not_process_safe_single_destination(dummy_queue_network):
@@ -75,7 +79,8 @@ def test_link_not_process_safe_single_destination(dummy_queue_network):
     dummy_queue_network.link(source_routine, destination_routines, data_transmitter)
 
     assert type(source_routine.message_handler.output_queue) == PublishQueue
-    assert source_routine.message_handler.output_queue._queues[0] == destination_routines[0].message_handler.input_queue.get_queue(False)
+    assert source_routine.message_handler.output_queue._mp_queues[0] == destination_routines[
+        0].message_handler.input_queue.get_queue(False)
 
 
 def test_link_process_safe_single_destination(dummy_queue_network):
@@ -89,7 +94,8 @@ def test_link_process_safe_single_destination(dummy_queue_network):
     dummy_queue_network.link(source_routine, destination_routines, data_transmitter)
 
     assert type(source_routine.message_handler.output_queue) == PublishQueue
-    assert source_routine.message_handler.output_queue._queues[0] == destination_routines[0].message_handler.input_queue.get_queue(True)
+    assert source_routine.message_handler.output_queue._mp_queues[0] == destination_routines[
+        0].message_handler.input_queue.get_queue(True)
 
 
 def test_link_process_safe_multiple_destinations(dummy_queue_network):
@@ -107,4 +113,5 @@ def test_link_process_safe_multiple_destinations(dummy_queue_network):
     assert type(source_routine.message_handler.output_queue) == PublishQueue
 
     for index, routine in enumerate(destination_routines):
-        assert source_routine.message_handler.output_queue._queues[index] == routine.message_handler.input_queue.get_queue(False)
+        assert source_routine.message_handler.output_queue._mp_queues[
+                   index] == routine.message_handler.input_queue.get_queue(False)
