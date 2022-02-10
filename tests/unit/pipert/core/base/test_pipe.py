@@ -122,10 +122,10 @@ def test_pipe_structure(mocker: MockerFixture):
     dummy_flow.name = "flow1"
 
     dummy_routine_with_custom_event = mocker.MagicMock()
-    dummy_routine_with_custom_event.get_events.return_value = {'test': [], 'start': [], 'stop': [], 'kill': []}
+    dummy_routine_with_custom_event.get_events.return_value = {'kill': [], 'start': [], 'stop': [], 'test': []}
 
     dummy_routine_without_custom_event = mocker.MagicMock()
-    dummy_routine_without_custom_event.get_events.return_value = {'start': [], 'stop': [], 'kill': []}
+    dummy_routine_without_custom_event.get_events.return_value = {'kill': [], 'start': [], 'stop': []}
 
     dummy_flow.routines = {
         "dummy_routine1": dummy_routine_with_custom_event,
@@ -143,15 +143,18 @@ def test_pipe_structure(mocker: MockerFixture):
             {
                 'flow_name': 'flow1',
                 'routine_name': 'dummy_routine1',
-                'events': list({'kill', 'start', 'test', 'stop'})
+                'events': {'kill', 'start', 'stop', 'test'}
             },
             {
                 'flow_name': 'flow1',
                 'routine_name': 'dummy_routine2',
-                'events': list({'kill', 'start', 'stop'})
+                'events': {'kill', 'start', 'stop'}
             }
         ],
         'Events': ['start', 'stop', 'kill']
     }
 
-    assert expected_result == pipe_structure
+    for routine in pipe_structure['Routines']:
+        routine['events'] = set(routine['events'])
+
+    assert pipe_structure == expected_result

@@ -136,6 +136,36 @@ For triggering an event for a specific flow or routine we add a dictionary of th
     ```Python
   example_pipe.notify_event(START_EVENT_NAME, {"example_flow": [generate_data_routine.name, print_result_routine.name]})  
   ```
+  
+### Custom Data Types
+
+Instead of using the `Data` class to pass arguments throughout the pipe's routines, you can create custom class that will inherit from `Data` 
+with your own parameters. 
+
+For example: 
+
+```Python
+class Example(Data):
+    def __init__(self):
+        self.custom_param = "custom param"
+
+class SrcRoutine(SourceRoutine):
+    def main_logic(self) -> Example:
+        return Example()
+
+class MidRoutine(MiddleRoutine):
+    def main_logic(self, example: Example) -> Example:
+        print(example.custom_param) // output -> "custom param"
+        example.custom_param = "change"
+        
+        return example
+
+class DstRoutine(DestinationRoutine):
+    def main_logic(self, example):
+        print(example.custom_param) // output -> "change"
+```
+
+
 
 # Advanced
 ## The Routine
