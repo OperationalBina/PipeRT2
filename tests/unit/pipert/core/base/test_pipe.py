@@ -113,3 +113,45 @@ def test_join(dummy_pipe_with_flows):
     dummy_pipe_object, flow_names = dummy_pipe_with_flows
     dummy_pipe_object.join()
     assert dummy_pipe_object.flows[flow_names[0]].join.call_count == 3
+
+
+def test_pipe_structure(mocker: MockerFixture):
+    pipe = Pipe()
+
+    dummy_flow = mocker.MagicMock()
+    dummy_flow.name = "flow1"
+
+    dummy_routine_with_custom_event = mocker.MagicMock()
+    dummy_routine_with_custom_event.get_events.return_value = {'test': [], 'start': [], 'stop': [], 'kill': []}
+
+    dummy_routine_without_custom_event = mocker.MagicMock()
+    dummy_routine_without_custom_event.get_events.return_value = {'start': [], 'stop': [], 'kill': []}
+
+    dummy_flow.routines = {
+        "dummy_routine1": dummy_routine_with_custom_event,
+        "dummy_routine2": dummy_routine_without_custom_event
+    }
+
+    pipe.flows = {
+        "flow1": dummy_flow
+    }
+
+    pipe_structure = pipe.get_pipe_structure()
+
+    expected_result = {
+        'Routines': [
+            {
+                'flow_name': 'flow1',
+                'routine_name': 'dummy_routine1',
+                'events': list({'kill', 'start', 'test', 'stop'})
+            },
+            {
+                'flow_name': 'flow1',
+                'routine_name': 'dummy_routine2',
+                'events': list({'kill', 'start', 'stop'})
+            }
+        ],
+        'Events': ['start', 'stop', 'kill']
+    }
+
+    assert expected_result == pipe_structure
