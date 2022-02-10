@@ -27,6 +27,7 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Running via RPC CLI](#running-via-rpc-cli)
 - [Running via API](#running-via-api)
 - [Synchroniser](#synchroniser)
+- [Constant FPS](#const-fps)
 - [FAQ](#faq)
 - [Contributing](#contributing)
 
@@ -338,6 +339,20 @@ followed by routines with lower FPS.
 To activate this mechanism, create the pipe should with `auto_pacing_mechanism` parameter as true, for example: 
 ```Python
 pipe = Pipe(auto_pacing_mechanism=True)
+```
+
+# Const FPS
+
+There is an ability to set constant FPS to a specific routine.
+Can use in case where you have an environmental limits of FPS rate. 
+
+How to set it? 
+When initializing a routine, call the `set_const_fps` function with you required FPS.
+
+```Python
+class Example(DestinationRoutine):
+    def __init__(self, required_fps):
+        self.set_const_fps(required_fps)
 ```
 
 # FAQ 
