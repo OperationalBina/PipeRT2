@@ -39,6 +39,10 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     packages=setuptools.find_packages(),
-    install_requires=["posix-ipc", "numpy", "zerorpc"],
+    install_requires=["posix-ipc", "numpy"],
+    extras_require={
+        'rpc': ['zerorpc'],
+        'api': ['flask', 'flask_cors'],
+    },
     python_requires=">=3.6",
 )

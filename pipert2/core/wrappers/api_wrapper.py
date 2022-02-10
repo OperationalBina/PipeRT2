@@ -1,7 +1,11 @@
-import flask
-from flask import Flask
-from flask import Response
-from flask_cors import CORS
+try:
+    import flask
+    from flask import Flask
+    from flask import Response
+    from flask_cors import CORS
+except ImportError:
+    print(f"""Oops! seems like flask isn't installed!\nIf you want to use the capabilities of the api_wrapper run 'pip install PipeRT[api]'""")
+
 from pipert2.core.base import Pipe
 from multiprocessing import Process
 from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
