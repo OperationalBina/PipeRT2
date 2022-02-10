@@ -341,7 +341,7 @@ To activate this mechanism, create the pipe should with `auto_pacing_mechanism` 
 pipe = Pipe(auto_pacing_mechanism=True)
 ```
 
-# Const FPS
+# Constant FPS
 
 There is an ability to set constant FPS to a specific routine.
 Can use in case where you have an environmental limits of FPS rate. 
