@@ -343,11 +343,8 @@ pipe = Pipe(auto_pacing_mechanism=True)
 
 # Constant FPS
 
-There is an ability to set constant FPS to a specific routine.
-Can use in case where you have an environmental limits of FPS rate. 
-
 How to set it? 
-When initializing a routine, call the `set_const_fps` function with you required FPS.
+When initializing a routine, call the `set_const_fps` function with the required FPS.
 
 ```Python
 class Example(DestinationRoutine):
