@@ -143,15 +143,18 @@ def test_pipe_structure(mocker: MockerFixture):
             {
                 'flow_name': 'flow1',
                 'routine_name': 'dummy_routine1',
-                'events': list({'kill', 'start', 'stop', 'test'})
+                'events': {'kill', 'start', 'stop', 'test'}
             },
             {
                 'flow_name': 'flow1',
                 'routine_name': 'dummy_routine2',
-                'events': list({'kill', 'start', 'stop'})
+                'events': {'kill', 'start', 'stop'}
             }
         ],
         'Events': ['start', 'stop', 'kill']
     }
+
+    for routine in pipe_structure['Routines']:
+        routine['events'] = set(routine['events'])
 
     assert pipe_structure == expected_result
