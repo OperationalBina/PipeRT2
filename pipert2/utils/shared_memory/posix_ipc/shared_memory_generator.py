@@ -66,6 +66,7 @@ class SharedMemoryGenerator:
 
         for _ in range(self.max_segment_count):
             name_to_unlink = self.memory_id_gen.get_next()
+
             if name_to_unlink in self.shared_memories:
                 self._destroy_memory(name_to_unlink)
 
