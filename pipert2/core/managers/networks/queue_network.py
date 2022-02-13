@@ -56,9 +56,9 @@ class QueueNetwork(Network):
 
         for destination_routine in destinations:
             if source.flow_name == destination_routine.flow_name:
-                publish_queue.register(destination_routine.message_handler.input_queue.get_queue(process_safe=False))
+                publish_queue.register(destination_routine.name, destination_routine.message_handler.input_queue.get_queue(process_safe=False))
             else:
-                publish_queue.register(destination_routine.message_handler.input_queue.get_queue(process_safe=True))
+                publish_queue.register(destination_routine.name, destination_routine.message_handler.input_queue.get_queue(process_safe=True))
 
             destination_routine.message_handler.input_queue.receive = data_transmitter.receive()
 

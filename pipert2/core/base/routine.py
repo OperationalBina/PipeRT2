@@ -9,7 +9,7 @@ from pipert2.utils.dummy_object import Dummy
 from logging import Logger, LoggerAdapter
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts.event_names import LOG_DATA, START_EVENT_NAME, STOP_EVENT_NAME
+from pipert2.utils.consts.event_names import LOG_DATA, START_EVENT_NAME, STOP_EVENT_NAME, UNLINK
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
@@ -176,6 +176,10 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.stop_event.clear()
             self.runner = self.runner_creator()
             self.runner.start()
+
+    @events(UNLINK)
+    def unlink(self, unlink_routine_name):
+        self.message_handler.output_queue.unregister(unlink_routine_name)
 
     @events(STOP_EVENT_NAME)
     def stop(self) -> None:
