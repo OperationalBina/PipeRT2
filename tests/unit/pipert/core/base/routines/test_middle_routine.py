@@ -109,3 +109,11 @@ def test_join(dummy_routine: MiddleRoutine, mocker: MagicMock):
     dummy_routine.join()
 
     handler.close.assert_called()
+
+
+def test_unlink(dummy_routine, mocker: MockerFixture):
+    dummy_output_queue = mocker.MagicMock()
+    dummy_routine.message_handler.output_queue = dummy_output_queue
+    dummy_routine.unlink("name")
+
+    dummy_output_queue.unregister.assert_called_with("name")
