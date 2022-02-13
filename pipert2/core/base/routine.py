@@ -179,6 +179,12 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     @events(UNLINK)
     def unlink(self, unlink_routine_name):
+        """Unlink a routine from the current routine.
+
+        Args:
+            unlink_routine_name: The name of the unlink routine.
+
+        """
         self.message_handler.output_queue.unregister(unlink_routine_name)
 
     @events(STOP_EVENT_NAME)
