@@ -68,7 +68,6 @@ class Flow(BaseEventExecutor):
                     for routine in self.routines.values():
                         routine.execute_event(event)
 
-                print(event.event_name)
                 EventExecutorInterface.execute_event(self, event)
 
     def _after_join(self):
