@@ -2,9 +2,11 @@ from typing import List
 from logging import Logger
 from pipert2.utils.method_data import Method
 from pipert2.core.base.routine import Routine
+from pipert2.utils.consts.event_names import CLEANUP
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
+from pipert2.utils.shared_memory_manager import SharedMemoryManager
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
@@ -66,6 +68,7 @@ class Flow(BaseEventExecutor):
                     for routine in self.routines.values():
                         routine.execute_event(event)
 
+                print(event.event_name)
                 EventExecutorInterface.execute_event(self, event)
 
     def _after_join(self):
@@ -86,3 +89,10 @@ class Flow(BaseEventExecutor):
         """
 
         return cls.events.all[cls.__name__]
+
+    @events(CLEANUP)
+    def cleanup(self):
+        """Cleanup the process resources.
+
+        """
+        SharedMemoryManager().cleanup_memory()
