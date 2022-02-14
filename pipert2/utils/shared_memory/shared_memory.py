@@ -58,8 +58,6 @@ class SharedMemory:
 
         try:
             self.semaphore.unlink()
+            self.memory.unlink()
         except posix_ipc.ExistentialError:
             pass
-        else:
-            self.memory.unlink()
-
