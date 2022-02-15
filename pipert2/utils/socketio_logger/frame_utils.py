@@ -1,4 +1,10 @@
-import cv2
+try:
+    import cv2
+except ImportError:
+    print(
+        "Seems like opencv isn't installed...\nIn order to use the cockpit and its features run pip install PipeRT["
+        "cockpit]")
+
 import base64
 import numpy as np
 
