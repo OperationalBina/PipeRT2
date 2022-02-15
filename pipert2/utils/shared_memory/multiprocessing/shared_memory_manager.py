@@ -1,15 +1,14 @@
-from pipert2.utils.singleton import Singleton
+from pipert2.utils.shared_memory.general.shared_memory_manager import AbsSharedMemoryManager
 from pipert2.utils.shared_memory.multiprocessing.shared_memory_generator import SharedMemoryGenerator, \
     get_shared_memory_object
 
 
-class SharedMemoryManager(metaclass=Singleton):
+class SharedMemoryManager(AbsSharedMemoryManager):
     """The shared memory manager interacts with an implementation of a shared memory library, and simplifies user usage.
 
     """
 
     def __init__(self, max_segment_count: int = 50, segment_size: int = 5000000):
-        print("Loaded multiprocessing")
         self.shared_memory_generator = SharedMemoryGenerator(max_segment_count=max_segment_count)
 
     def write_to_mem(self, data: bytes) -> str:
