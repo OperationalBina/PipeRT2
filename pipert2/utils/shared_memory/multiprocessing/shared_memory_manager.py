@@ -51,4 +51,8 @@ class SharedMemoryManager(AbsSharedMemoryManager):
         return data
 
     def cleanup_memory(self):
+        """Call the cleanup method of the shared_memory_generator to release all of the memory held.
+
+        """
+
         self.shared_memory_generator.cleanup()
