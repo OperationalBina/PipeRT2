@@ -1,6 +1,12 @@
+try:
+    import posix_ipc
+except ImportError:
+    print(
+        "Seems like posix-ipc isn't installed...\nFor shared memory support in python ver < 3.8 run pip install "
+        "PipeRT[shared_memory]")
+
 import os
 import mmap
-import posix_ipc
 from typing import Optional
 from pipert2.utils.shared_memory.shared_memory import SharedMemory
 from pipert2.utils.shared_memory.memory_id_iterator import MemoryIdIterator

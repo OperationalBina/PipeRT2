@@ -1,6 +1,10 @@
-import sys
-# if sys.version_info.minor <= 7:
-import posix_ipc
+try:
+    import posix_ipc
+except ImportError:
+    print(
+        "Seems like posix-ipc isn't installed...\nFor shared memory support in python ver < 3.8 run pip install "
+        "PipeRT[shared_memory]")
+
 import mmap
 
 
