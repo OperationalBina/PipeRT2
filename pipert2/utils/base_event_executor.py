@@ -1,11 +1,10 @@
-from logging import Logger
 from multiprocessing import Process
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from pipert2.utils.interfaces import EventExecutorInterface
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts import KILL_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.core.managers.event_board import EventBoard, EventHandler
+from pipert2.utils.consts import KILL_EVENT_NAME, STOP_EVENT_NAME, CLEANUP
 
 
 class BaseEventExecutor(EventExecutorInterface):
@@ -53,6 +52,7 @@ class BaseEventExecutor(EventExecutorInterface):
             event = self.event_handler.wait()
 
         self.execute_event(Method(STOP_EVENT_NAME))
+        self.execute_event(Method(CLEANUP))
 
     def execute_event(self, event: Method) -> None:
         """Execute the event callbacks.

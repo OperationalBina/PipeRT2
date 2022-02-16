@@ -60,3 +60,4 @@ pipe.notify_event(START_EVENT_NAME)
 time.sleep(10)
 
 pipe.notify_event(STOP_EVENT_NAME)
+pipe.join(True)

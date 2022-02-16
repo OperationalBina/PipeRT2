@@ -52,9 +52,13 @@ class SharedMemory:
         """Cleans what is on the memory and deletes it.
 
         """
-
         self.mapfile.close()
         self.memory.close_fd()
         self.semaphore.release()
-        self.semaphore.unlink()
-        self.memory.unlink()
+
+        try:
+            self.semaphore.unlink()
+        except posix_ipc.ExistentialError:
+            pass
+        else:
+            self.memory.unlink()
