@@ -1,5 +1,7 @@
 import pytest
-from mock import Mock
+from mock import Mock, call
+from pytest_mock import MockerFixture
+
 from pipert2.utils.queue_utils.publish_queue import PublishQueue
 from pipert2.utils.queue_utils.queue_wrapper import QueueWrapper
 from pipert2.core.managers.networks.queue_network import QueueNetwork
@@ -22,96 +24,110 @@ def test_get_message_handler(dummy_queue_network):
     assert message_handler == message_handler2
 
 
-def test_link_single_destination(dummy_queue_network):
-    source_routine = Mock()
-    destination_routines = (Mock(),)
-    destination_routines[0].input_queue = QueueWrapper()
-    data_transmitter = Mock()
-
-    dummy_queue_network.link(source_routine, destination_routines, data_transmitter)
-
-    assert type(source_routine.message_handler.output_queue) == PublishQueue
-    assert source_routine.message_handler.output_queue._mp_queues[0] == destination_routines[
-        0].message_handler.input_queue.get_queue(False)
-
-
-def test_link_multiple_destinations(dummy_queue_network):
-    source_routine = Mock()
-    destination_routines = (Mock(), Mock())
-    for destination_routine in destination_routines:
-        destination_routine.input_queue = QueueWrapper()
-    data_transmitter = Mock()
-
-    dummy_queue_network.link(source_routine, destination_routines, data_transmitter)
-
-    assert type(source_routine.message_handler.output_queue) == PublishQueue
-
-    for index, routine in enumerate(destination_routines):
-        assert source_routine.message_handler.output_queue._mp_queues[
-                   index] == routine.message_handler.input_queue.get_queue(False)
-
-
-def test_link_multiple_sources(dummy_queue_network):
-    source_routine1 = Mock()
-    source_routine2 = Mock()
-    destination_routines = (Mock(),)
-    destination_routines[0].input_queue = QueueWrapper()
-    data_transmitter = Mock()
-
-    dummy_queue_network.link(source_routine1, destination_routines, data_transmitter)
-    dummy_queue_network.link(source_routine2, destination_routines, data_transmitter)
-
-    for index, routine in enumerate(destination_routines):
-        assert source_routine1.message_handler.output_queue._mp_queues[
-                   index] == routine.message_handler.input_queue.get_queue(False)
-        assert source_routine2.message_handler.output_queue._mp_queues[
-                   index] == routine.message_handler.input_queue.get_queue(False)
-
-
-def test_link_not_process_safe_single_destination(dummy_queue_network):
-    source_routine = Mock()
-    source_routine.flow_name = "dummy"
-    destination_routines = (Mock(),)
-    destination_routines[0].input_queue = QueueWrapper()
-    destination_routines[0].flow_name = "dummy"
-    data_transmitter = Mock()
-
-    dummy_queue_network.link(source_routine, destination_routines, data_transmitter)
-
-    assert type(source_routine.message_handler.output_queue) == PublishQueue
-    assert source_routine.message_handler.output_queue._mp_queues[0] == destination_routines[
-        0].message_handler.input_queue.get_queue(False)
-
-
-def test_link_process_safe_single_destination(dummy_queue_network):
+def test_link_mix_process_safe_and_thread_safe_multiple_destinations(dummy_queue_network, mocker: MockerFixture):
     source_routine = Mock()
     source_routine.flow_name = "dummy1"
-    destination_routines = (Mock(),)
-    destination_routines[0].input_queue = QueueWrapper()
-    destination_routines[0].flow_name = "dummy2"
-    data_transmitter = Mock()
+    source_routine.message_handler.output_queue = PublishQueue()
 
-    dummy_queue_network.link(source_routine, destination_routines, data_transmitter)
+    des1_routine = mocker.MagicMock()
+    des1_msg_handler = mocker.MagicMock()
+    des1_input_queue = mocker.MagicMock()
+    des1_routine.name = "des1"
+    des1_routine.message_handler = des1_msg_handler
+    des1_msg_handler.get_receiver.return_value = des1_input_queue
 
-    assert type(source_routine.message_handler.output_queue) == PublishQueue
-    assert source_routine.message_handler.output_queue._mp_queues[0] == destination_routines[
-        0].message_handler.input_queue.get_queue(True)
+    des2_routine = mocker.MagicMock()
+    des2_msg_handler = mocker.MagicMock()
+    des2_input_queue = mocker.MagicMock()
+    des2_routine.name = "des2"
+    des2_routine.message_handler = des2_msg_handler
+    des2_msg_handler.get_receiver.return_value = des2_input_queue
 
+    destination_routines = (des1_routine, des2_routine)
 
-def test_link_process_safe_multiple_destinations(dummy_queue_network):
-    source_routine = Mock()
-    source_routine.flow_name = "dummy1"
-    destination_routines = (Mock(), Mock())
     for destination_routine in destination_routines:
         destination_routine.input_queue = QueueWrapper()
+
     destination_routines[0].flow_name = "dummy1"
-    destination_routines[0].flow_name = "dummy2"
+    destination_routines[1].flow_name = "dummy2"
     data_transmitter = Mock()
 
     dummy_queue_network.link(source_routine, destination_routines, data_transmitter)
 
     assert type(source_routine.message_handler.output_queue) == PublishQueue
+    assert source_routine.message_handler.link.call_args_list == [call("des1", des1_input_queue), call("des2", des2_input_queue)]
+    des1_msg_handler.get_receiver.assert_called_with(False)
+    des2_msg_handler.get_receiver.assert_called_with(True)
 
-    for index, routine in enumerate(destination_routines):
-        assert source_routine.message_handler.output_queue._mp_queues[
-                   index] == routine.message_handler.input_queue.get_queue(False)
+
+def test_link_multiple_process_safe_multiple_destinations(dummy_queue_network, mocker: MockerFixture):
+    source_routine = Mock()
+    source_routine.flow_name = "dummy1"
+    source_routine.message_handler.output_queue = PublishQueue()
+
+    des1_routine = mocker.MagicMock()
+    des1_msg_handler = mocker.MagicMock()
+    des1_input_queue = mocker.MagicMock()
+    des1_routine.name = "des1"
+    des1_routine.message_handler = des1_msg_handler
+    des1_msg_handler.get_receiver.return_value = des1_input_queue
+
+    des2_routine = mocker.MagicMock()
+    des2_msg_handler = mocker.MagicMock()
+    des2_input_queue = mocker.MagicMock()
+    des2_routine.name = "des2"
+    des2_routine.message_handler = des2_msg_handler
+    des2_msg_handler.get_receiver.return_value = des2_input_queue
+
+    destination_routines = (des1_routine, des2_routine)
+
+    for destination_routine in destination_routines:
+        destination_routine.input_queue = QueueWrapper()
+
+    destination_routines[0].flow_name = "dummy2"
+    destination_routines[1].flow_name = "dummy2"
+    data_transmitter = Mock()
+
+    dummy_queue_network.link(source_routine, destination_routines, data_transmitter)
+
+    assert type(source_routine.message_handler.output_queue) == PublishQueue
+    assert source_routine.message_handler.link.call_args_list == [call("des1", des1_input_queue), call("des2", des2_input_queue)]
+    des1_msg_handler.get_receiver.assert_called_with(True)
+    des2_msg_handler.get_receiver.assert_called_with(True)
+
+
+def test_link_multiple_thread_safe_multiple_destinations(dummy_queue_network, mocker: MockerFixture):
+    source_routine = Mock()
+    source_routine.flow_name = "dummy1"
+    source_routine.message_handler.output_queue = PublishQueue()
+
+    des1_routine = mocker.MagicMock()
+    des1_msg_handler = mocker.MagicMock()
+    des1_input_queue = mocker.MagicMock()
+    des1_routine.name = "des1"
+    des1_routine.message_handler = des1_msg_handler
+    des1_msg_handler.get_receiver.return_value = des1_input_queue
+
+    des2_routine = mocker.MagicMock()
+    des2_msg_handler = mocker.MagicMock()
+    des2_input_queue = mocker.MagicMock()
+    des2_routine.name = "des2"
+    des2_routine.message_handler = des2_msg_handler
+    des2_msg_handler.get_receiver.return_value = des2_input_queue
+
+    destination_routines = (des1_routine, des2_routine)
+
+    for destination_routine in destination_routines:
+        destination_routine.input_queue = QueueWrapper()
+
+    destination_routines[0].flow_name = "dummy1"
+    destination_routines[1].flow_name = "dummy1"
+    data_transmitter = Mock()
+
+    dummy_queue_network.link(source_routine, destination_routines, data_transmitter)
+
+    assert type(source_routine.message_handler.output_queue) == PublishQueue
+    assert source_routine.message_handler.link.call_args_list == [call("des1", des1_input_queue), call("des2", des2_input_queue)]
+    des1_msg_handler.get_receiver.assert_called_with(False)
+    des2_msg_handler.get_receiver.assert_called_with(False)
+

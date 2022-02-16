@@ -52,17 +52,11 @@ class QueueNetwork(Network):
 
         """
 
-        publish_queue = PublishQueue()
-
         for destination_routine in destinations:
             process_safe = not (source.flow_name == destination_routine.flow_name)
+            source.message_handler.link(destination_routine.name,
+                                        destination_routine.message_handler.get_receiver(process_safe))
 
-            publish_queue.register(
-                destination_routine.name,
-                destination_routine.message_handler.input_queue.get_queue(process_safe=process_safe)
-            )
+            destination_routine.message_handler.set_receive(data_transmitter.receive())
 
-            destination_routine.message_handler.input_queue.receive = data_transmitter.receive()
-
-        source.message_handler.output_queue = publish_queue
-        source.message_handler.output_queue.transmit = data_transmitter.transmit()
+        source.message_handler.set_transmit(data_transmitter.transmit())
