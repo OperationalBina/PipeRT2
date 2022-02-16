@@ -25,11 +25,13 @@ if flask:
             """
 
             self.notify_callback = pipe.get_event_notify()
+            self.pipe = pipe
 
             self.app = Flask(__name__)
             self.app.add_url_rule("/start", "start", self.start, methods=['POST'])
             self.app.add_url_rule("/pause", "pause", self.pause, methods=['POST'])
             self.app.add_url_rule("/kill", "kill", self.kill, methods=['POST'])
+            self.app.add_url_rule("/pipe/structure", "pipe_structure", self.get_pipe_structure, methods=['GET'])
 
             self.app.add_url_rule("/routines/<routine_name>/events/<event_name>/execute/",
                                   "routine_execute",
@@ -87,6 +89,24 @@ if flask:
                 shutdown_hook()
 
             return Response(status=200)
+
+        def get_pipe_structure(self):
+            """Get the structure of the pipeline with the events its including.
+
+            Returns:
+                Dictionary of routines details, and custom events the pipe supported.
+                {
+                    Routines: [
+                        {
+                            flow_name: xxx,
+                            routine_name: xxx,
+                            events: []
+                        }
+                    ],
+                    Events: []
+                }
+            """
+            return self.pipe.get_pipe_structure()
 
         def routine_execute(self, routine_name, event_name):
             """Execute custom event. Should get request with 'event_name' and with optional keys parameters.

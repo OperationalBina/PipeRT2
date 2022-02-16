@@ -10,8 +10,8 @@ if posix_ipc:
     import os
     import mmap
     from typing import Optional
-    from pipert2.utils.shared_memory.shared_memory import SharedMemory
-    from pipert2.utils.shared_memory.memory_id_iterator import MemoryIdIterator
+    from pipert2.utils.shared_memory.posix_ipc.shared_memory import SharedMemory
+    from pipert2.utils.shared_memory.general.memory_id_iterator import MemoryIdIterator
 
 
     def get_shared_memory_object(name: str) -> Optional[SharedMemory]:
@@ -74,6 +74,7 @@ if posix_ipc:
 
             for _ in range(self.max_segment_count):
                 name_to_unlink = self.memory_id_gen.get_next()
+
                 if name_to_unlink in self.shared_memories:
                     self._destroy_memory(name_to_unlink)
 

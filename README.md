@@ -27,6 +27,7 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Running via RPC CLI](#running-via-rpc-cli)
 - [Running via API](#running-via-api)
 - [Synchroniser](#synchroniser)
+- [Constant FPS](#constant-fps)
 - [FAQ](#faq)
 - [Contributing](#contributing)
 
@@ -135,6 +136,36 @@ For triggering an event for a specific flow or routine we add a dictionary of th
     ```Python
   example_pipe.notify_event(START_EVENT_NAME, {"example_flow": [generate_data_routine.name, print_result_routine.name]})  
   ```
+  
+### Custom Data Types
+
+Instead of using the `Data` class to pass arguments throughout the pipe's routines, you can create custom class that will inherit from `Data` 
+with your own parameters. 
+
+For example: 
+
+```Python
+class Example(Data):
+    def __init__(self):
+        self.custom_param = "custom param"
+
+class SrcRoutine(SourceRoutine):
+    def main_logic(self) -> Example:
+        return Example()
+
+class MidRoutine(MiddleRoutine):
+    def main_logic(self, example: Example) -> Example:
+        print(example.custom_param) // output -> "custom param"
+        example.custom_param = "change"
+        
+        return example
+
+class DstRoutine(DestinationRoutine):
+    def main_logic(self, example):
+        print(example.custom_param) // output -> "change"
+```
+
+
 
 # Advanced
 ## The Routine
@@ -339,6 +370,17 @@ followed by routines with lower FPS.
 To activate this mechanism, create the pipe should with `auto_pacing_mechanism` parameter as true, for example: 
 ```Python
 pipe = Pipe(auto_pacing_mechanism=True)
+```
+
+# Constant FPS
+
+How to set it? 
+When initializing a routine, call the `set_const_fps` function with the required FPS.
+
+```Python
+class Example(DestinationRoutine):
+    def __init__(self, required_fps):
+        self.set_const_fps(required_fps)
 ```
 
 # FAQ 

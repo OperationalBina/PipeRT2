@@ -1,13 +1,12 @@
 try:
-    from pipert2.utils.shared_memory.shared_memory_generator import SharedMemoryGenerator, get_shared_memory_object
+    from pipert2.utils.shared_memory.general.shared_memory_manager import AbsSharedMemoryManager
+    from pipert2.utils.shared_memory.posix_ipc.shared_memory_generator import SharedMemoryGenerator, \
+        get_shared_memory_object
 except ImportError:
     SharedMemoryGenerator = None
 
 if SharedMemoryGenerator:
-    from pipert2.utils.singleton import Singleton
-
-
-    class SharedMemoryManager(metaclass=Singleton):
+    class SharedMemoryManager(AbsSharedMemoryManager):
         """The shared memory manager interacts with an implementation of a shared memory library, and simplifies user usage.
 
         """

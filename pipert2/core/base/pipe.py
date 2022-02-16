@@ -171,7 +171,23 @@ class Pipe:
         flow_validator.validate_flow(self.flows, self.wires)
         wires_validator.validate_wires(self.wires.values())
 
-    def _send_initial_log(self):
+    def get_pipe_structure(self):
+        """Calculate the structure of the pipe including the routines and the events.
+
+        Returns:
+            Dictionary of routines details, and custom events the pipe supported.
+            {
+                Routines: [
+                    {
+                        flow_name: xxx,
+                        routine_name: xxx,
+                        events: []
+                    }
+                ],
+                Events: []
+            }
+        """
+
         flows_routines = []
 
         for flow in self.flows.values():
@@ -189,6 +205,15 @@ class Pipe:
             'Routines': flows_routines,
             'Events': [START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME]
         }
+
+        return creation_log
+
+    def _send_initial_log(self):
+        """Send initial log with the structure of the pipeline.
+
+        """
+
+        creation_log = self.get_pipe_structure()
 
         self.logger.handlers[0].log_event_name = CREATION_LOG_NAME
         self.logger.info(creation_log)

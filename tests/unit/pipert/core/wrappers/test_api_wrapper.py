@@ -17,6 +17,12 @@ def api_wrapper_with_mock_notify(mocker: MockerFixture):
     return api_wrapper
 
 
+def test_get_pipe_structure(api_wrapper_with_mock_notify):
+    _ = api_wrapper_with_mock_notify.get_pipe_structure()
+
+    api_wrapper_with_mock_notify.pipe.get_pipe_structure.assert_called_once()
+
+
 def test_run(api_wrapper_with_mock_notify, mocker: MockerFixture):
 
     api_wrapper_with_mock_notify.api_process = mocker.MagicMock()

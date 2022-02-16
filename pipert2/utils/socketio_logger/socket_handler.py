@@ -21,7 +21,10 @@ if socketio:
 
         def emit(self, record: logging.LogRecord) -> None:
             if not self.sio.connected:
-                self.sio.connect(self.url)
+                try:
+                    self.sio.connect(self.url)
+                except socketio.exceptions.ConnectionError:
+                    return
             try:
                 self.sio.emit(self.log_event_name, self.formatter.format(record))
             except SocketIOError:

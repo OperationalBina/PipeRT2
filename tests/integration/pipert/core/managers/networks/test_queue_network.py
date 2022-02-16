@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 from pipert2 import SharedMemoryTransmitter
 from pipert2 import QueueNetwork, QueueHandler
 from pipert2.core.base.data import Data
-from pipert2.utils.shared_memory_manager import SharedMemoryManager
+from pipert2.utils.shared_memory import SharedMemoryManager
 
 
 def test_link_shared_memory_transmitter_to_destination_routines_message_handlers(mocker: MockerFixture):
@@ -38,8 +38,8 @@ def test_link_shared_memory_transmitter_to_destination_routines_message_handlers
     expected_value = Data()
     expected_value.additional_data = {"test": input_sentence_in_bytes}
 
-    assert first_destination_routine.message_handler.receive(requested_data) == expected_value
-    assert second_destination_routine.message_handler.receive(requested_data) == expected_value
+    assert first_destination_routine.message_handler.input_queue.receive(requested_data) == expected_value
+    assert second_destination_routine.message_handler.input_queue.receive(requested_data) == expected_value
 
 
 def test_link_shared_memory_transmitter_to_source_routine_message_handlers(mocker: MockerFixture):
@@ -59,7 +59,7 @@ def test_link_shared_memory_transmitter_to_source_routine_message_handlers(mocke
 
     expected_value.additional_data = {"test": data_to_transmit}
 
-    memory_name = source_routine.message_handler.transmit(expected_value)
+    memory_name = source_routine.message_handler.output_queue.transmit(expected_value)
 
     expected_data_in_memory = bytes(data_to_transmit)
 
