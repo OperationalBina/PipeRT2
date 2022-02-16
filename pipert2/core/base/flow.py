@@ -6,7 +6,7 @@ from pipert2.utils.consts.event_names import CLEANUP
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.shared_memory_manager import SharedMemoryManager
+from pipert2.utils.shared_memory import SharedMemoryManager
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 
 
