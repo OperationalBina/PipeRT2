@@ -186,7 +186,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
         """
         
-        self.message_handler.output_queue.unregister(unlink_routine_name)
+        self.message_handler.unlink(unlink_routine_name)
 
     @events(STOP_EVENT_NAME)
     def stop(self) -> None:
