@@ -1,7 +1,7 @@
 import time
 
 import pytest
-from pipert2.utils.shared_memory_manager import SharedMemoryManager
+from pipert2.utils.shared_memory import SharedMemoryManager
 
 
 MAX_SEGMENT_COUNT = 50

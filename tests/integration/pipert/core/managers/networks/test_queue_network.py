@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 from pipert2 import SharedMemoryTransmitter
 from pipert2 import QueueNetwork, QueueHandler
 from pipert2.core.base.data import Data
-from pipert2.utils.shared_memory_manager import SharedMemoryManager
+from pipert2.utils.shared_memory import SharedMemoryManager
 
 
 def test_link_shared_memory_transmitter_to_destination_routines_message_handlers(mocker: MockerFixture):
