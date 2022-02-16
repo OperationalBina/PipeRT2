@@ -3,8 +3,11 @@ import sys
 import logging
 from dotenv import load_dotenv
 from pipert2.utils.consts.emit_socket_names import LOG_NAME
-from pipert2.utils.socketio_logger.socket_logger import SocketLogger
-from pipert2.utils.socketio_logger.socket_handler import SocketHandler
+try:
+    from pipert2.utils.socketio_logger.socket_logger import SocketLogger
+    from pipert2.utils.socketio_logger.socket_handler import SocketHandler
+except ImportError:
+    SocketLogger = None
 
 
 PIPE_INFRASTRUCTURE_LOG_LEVEL = 5
@@ -49,22 +52,23 @@ def get_default_print_logger(logger_name):
     return logger
 
 
-def get_socket_logger(logger_name, level):
-    logging.setLoggerClass(SocketLogger)
+if SocketLogger:
+    def get_socket_logger(logger_name, level):
+        logging.setLoggerClass(SocketLogger)
 
-    logger: SocketLogger = logging.getLogger(logger_name)
+        logger: SocketLogger = logging.getLogger(logger_name)
 
-    logger.set_url(os.getenv("SOCKET_LOGGER_URL"))
-    logger.set_log_event_name(LOG_NAME)
-    logger.propagate = False
-    logger.setLevel(level)
+        logger.set_url(os.getenv("SOCKET_LOGGER_URL"))
+        logger.set_log_event_name(LOG_NAME)
+        logger.propagate = False
+        logger.setLevel(level)
 
-    handler = SocketHandler(logger._url, logger._log_event_name)
-    handler.setFormatter(logging.Formatter('{"time": "%(asctime)s.%(msecs)03d", '
-                                            '"source": "%(name)s", '
-                                            '"level": "%(levelname)s", '
-                                            '"message": "%(message)s"}',
-                                            datefmt="%d-%m-%y %H:%M:%S"))
-    logger.addHandler(handler)
+        handler = SocketHandler(logger._url, logger._log_event_name)
+        handler.setFormatter(logging.Formatter('{"time": "%(asctime)s.%(msecs)03d", '
+                                                '"source": "%(name)s", '
+                                                '"level": "%(levelname)s", '
+                                                '"message": "%(message)s"}',
+                                                datefmt="%d-%m-%y %H:%M:%S"))
+        logger.addHandler(handler)
 
-    return logger
+        return logger
