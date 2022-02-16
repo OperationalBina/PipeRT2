@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from pipert2.core.base.data import FrameData
 from pipert2.core.wrappers.api_wrapper import APIWrapper
-from pipert2.utils.logging_module_modifiers import get_socket_logger
+from pipert2.utils.socketio_logger.socket_logger import get_socket_logger
 from pipert2 import SourceRoutine, Data, MiddleRoutine, DestinationRoutine, Pipe, START_EVENT_NAME
 
 

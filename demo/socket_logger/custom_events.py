@@ -1,7 +1,7 @@
 from pipert2.core.wrappers.api_wrapper import APIWrapper
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2 import SourceRoutine, Data, DestinationRoutine, Pipe
-from pipert2.utils.logging_module_modifiers import get_socket_logger
+from pipert2.utils.socketio_logger.socket_logger import get_socket_logger
 
 
 class Src(SourceRoutine):
