@@ -287,7 +287,7 @@ SOCKET_LOGGER_URL="<cockpit url here (usually http://localhost:3000 if on the sa
 After that your pipes default logger with the socket logger like so:
 ```Python
 from pipert2 import Pipe
-from pipert2.utils.logging_module_modifiers import get_socket_logger
+from pipert2.utils.socketio_logger.socket_logger import get_socket_logger
 
 # logger level indicates what logs will be sent, if logging.INFO is provided info logs and above will be sent and so on.
 example_pipe = Pipe(logger=get_socket_logger("<desired base name here>", <logger level>))

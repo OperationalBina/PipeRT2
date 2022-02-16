@@ -70,7 +70,7 @@ class QueueHandler(MessageHandler):
         if message is not None:
             if isinstance(message, Message):
                 if self.send_data and isinstance(message.payload.data, FrameData):
-                    self.log_frame("input", message)
+                    self.logger.log_frame("input", message)
 
                 message.record_entry(self.routine_name)
 
@@ -85,6 +85,6 @@ class QueueHandler(MessageHandler):
         """
 
         if self.send_data and isinstance(message.payload.data, FrameData):
-            self.log_frame("output", message)
+            self.logger.log_frame("output", message)
 
         self._put(message)
