@@ -32,7 +32,7 @@ class Src(FPSRoutine):
     def setup(self) -> None:
         self.cap = cv2.VideoCapture(self.video_path)
 
-    def main_logic(self) -> FrameData:
+    def main_logic(self, data) -> FrameData:
         ret, img = self.cap.read()
 
         img = cv2.putText(img, f"{self.count}", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 255, 0), 1, cv2.LINE_AA)
