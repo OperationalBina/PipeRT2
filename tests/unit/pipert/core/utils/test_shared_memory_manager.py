@@ -1,5 +1,7 @@
+import time
+
 import pytest
-from pipert2.utils.shared_memory_manager import SharedMemoryManager
+from pipert2.utils.shared_memory import SharedMemoryManager
 
 
 MAX_SEGMENT_COUNT = 50
@@ -8,6 +10,7 @@ MAX_SEGMENT_COUNT = 50
 @pytest.fixture
 def dummy_shared_memory_manager():
     dummy_shared_memory_manager = SharedMemoryManager()
+    dummy_shared_memory_manager.shared_memory_generator.create_memories()
     return dummy_shared_memory_manager
 
 
