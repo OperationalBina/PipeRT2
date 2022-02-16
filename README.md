@@ -386,7 +386,7 @@ class Example(DestinationRoutine):
 
 # Unlink Routines
 
-To disconnect on runtime one routine to another and to stop outputting its result,
+To disconnect one routine from another, and stop the output of its results to that other specific routine,  
 you should use the `unlink` event. 
 
 To unlink them use:
