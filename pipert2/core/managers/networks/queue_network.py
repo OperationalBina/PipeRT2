@@ -3,7 +3,6 @@ from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.handlers.message_handlers.queue_handler import QueueHandler
-from pipert2.utils.queue_utils.publish_queue import PublishQueue
 
 
 class QueueNetwork(Network):
