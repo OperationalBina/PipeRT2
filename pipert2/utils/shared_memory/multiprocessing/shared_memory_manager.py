@@ -1,17 +1,15 @@
-from pipert2.utils.singleton import Singleton
-# if sys.version_info.minor <= 7:
-from pipert2.utils.shared_memory.shared_memory_generator import SharedMemoryGenerator, get_shared_memory_object
+from pipert2.utils.shared_memory.general.shared_memory_manager import AbsSharedMemoryManager
+from pipert2.utils.shared_memory.multiprocessing.shared_memory_generator import SharedMemoryGenerator, \
+    get_shared_memory_object
 
 
-class SharedMemoryManager(metaclass=Singleton):
+class SharedMemoryManager(AbsSharedMemoryManager):
     """The shared memory manager interacts with an implementation of a shared memory library, and simplifies user usage.
 
     """
 
     def __init__(self, max_segment_count: int = 50, segment_size: int = 5000000):
-        self.shared_memory_generator = SharedMemoryGenerator(max_segment_count=max_segment_count,
-                                                             segment_size=segment_size)
-        self.shared_memory_generator.create_memories()
+        self.shared_memory_generator = SharedMemoryGenerator(max_segment_count=max_segment_count)
 
     def write_to_mem(self, data: bytes) -> str:
         """Writes given bytes to the shared memory.
@@ -24,15 +22,12 @@ class SharedMemoryManager(metaclass=Singleton):
 
         """
 
-        memory_name = self.shared_memory_generator.get_next_shared_memory_name()
-        memory = get_shared_memory_object(memory_name)
+        memory = self.shared_memory_generator.get_next_shared_memory(size=len(data))
 
         if memory:
-            memory.acquire_semaphore()
-            memory.write_to_memory(data)
-            memory.release_semaphore()
+            memory.buf[:] = data
 
-        return memory_name
+        return memory.name
 
     def read_from_mem(self, mem_name: str, bytes_to_read: int) -> [bytes, None]:
         """Reads from a given shared memory segment.
@@ -49,13 +44,15 @@ class SharedMemoryManager(metaclass=Singleton):
         memory = get_shared_memory_object(mem_name)
 
         if memory:
-            memory.acquire_semaphore()
-            data = memory.read_from_memory(size=bytes_to_read)
-            memory.release_semaphore()
+            data = bytes(memory.buf[:bytes_to_read])
         else:
             data = None
 
         return data
 
     def cleanup_memory(self):
+        """Call the cleanup method of the shared_memory_generator to release all of the memory held.
+
+        """
+
         self.shared_memory_generator.cleanup()

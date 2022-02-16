@@ -3,7 +3,7 @@ from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.handlers.message_handlers.queue_handler import QueueHandler
-from pipert2.utils.publish_queue import PublishQueue
+from pipert2.utils.queue_utils.publish_queue import PublishQueue
 
 
 class QueueNetwork(Network):
@@ -60,7 +60,7 @@ class QueueNetwork(Network):
             else:
                 publish_queue.register(destination_routine.message_handler.input_queue.get_queue(process_safe=True))
 
-            destination_routine.message_handler.receive = data_transmitter.receive()
+            destination_routine.message_handler.input_queue.receive = data_transmitter.receive()
 
         source.message_handler.output_queue = publish_queue
-        source.message_handler.transmit = data_transmitter.transmit()
+        source.message_handler.output_queue.transmit = data_transmitter.transmit()

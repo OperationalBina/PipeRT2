@@ -26,8 +26,11 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Using The Cockpit](#using-the-cockpit)
 - [Running via RPC CLI](#running-via-rpc-cli)
 - [Running via API](#running-via-api)
+- [Synchroniser](#synchroniser)
+- [Constant FPS](#constant-fps)
 - [FAQ](#faq)
 - [Contributing](#contributing)
+
 
 # Requirements
 
@@ -133,6 +136,36 @@ For triggering an event for a specific flow or routine we add a dictionary of th
     ```Python
   example_pipe.notify_event(START_EVENT_NAME, {"example_flow": [generate_data_routine.name, print_result_routine.name]})  
   ```
+  
+### Custom Data Types
+
+Instead of using the `Data` class to pass arguments throughout the pipe's routines, you can create custom class that will inherit from `Data` 
+with your own parameters. 
+
+For example: 
+
+```Python
+class Example(Data):
+    def __init__(self):
+        self.custom_param = "custom param"
+
+class SrcRoutine(SourceRoutine):
+    def main_logic(self) -> Example:
+        return Example()
+
+class MidRoutine(MiddleRoutine):
+    def main_logic(self, example: Example) -> Example:
+        print(example.custom_param) // output -> "custom param"
+        example.custom_param = "change"
+        
+        return example
+
+class DstRoutine(DestinationRoutine):
+    def main_logic(self, example):
+        print(example.custom_param) // output -> "change"
+```
+
+
 
 # Advanced
 ## The Routine
@@ -264,7 +297,7 @@ After that your pipe will send its logs to the cockpit!
 
 # Running via RPC CLI
 
-Firstly, you need to install the zerorpc python package via `pip3 install zerorpc`
+Firstly, in order to use this capability, you need to install the optional package via `pip install PipeRT[rpc]`  
 
 The next step is running the RPC Server:
 ```Python
@@ -288,6 +321,7 @@ Arguments to pipe events are passed in a JSON format:
  
 
 # Running via API
+Firstly, in order to use this capability, you need to install the optional package via `pip install PipeRT[api]`  
 
 After creating a pipeline, you need to call run_api_wrapper with your host and port:
 ```Python
@@ -323,6 +357,32 @@ In order to execute pipe events you need to execute `GET` http calls for `your_h
   } 
 }
 ```
+
+# Synchroniser
+
+In the pipe there is a synchronising mechanism which is used to synchronise the routine's FPS.
+This mechanism forces routines to rest, if their FPS is significantly higher than that of the bottlenecks routines.
+It saves resources, and should not affect the number of the processed routines. 
+
+The best example of a case where the synchronising mechanism would be useful, is when there are fast routines
+followed by routines with lower FPS.
+
+To activate this mechanism, create the pipe should with `auto_pacing_mechanism` parameter as true, for example: 
+```Python
+pipe = Pipe(auto_pacing_mechanism=True)
+```
+
+# Constant FPS
+
+How to set it? 
+When initializing a routine, call the `set_const_fps` function with the required FPS.
+
+```Python
+class Example(DestinationRoutine):
+    def __init__(self, required_fps):
+        self.set_const_fps(required_fps)
+```
+
 # FAQ 
     
     Q: What will happen when nothing is returned from the main logic?

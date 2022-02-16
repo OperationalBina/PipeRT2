@@ -1,7 +1,11 @@
-import flask
-from flask import Flask
-from flask import Response
-from flask_cors import CORS
+try:
+    import flask
+    from flask import Flask
+    from flask import Response
+    from flask_cors import CORS
+except ImportError:
+    print(f"""Oops! seems like flask isn't installed!\nIf you want to use the capabilities of the api_wrapper run 'pip install PipeRT[api]'""")
+
 from pipert2.core.base import Pipe
 from multiprocessing import Process
 from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
@@ -18,11 +22,13 @@ class APIWrapper:
         """
 
         self.notify_callback = pipe.get_event_notify()
+        self.pipe = pipe
 
         self.app = Flask(__name__)
         self.app.add_url_rule("/start", "start", self.start, methods=['POST'])
         self.app.add_url_rule("/pause", "pause", self.pause, methods=['POST'])
         self.app.add_url_rule("/kill", "kill", self.kill, methods=['POST'])
+        self.app.add_url_rule("/pipe/structure", "pipe_structure", self.get_pipe_structure, methods=['GET'])
 
         self.app.add_url_rule("/routines/<routine_name>/events/<event_name>/execute/",
                               "routine_execute",
@@ -80,6 +86,24 @@ class APIWrapper:
             shutdown_hook()
 
         return Response(status=200)
+
+    def get_pipe_structure(self):
+        """Get the structure of the pipeline with the events its including.
+
+        Returns:
+            Dictionary of routines details, and custom events the pipe supported.
+            {
+                Routines: [
+                    {
+                        flow_name: xxx,
+                        routine_name: xxx,
+                        events: []
+                    }
+                ],
+                Events: []
+            }
+        """
+        return self.pipe.get_pipe_structure()
 
     def routine_execute(self, routine_name, event_name):
         """Execute custom event. Should get request with 'event_name' and with optional keys parameters.

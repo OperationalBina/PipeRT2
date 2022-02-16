@@ -57,9 +57,9 @@ def test_put(blocking_queue_handler, non_blocking_queue_handler, output_queue):
 
 def test_get(blocking_queue_handler, non_blocking_queue_handler, input_queue):
     message = StrMessage("Test Message", "dummy")
-    input_queue.put(Message.encode(message))
+    input_queue.put(message)
     assert blocking_queue_handler.get() == message
-    input_queue.put(Message.encode(message))
+    input_queue.put(message)
     assert non_blocking_queue_handler.get() == message
     assert blocking_queue_handler.get() is None
     assert non_blocking_queue_handler.get() is None
@@ -96,9 +96,9 @@ def test_safe_push(blocking_queue_handler, output_queue):
 def test_record_entry(blocking_queue_handler, non_blocking_queue_handler, input_queue):
     blocking_message = StrMessage("Blocking Message", "blocking")
     non_blocking_message = StrMessage("Non Blocking Message", "non blocking")
-    input_queue.put(Message.encode(blocking_message))
+    input_queue.put(blocking_message)
     assert blocking_queue_handler.get().history["dummy"]
-    input_queue.put(Message.encode(non_blocking_message))
+    input_queue.put(non_blocking_message)
     assert non_blocking_queue_handler.get().history["dummy"]
 
 
@@ -116,9 +116,9 @@ def test_get_no_receive_method(blocking_queue_handler, non_blocking_queue_handle
     message = StrMessage("Test Message", "dummy")
     blocking_queue_handler.receive = None
     non_blocking_queue_handler.receive = None
-    input_queue.put(Message.encode(message))
+    input_queue.put(message)
     assert blocking_queue_handler.get() == message
-    input_queue.put(Message.encode(message))
+    input_queue.put(message)
     assert non_blocking_queue_handler.get() == message
     assert blocking_queue_handler.get() is None
     assert non_blocking_queue_handler.get() is None

@@ -1,5 +1,9 @@
+try:
+    from zerorpc import Server
+except ImportError:
+    print(f"""Oops! seems like zerorpc isn't installed!\nIf you want to use the capabilities of the rpc_wrapper run 'pip install PipeRT[rpc]'""")
+
 from pipert2 import Pipe
-from zerorpc import Server
 from pipert2.core.wrappers.utils import parse_arguments
 from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 
