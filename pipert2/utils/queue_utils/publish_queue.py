@@ -10,11 +10,16 @@ class PublishQueue(object):
 
     def __init__(self):
         self.transmit = None
+        self._queues_by_name = {}
         self._mp_queues = []
         self._queues = []
 
-    def register(self, queue: Queue):
+    def register(self, name: str, queue: Queue):
         """Register a new queue to publish to.
+
+        Args:
+            name: The name of the queue.
+            queue: The registered queue.
 
         """
 
@@ -22,6 +27,24 @@ class PublishQueue(object):
             self._queues.append(queue)
         else:
             self._mp_queues.append(queue)
+
+        self._queues_by_name[name] = queue
+
+    def unregister(self, name: str):
+        """Unregister queue by it's name from the queue lists.
+
+        Args:
+            name: The name of the mapped queue.
+
+        """
+
+        queue = self._queues_by_name.get(name)
+
+        if queue is not None:
+            if isinstance(queue, Queue):
+                self._queues.remove(queue)
+            else:
+                self._mp_queues.remove(queue)
 
     def put(self, message, block=False, timeout=1):
         """Publish a value to every registered queue.

@@ -10,8 +10,8 @@ from pipert2.utils.dummy_object import Dummy
 from logging import Logger, LoggerAdapter
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.consts.event_names import LOG_DATA, START_EVENT_NAME, STOP_EVENT_NAME
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
+from pipert2.utils.consts.event_names import LOG_DATA, START_EVENT_NAME, STOP_EVENT_NAME, UNLINK
 
 
 class Routine(EventExecutorInterface, metaclass=ABCMeta):
@@ -192,6 +192,17 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             self.stop_event.clear()
             self.runner = self.runner_creator()
             self.runner.start()
+
+    @events(UNLINK)
+    def unlink(self, unlink_routine_name):
+        """Unlink a routine from the current routine.
+
+        Args:
+            unlink_routine_name: The name of the routine to unlink.
+
+        """
+
+        self.message_handler.unlink(unlink_routine_name)
 
     @events(STOP_EVENT_NAME)
     def stop(self) -> None:

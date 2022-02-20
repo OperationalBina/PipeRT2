@@ -1,6 +1,7 @@
 from queue import Full, Empty
 from pipert2.core.base.data import FrameData
 from pipert2.core.base.message import Message
+from pipert2.utils.queue_utils.publish_queue import PublishQueue
 from pipert2.utils.queue_utils.queue_wrapper import QueueWrapper
 from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.exceptions.queue_not_initialized import QueueNotInitialized
@@ -19,7 +20,7 @@ class QueueHandler(MessageHandler):
     def __init__(self, routine_name: str, max_queue_len=1, put_block=False, get_block=True, timeout=1):
         super().__init__(routine_name)
         self.input_queue = QueueWrapper(max_queue_len)
-        self.output_queue = None
+        self.output_queue: PublishQueue = PublishQueue()
         self.put_block = put_block
         self.get_block = get_block
         self.timeout = timeout
@@ -88,3 +89,50 @@ class QueueHandler(MessageHandler):
             self.log_frame("output", message)
 
         self._put(message)
+
+    def link(self, name, queue):
+        """Link between the current output queue to destination queue.
+
+        Args:
+            name: The name of the destination.
+            queue: The destination queue.
+
+        """
+        self.output_queue.register(name, queue)
+
+    def unlink(self, name):
+        """Unlink between the current output queue from destination queue.
+
+        Args:
+            name: The name of the destination.
+        """
+        self.output_queue.unregister(name)
+
+    def get_receiver(self, process_safe):
+        """Get the receiver queue.
+
+        Args:
+            process_safe: If the receiver should be process safe or not.
+
+        Returns:
+            Return process safe queue if process_safe is True, if it false then return not process safe.
+        """
+        return self.input_queue.get_queue(process_safe)
+
+    def set_receive(self, receive):
+        """Set the receive function of the message handler on the input queue.
+
+        Args:
+            receive: The receive function.
+
+        """
+        self.input_queue.receive = receive
+
+    def set_transmit(self, transmit):
+        """Set the transmit function of the message handler on the output queue.
+
+        Args:
+            transmit: The transmit function.
+
+        """
+        self.output_queue.transmit = transmit
