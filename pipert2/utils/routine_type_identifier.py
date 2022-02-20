@@ -1,6 +1,6 @@
 from typing import Dict, List, Set
-from pipert2.core.base.routine import Routine
 from pipert2.core.base.wire import Wire
+from pipert2.core.base.routine import Routine
 from pipert2.utils.consts import GENERATOR_ROUTINE, INNER_ROUTINE, FINAL_ROUTINE
 
 
