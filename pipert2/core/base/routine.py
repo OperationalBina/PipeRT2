@@ -2,7 +2,7 @@ import threading
 import multiprocessing as mp
 from functools import partial
 from collections import defaultdict
-from typing import Callable, Optional
+from typing import Callable
 from abc import ABCMeta, abstractmethod
 from pipert2.core.base.data.data import Data
 from pipert2.utils.method_data import Method
@@ -106,7 +106,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.extended_run_strategy(self)
 
     @abstractmethod
-    def main_logic(self, data: Optional[Data]) -> Data:
+    def main_logic(self, data: Data = None) -> Data:
         """Process the given data to the routine.
 
         Args:
