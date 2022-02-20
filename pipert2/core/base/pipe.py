@@ -117,7 +117,7 @@ class Pipe:
         # based on connections provided by the user
         # @@@@@@@!!Important!! @@@@@@@@@
         # Do not place this code after flow creation because it is not possible
-        # to perform this action on different processes
+        # to perform on different processes
         for routine_type, routines in infer_routines_types(self.wires.values()).items():
             for routine in routines:
                 routine.extended_run_strategy = get_runner_for_type(routine_type)

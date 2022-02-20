@@ -1,6 +1,6 @@
 from pipert2 import Wire
 from pipert2.core.base.routines import FPSRoutine
-from pipert2.core.base.routines.extended_run_factory import GENERATOR_ROUTINE, INNER_ROUTINE, FINAL_ROUTINE
+from pipert2.utils.consts import GENERATOR_ROUTINE, INNER_ROUTINE, FINAL_ROUTINE
 from pipert2.utils.routine_type_identifier import infer_routines_types
 
 

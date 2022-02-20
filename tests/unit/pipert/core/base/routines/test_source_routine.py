@@ -1,6 +1,7 @@
 from pytest_mock import MockerFixture
 
-from pipert2.core.base.routines.extended_run_factory import get_runner_for_type, GENERATOR_ROUTINE
+from pipert2.core.base.routines.extended_run_factory import get_runner_for_type
+from pipert2.utils.consts import GENERATOR_ROUTINE
 from pipert2.utils.dummy_object import Dummy
 from tests.unit.pipert.core.utils.dummy_routines.dummy_source_routine import DummySourceRoutine, \
     DummySourceRoutineException
