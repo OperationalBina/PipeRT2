@@ -28,6 +28,7 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Running via API](#running-via-api)
 - [Synchroniser](#synchroniser)
 - [Constant FPS](#constant-fps)
+- [Unlink Routines](#unlink-routines)
 - [FAQ](#faq)
 - [Contributing](#contributing)
 
@@ -381,6 +382,23 @@ When initializing a routine, call the `set_const_fps` function with the required
 class Example(DestinationRoutine):
     def __init__(self, required_fps):
         self.set_const_fps(required_fps)
+```
+
+# Unlink Routines
+
+To disconnect one routine from another, and stop the output of its results to that other specific routine,  
+you should use the `unlink` event. 
+
+To unlink them use:
+
+- Python code - `pipe.notify_event(UNLINK, specific_routine="<source_routine_name>", unlink_routine_name="<destination_routine_name>")`
+- API - Send http POST request to `<your_host>:<your_port>/routines/<source_routine_name>/events/unlink/execute` with the parameters: 
+```JSON
+{
+  "extra_args": {
+    "unlink_routine_name": <destination_routine_name>
+  } 
+}
 ```
 
 # FAQ 
