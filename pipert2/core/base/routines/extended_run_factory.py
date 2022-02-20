@@ -10,6 +10,7 @@ def get_runner_for_type(routine_type: str) -> Callable:
         INNER_ROUTINE: _inner_extended_run,
         FINAL_ROUTINE: _final_extended_run
     }
+
     return runner_mappings[routine_type]
 
 
