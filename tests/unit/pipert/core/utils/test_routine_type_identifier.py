@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 from pipert2 import Wire
 from pipert2.core.base.routines import FPSRoutine
 from pipert2.utils.consts import GENERATOR_ROUTINE, INNER_ROUTINE, FINAL_ROUTINE
@@ -5,10 +7,10 @@ from pipert2.utils.routine_type_identifier import infer_routines_types
 
 
 def test_infer_routines_types_1_gen_2_inner_1_final():
-    routine_1 = FPSRoutine()
-    routine_2 = FPSRoutine()
-    routine_3 = FPSRoutine()
-    routine_4 = FPSRoutine()
+    routine_1 = Mock(spec=FPSRoutine)
+    routine_2 = Mock(spec=FPSRoutine)
+    routine_3 = Mock(spec=FPSRoutine)
+    routine_4 = Mock(spec=FPSRoutine)
 
     wire_1 = Wire(source=routine_1, destinations=(routine_2, routine_3))
     wire_2 = Wire(source=routine_2, destinations=(routine_4,))
@@ -25,11 +27,11 @@ def test_infer_routines_types_1_gen_2_inner_1_final():
 
 
 def test_infer_routines_types_1_gen_2_inner_2_final():
-    routine_1 = FPSRoutine()
-    routine_2 = FPSRoutine()
-    routine_3 = FPSRoutine()
-    routine_4 = FPSRoutine()
-    routine_5 = FPSRoutine()
+    routine_1 = Mock(spec=FPSRoutine)
+    routine_2 = Mock(spec=FPSRoutine)
+    routine_3 = Mock(spec=FPSRoutine)
+    routine_4 = Mock(spec=FPSRoutine)
+    routine_5 = Mock(spec=FPSRoutine)
 
     wire_1 = Wire(source=routine_1, destinations=(routine_2, routine_3))
     wire_2 = Wire(source=routine_2, destinations=(routine_4,))
@@ -46,11 +48,11 @@ def test_infer_routines_types_1_gen_2_inner_2_final():
 
 
 def test_infer_routines_types_1_gen_3_inner_2_final():
-    routine_1 = FPSRoutine()
-    routine_2 = FPSRoutine()
-    routine_3 = FPSRoutine()
-    routine_4 = FPSRoutine()
-    routine_5 = FPSRoutine()
+    routine_1 = Mock(spec=FPSRoutine)
+    routine_2 = Mock(spec=FPSRoutine)
+    routine_3 = Mock(spec=FPSRoutine)
+    routine_4 = Mock(spec=FPSRoutine)
+    routine_5 = Mock(spec=FPSRoutine)
 
     wire_1 = Wire(source=routine_1, destinations=(routine_2,))
     wire_2 = Wire(source=routine_2, destinations=(routine_3, routine_4))
@@ -68,11 +70,11 @@ def test_infer_routines_types_1_gen_3_inner_2_final():
 
 
 def test_infer_routines_types_multiple_inners():
-    routine_1 = FPSRoutine()
-    routine_2 = FPSRoutine()
-    routine_3 = FPSRoutine()
-    routine_4 = FPSRoutine()
-    routine_5 = FPSRoutine()
+    routine_1 = Mock(spec=FPSRoutine)
+    routine_2 = Mock(spec=FPSRoutine)
+    routine_3 = Mock(spec=FPSRoutine)
+    routine_4 = Mock(spec=FPSRoutine)
+    routine_5 = Mock(spec=FPSRoutine)
 
     wire_1 = Wire(source=routine_1, destinations=(routine_3,))
     wire_2 = Wire(source=routine_2, destinations=(routine_3, routine_4))

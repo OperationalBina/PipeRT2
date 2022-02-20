@@ -105,6 +105,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         """
         self.extended_run_strategy(self)
 
+    @abstractmethod
     def main_logic(self, data: Optional[Data]) -> Data:
         """Process the given data to the routine.
 
