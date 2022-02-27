@@ -39,10 +39,12 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     packages=setuptools.find_packages(),
-    install_requires=["posix-ipc", "numpy"],
+    install_requires=["numpy"],
     extras_require={
         'rpc': ['zerorpc'],
         'api': ['flask', 'flask_cors'],
+        'shared_memory': ['posix-ipc'],
+        'cockpit': ['opencv-python', 'python-socketio', 'websocket-client'],
     },
     python_requires=">=3.6",
 )
