@@ -37,14 +37,9 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
 
         self.notifier = BatchNotifier(
             ROUTINE_NOTIFY_DURATIONS_INTERVAL,
-            self.notify_routine_fps,
+            self._notify_routine_fps,
             DURATIONS_MAX_SIZE
         )
-
-    def notify_routine_fps(self, data):
-        if data is not None and len(data) > 0:
-            self._logger.plog(f"fps: {1 / median(data)}")
-            self.event_notifier(event_name=NOTIFY_ROUTINE_DURATIONS_NAME, source_name=self.name, data=data)
 
     def set_const_fps(self, fps):
         """Set const fps for routine.
@@ -68,6 +63,18 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
         if self.last_duration is not None:
             self._delay_routine(self.last_duration)
             self.last_duration = None
+
+    def _notify_routine_fps(self, data):
+        """Notify the routine fps to the logger and to the synchroniser.
+
+        Args:
+            data: The routine fps.
+
+        """
+
+        if data is not None and len(data) > 0:
+            self._logger.plog(f"fps: {1 / median(data)}")
+            self.event_notifier(event_name=NOTIFY_ROUTINE_DURATIONS_NAME, source_name=self.name, data=data)
 
     def _delay_routine(self, last_duration):
         """Delay the routine by required fps.
