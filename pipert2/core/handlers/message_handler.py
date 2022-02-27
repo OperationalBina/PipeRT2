@@ -91,3 +91,57 @@ class MessageHandler(ABC):
             message.record_entry(self.routine_name)
 
         return message
+
+    @abstractmethod
+    def link(self, name, destination):
+        """Link the message handler to another destination.
+
+        Args:
+            name: The name of the destination.
+            destination: The destination object.
+
+        """
+
+        pass
+
+    @abstractmethod
+    def unlink(self, name):
+        """Unlink the message handler from another destination.
+
+        Args:
+            name: The name of the destination.
+
+        """
+        pass
+
+    @abstractmethod
+    def get_receiver(self, process_safe):
+        """Get the receiver of the message handler.
+
+        Args:
+            process_safe: Whether the receiver should be process safe or not.
+
+        Returns:
+            Receiver object.
+        """
+        pass
+
+    def set_receive(self, receive):
+        """Set the receive function of the message handler.
+
+        Args:
+            receive: The receive function.
+
+        """
+
+        self.receive = receive
+
+    def set_transmit(self, transmit):
+        """Set the transmit function of the message handler.
+
+        Args:
+            transmit: The transmit function.
+
+        """
+
+        self.transmit = transmit

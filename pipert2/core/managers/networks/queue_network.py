@@ -3,7 +3,6 @@ from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
 from pipert2.core.base.data_transmitter import DataTransmitter
 from pipert2.core.handlers.message_handlers.queue_handler import QueueHandler
-from pipert2.utils.queue_utils.publish_queue import PublishQueue
 
 
 class QueueNetwork(Network):
@@ -52,15 +51,11 @@ class QueueNetwork(Network):
 
         """
 
-        publish_queue = PublishQueue()
-
         for destination_routine in destinations:
-            if source.flow_name == destination_routine.flow_name:
-                publish_queue.register(destination_routine.message_handler.input_queue.get_queue(process_safe=False))
-            else:
-                publish_queue.register(destination_routine.message_handler.input_queue.get_queue(process_safe=True))
+            process_safe = not (source.flow_name == destination_routine.flow_name)
+            source.message_handler.link(destination_routine.name,
+                                        destination_routine.message_handler.get_receiver(process_safe))
 
-            destination_routine.message_handler.input_queue.receive = data_transmitter.receive()
+            destination_routine.message_handler.set_receive(data_transmitter.receive())
 
-        source.message_handler.output_queue = publish_queue
-        source.message_handler.output_queue.transmit = data_transmitter.transmit()
+        source.message_handler.set_transmit(data_transmitter.transmit())

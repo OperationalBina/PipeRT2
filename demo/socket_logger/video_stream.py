@@ -1,11 +1,12 @@
 import os
-import time
 import cv2
+import time
 import numpy as np
+from pipert2 import Data, Pipe
 from pipert2.core.base.data import FrameData
+from pipert2.core.base.routines import FPSRoutine
 from pipert2.core.wrappers.api_wrapper import APIWrapper
 from pipert2.utils.socketio_logger.socket_logger import get_socket_logger
-from pipert2 import SourceRoutine, Data, MiddleRoutine, DestinationRoutine, Pipe, START_EVENT_NAME
 
 
 class Frame(FrameData):
@@ -17,7 +18,7 @@ class Frame(FrameData):
         return self.frame
 
 
-class Src(SourceRoutine):
+class Src(FPSRoutine):
 
     def __init__(self, name, video_path):
         super().__init__(name)
@@ -29,7 +30,7 @@ class Src(SourceRoutine):
     def setup(self) -> None:
         self.cap = cv2.VideoCapture(self.video_path)
 
-    def main_logic(self) -> FrameData:
+    def main_logic(self, data) -> FrameData:
         ret, img = self.cap.read()
 
         img = cv2.putText(img, f"{self.count}", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 255, 0), 1, cv2.LINE_AA)
@@ -45,14 +46,14 @@ class Src(SourceRoutine):
         return frame
 
 
-class Mid(MiddleRoutine):
+class Mid(FPSRoutine):
     def main_logic(self, data: Frame) -> Frame:
         data.frame = cv2.cvtColor(data.frame, cv2.COLOR_BGR2GRAY)
 
         return data
 
 
-class Dst(DestinationRoutine):
+class Dst(FPSRoutine):
     def main_logic(self, data: Data) -> None:
         self._logger.info("Get to destination")
 

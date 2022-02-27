@@ -1,9 +1,10 @@
 from multiprocessing import Event
+
+from pipert2.core.base.routines import FPSRoutine
 from pipert2.utils.consts.event_names import KILL_EVENT_NAME
-from pipert2.core.base.routines.destination_routine import DestinationRoutine
 
 
-class DataAssertionDestinationRoutine(DestinationRoutine):
+class DataAssertionDestinationRoutine(FPSRoutine):
     """"Routine used to assert that data coming to routine is equal to the expected one.
     When the data is not equal the routine will set the does_data_equal flag and kill the pipe.
     When all of the expected data is reached the routine will kill the pipe as well.

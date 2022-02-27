@@ -183,6 +183,34 @@ def test_send_data_false_get(non_blocking_queue_handler, input_queue):
     assert not logger.info.called
 
 
+def test_link(blocking_queue_handler, mocker: MockerFixture):
+    blocking_queue_handler.output_queue = mocker.MagicMock()
+    destination_queue = mocker.MagicMock()
+
+    blocking_queue_handler.link("des1", destination_queue)
+
+    blocking_queue_handler.output_queue.register.assert_called_with("des1", destination_queue)
+
+
+def test_unlink(blocking_queue_handler, mocker: MockerFixture):
+    blocking_queue_handler.output_queue = mocker.MagicMock()
+    blocking_queue_handler.unlink("des1")
+
+    blocking_queue_handler.output_queue.unregister.assert_called_with("des1")
+
+
+def get_receiver_process_safe(blocking_queue_handler, mocker: MockerFixture):
+    blocking_queue_handler.input_queue = mocker.MagicMock()
+    blocking_queue_handler.get_receiver(process_safe=True)
+    blocking_queue_handler.input_queue.get_queue.assert_calleD_with(True)
+
+
+def get_receiver_not_process_safe(blocking_queue_handler, mocker: MockerFixture):
+    blocking_queue_handler.input_queue = mocker.MagicMock()
+    blocking_queue_handler.get_receiver(process_safe=False)
+    blocking_queue_handler.input_queue.get_queue.assert_calleD_with(False)
+
+
 class StrMessage(Message):
     def __init__(self, data: collections.Mapping, source_address: str):
         super().__init__(data, source_address)
