@@ -39,7 +39,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     packages=setuptools.find_packages(),
-    install_requires=["numpy", "python-dotenv"],
+    install_requires=["numpy"],
     extras_require={
         'rpc': ['zerorpc'],
         'api': ['flask', 'flask_cors'],

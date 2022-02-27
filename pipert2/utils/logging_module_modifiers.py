@@ -1,12 +1,8 @@
 import sys
 import logging
-from dotenv import load_dotenv
 
 PIPE_INFRASTRUCTURE_LOG_LEVEL = 5
 PIPE_INFRASTRUCTURE_LOG_LEVEL_NAME = "PIPE_INFRASTRUCTURE"
-
-
-load_dotenv()
 
 
 def add_pipe_log_level():
