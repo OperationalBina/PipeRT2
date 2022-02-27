@@ -1,9 +1,10 @@
 import threading
-from typing import Callable
 import multiprocessing as mp
 from functools import partial
 from collections import defaultdict
+from typing import Callable
 from abc import ABCMeta, abstractmethod
+from pipert2.core.base.data.data import Data
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
 from logging import Logger, LoggerAdapter
@@ -55,6 +56,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
         self.stop_event = mp.Event()
         self.stop_event.set()
         self.runner = Dummy()
+        self.extended_run_strategy: Callable = Callable
 
     def initialize(self, message_handler: MessageHandler, event_notifier: Callable, *args, **kwargs):
         """Initialize the routine to be ready to run
@@ -97,11 +99,23 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
     def _get_runners(cls):
         return cls.runners.all[cls.__name__]
 
-    @abstractmethod
     def _extended_run(self) -> None:
         """Wrapper method for executing the entire routine logic
 
         """
+        self.extended_run_strategy(self)
+
+    @abstractmethod
+    def main_logic(self, data: Data = None) -> Data:
+        """Process the given data to the routine.
+
+        Args:
+            data: The data that the routine processes and sends.
+
+        Returns:
+            The main logic result.
+        """
+
         raise NotImplementedError
 
     @events(LOG_DATA)
@@ -113,10 +127,11 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
                 return f"{msg}, 'data': {data}", kwargs
 
         if not self.message_handler.send_data:
-            self.message_handler.logger = CustomAdapter(self._logger, {'data': '1956'})
+            self.message_handler.logger = CustomAdapter(
+                self._logger, {'data': '1956'})
         else:
             self.message_handler.logger = self._logger
-        
+
         self.message_handler.send_data = not self.message_handler.send_data
 
     def setup(self) -> None:
@@ -161,7 +176,8 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
 
     @runners("thread")
     def set_runner_as_thread(self):
-        self.runner_creator = partial(threading.Thread, target=self._start_routine_logic)
+        self.runner_creator = partial(
+            threading.Thread, target=self._start_routine_logic)
 
     @events(START_EVENT_NAME)
     def start(self) -> None:
@@ -185,7 +201,7 @@ class Routine(EventExecutorInterface, metaclass=ABCMeta):
             unlink_routine_name: The name of the routine to unlink.
 
         """
-        
+
         self.message_handler.unlink(unlink_routine_name)
 
     @events(STOP_EVENT_NAME)

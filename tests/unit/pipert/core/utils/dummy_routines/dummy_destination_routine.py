@@ -1,8 +1,8 @@
-from pipert2.core.base.routines import DestinationRoutine
+from pipert2.core.base.routines import FPSRoutine
 from tests.unit.pipert.core.utils.dummy_routines.dummy_middle_routine import DUMMY_ROUTINE_EVENT
 
 
-class DummyDestinationRoutine(DestinationRoutine):
+class DummyDestinationRoutine(FPSRoutine):
     
     def __init__(self, name="dummy_end_routine"):
         super(DummyDestinationRoutine, self).__init__(name=name)
@@ -18,7 +18,7 @@ class DummyDestinationRoutine(DestinationRoutine):
         pass
 
 
-class DummyDestinationRoutineException(DestinationRoutine):
+class DummyDestinationRoutineException(FPSRoutine):
 
     def __init__(self, counter=0, **kwargs):
         super().__init__(**kwargs)
@@ -34,6 +34,6 @@ class DummyDestinationRoutineException(DestinationRoutine):
     def cleanup(self) -> None:
         pass
 
-    @DestinationRoutine.events(DUMMY_ROUTINE_EVENT.event_name)
+    @FPSRoutine.events(DUMMY_ROUTINE_EVENT.event_name)
     def change_logic(self):
         self.inc = not self.inc

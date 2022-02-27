@@ -41,14 +41,8 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 
 **Routine** - The smallest component in the pipe.
 
-Each routine has to implement a `main_logic` function that contains the business logic of the routine.
+* Each routine has to implement a `main_logic` function that contains the business logic of the routine.
 
-There are three types of routines - 
-
-- **SourceRoutine** - The first routine in a pipe. Used for generating new data and streaming it 
-through the pipeline. 
-- **MiddleRoutine** - Consumes data from other routines in the pipeline. Perform desired operations on any given data and send the results into the next routine. 
-- **DestinationRoutine** - The last routine of the pipe. Used for storing the results from all data manipulation. 
 
 **Flow** - Contains multiple routines with the same context.
 
@@ -69,13 +63,13 @@ Run `pip3 install PipeRT` for installing the official PipeRT2 stable version.
 
 For example, we're going to create a pipe which contains simple flows with very simple routines.
 
-The First step is to create a 'SourceRoutine', which will be responsible for generating data inside our pipeline. 
+The First step is to create a 'FPSRoutine', which will be responsible for generating data inside our pipeline. 
     We create the source class that generates data:
 
 ```Python
-from pipert2 import SourceRoutine
+from pipert2 import FPSRoutine
 
-class GenerateData(SourceRoutine):
+class GenerateData(FPSRoutine):
 
     def main_logic(self) -> dict:
         return {
@@ -83,12 +77,12 @@ class GenerateData(SourceRoutine):
         }
 ```
 
-Then we create the destination routine to store (in our case print) the pipeline's result:
+Then we create the destination routine (which is also FPSRoutine) to store (in our case print) the pipeline's result:
 
 ```Python
-from pipert2 import DestinationRoutine
+from pipert2 import FPSRoutine
 
-class PrintResult(DestinationRoutine):
+class PrintResult(FPSRoutine):
 
     def main_logic(self, data: dict) -> None:
         print(data["value"])
@@ -150,18 +144,18 @@ class Example(Data):
     def __init__(self):
         self.custom_param = "custom param"
 
-class SrcRoutine(SourceRoutine):
+class SrcRoutine(FPSRoutine):
     def main_logic(self) -> Example:
         return Example()
 
-class MidRoutine(MiddleRoutine):
+class MidRoutine(FPSRoutine):
     def main_logic(self, example: Example) -> Example:
         print(example.custom_param) // output -> "custom param"
         example.custom_param = "change"
         
         return example
 
-class DstRoutine(DestinationRoutine):
+class DstRoutine(FPSRoutine):
     def main_logic(self, example):
         print(example.custom_param) // output -> "change"
 ```
@@ -172,40 +166,26 @@ class DstRoutine(DestinationRoutine):
 ## The Routine
 When inhereting the base routine class, there are 3 main functions to extend upon.
 
-The first:
-### main_logic
-The `main_logic` function acts as the core of the routine. Each routine *has* to implement this method in order for it to work.  
-The `main_logic` function occurs each time new data is being received from another routine. A routine that generates data will have its `main_logic` executed whenever possible.  
-The `main_logic` function can serve a few porpouses according to the routines need:
+###The first:
+#### main_logic
+1. The `main_logic` function acts as the core of the routine. Each routine *has* to implement this method in order for it to work.  
+2. The `main_logic` function occurs each time new data is being received from another routine. A routine that generates data will have its `main_logic` executed whenever possible.  
+3. The `main_logic` function can serve a few purposes according to the routines need:
+   1. It can receive data from another routine which is linked to current routine
+   2. It can generate new data and send it to another routine
+   3. It can get data and return nothing (f.e - saving to file/send to remote API/etc..)
 ```Python
-# The first type of main logic for a generator type routine
-def main_logic(self) -> Data:
-    # This main logic will return a new `Data` object without any input required.
-    # Usually this type of routine will be placed as a starting routine for the pipe/flow.
-
-    # This main logic must return data as its return clause.
-
-# The second type of main logic is for a 'computational' routine.
-def main_logic(self, data: Data) -> Data:
-    # This main logic will get input from a previous routine within the pipe, and send out new data.
-    # This type of routine will most likely be the core of your pipe, doing manipulations on your data or whatever you desire it to do!
-
-    # This main logic must return data as its return clause.
-
-# The third type of main logic is for a final routine.
-def main_logic(self, data: Data) -> None:
-    # This main logic will get input from a previous routine within the pipe, and do whatever you define it to do.
-    # This type of routine will usually be the finalizing process of your pipe, doing things such as: saving to a file, showing a resulting image, and so on.
+def main_logic(self, data: Data = None) -> Optional[Data]:    
 ```
 
-The second:
-### setup
+###The second:
+#### setup
 The `setup` function of a routine happens right before the routine starts working.  
 The `setup` function should be used to set a starting state for your routine.  
 For example: opening a file, setting up a socket for a stream, resetting attributes of the routine, etc...  
 
-The third:
-### cleanup
+###The third:
+#### cleanup
 The `cleanup` function acts as the counterpart to the `setup`.  
 The `cleanup` function should be used to clean any resources left used by the routine.  
 For example: releasing a file reader, closing a socket, etc...  
@@ -224,7 +204,7 @@ example_pipe.notify_event(<Event_name>, {<Flow_name1>: [], <Flow_name2>: []...})
 example_pipe.notify_event(<Event_name>, {<Flow_name1>: [<routine_name1>, <routine_name2>...]})
     
 # Same applies for routine except 
-class SomeRoutine(Routine):
+class SomeRoutine(FPSRoutine):
     ...
     def SomeFunc(self):
         # In order to notify event within the routine
@@ -246,7 +226,7 @@ When writing your routines, you can implement your own events to issue custom be
 
 Here is an example routine that has two custom events:
 ```Python
-class SomeRoutine(Routine):
+class SomeRoutine(FPSRoutine):
     def __init__(self, name):
         super().__init__(name)
         self.cap = None
@@ -259,7 +239,7 @@ class SomeRoutine(Routine):
 To call the new events `notify_event` is used just like any other event:
 ```Python
 from pipert2 import Pipe
-from pipert2.utils.consts.event_names import START_EVENT_NAME, KILL_EVENT_NAME
+from pipert2.utils.consts.event_names import START_EVENT_NAME
 
 # Creating the pipe.
 example_pipe = Pipe()
