@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7]
+        python-version: [3.6, 3.7, 3.8, 3.9]
     env:
       OS: 'ubuntu-latest'
       PYTHON: ${{ matrix.python-version }}
@@ -31,7 +31,7 @@ jobs:
         pip install posix-ipc
         pip install numpy
         pip install mock
-        pip install coverage
+        pip install coverage==6.2
         pip install python-socketio
         pip install python-dotenv
         pip install opencv-python
@@ -39,6 +39,7 @@ jobs:
         pip install Flask
         pip install Flask-Cors
         coverage run --concurrency=multiprocessing -m pytest --timeout=25
+        coverage combine
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
