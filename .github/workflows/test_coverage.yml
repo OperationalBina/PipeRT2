@@ -38,7 +38,7 @@ jobs:
         pip install zerorpc
         pip install Flask
         pip install Flask-Cors
-        coverage run --concurrency=multiprocessing -m pytest --timeout=15
+        coverage run --concurrency=multiprocessing -m pytest --timeout=25
         coverage combine
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
