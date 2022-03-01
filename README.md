@@ -259,6 +259,16 @@ example_pipe.notify_event(START_EVENT_NAME)
 ```
 
 # Using The Cockpit
+## Installation
+To install the Cockpit pipeline integration along with its dependencies, use the following command:    
+```Pip
+pip install PipeRT[cockpit]
+```  
+OR (if the command above doesn't work):  
+```Pip
+pip install 'PipeRT[cockpit]'
+```  
+## Usage
 (Before you get started, make sure you have an instance of the cockpit up and running. For more information visit the [PipeRT-Cockpit repository](https://github.com/OperationalBina/PipeRT-Cockpit))  
 In order for the pipe to be able to communicate with the cockpit a few things must be done.  
 First create a `.env` file with the following contents:
@@ -277,7 +287,16 @@ And that's it!
 After that your pipe will send its logs to the cockpit!
 
 # Running via RPC CLI
-
+## Installation
+To install the pipeline RPC Server along with its dependencies, use the following command:    
+```Pip
+pip install PipeRT[rpc]
+```  
+OR (if the command above doesn't work):  
+```Pip
+pip install 'PipeRT[rpc]'
+```  
+## Usage
 Firstly, in order to use this capability, you need to install the optional package via `pip install PipeRT[rpc]`  
 
 The next step is running the RPC Server:
@@ -302,8 +321,16 @@ Arguments to pipe events are passed in a JSON format:
  
 
 # Running via API
-Firstly, in order to use this capability, you need to install the optional package via `pip install PipeRT[api]`  
-
+## Installation
+To install the pipeline REST api along with its dependencies, use the following command:    
+```Pip
+pip install PipeRT[api]
+```  
+OR (if the command above doesn't work):  
+```Pip
+pip install 'PipeRT[api]'
+```  
+## Usage
 After creating a pipeline, you need to call run_api_wrapper with your host and port:
 ```Python
 pipe = Pipe()
