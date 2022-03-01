@@ -1,95 +1,112 @@
 import time
 import pytest
-from multiprocessing import Manager
-from pipert2 import Wire, Pipe, QueueNetwork
-from tests.unit.pipert.core.utils.events_utils import START_EVENT
-from tests.end_to_end.utils.routines.user_input_source_routine import UserInputSourceRoutine
-from tests.end_to_end.utils.routines.data_assertion_destination_routine import DataAssertionDestinationRoutine
-
-FIRST_ROUTINE_NAME = "R1"
-SECOND_ROUTINE_NAME = "R2"
-
-DATA_IN_PIPE = []
-
-for i in range(10):
-    DATA_IN_PIPE.append(
-        {"val": i}
-    )
+from pipert2 import Wire, Pipe, START_EVENT_NAME
+from tests.end_to_end.utils.routines.middle_buffering_routine import MiddleBufferingRoutine
+from tests.end_to_end.utils.routines.source_generating_routine import SourceGeneratingRoutine
+from tests.end_to_end.utils.routines.destination_saving_routine import DestinationSavingRoutine
 
 
-@pytest.fixture()
-def pipe_and_validations_routines():
-    manager = Manager()
-    shared_process_dict = manager.dict()
-
-    pipe = Pipe(network=QueueNetwork(max_queue_sizes=len(DATA_IN_PIPE)))
-
-    input_data_routine = UserInputSourceRoutine(name=FIRST_ROUTINE_NAME,
-                                                data_to_send=DATA_IN_PIPE.copy())
-
-    data_validation_routine = DataAssertionDestinationRoutine(name=SECOND_ROUTINE_NAME,
-                                                              data_to_expect=DATA_IN_PIPE.copy(),
-                                                              shared_process_dict=shared_process_dict)
-
-    return pipe, input_data_routine, data_validation_routine
-
-
-@pytest.fixture()
-def single_flow_pipe_with_input_output_validations_routines(pipe_and_validations_routines):
-    pipe, input_data_routine, data_validation_routine = pipe_and_validations_routines
-
-    pipe.create_flow("Flow1", True, input_data_routine, data_validation_routine)
-
-    pipe.build()
-
-    return pipe, input_data_routine, data_validation_routine
-
-
-@pytest.fixture()
-def multiple_flows_pipe_with_input_output_validations_routines(pipe_and_validations_routines):
-    pipe, input_data_routine, data_validation_routine = pipe_and_validations_routines
-
-    pipe.create_flow("Flow1", False, input_data_routine)
-    pipe.create_flow("Flow2", False, data_validation_routine)
-
-    pipe.link(Wire(source=input_data_routine, destinations=(data_validation_routine, )))
-
-    pipe.build()
-
-    return pipe, input_data_routine, data_validation_routine
+TEST_TIME = 2
 
 
 @pytest.mark.timeout(15)
-def test_pipe_start_flow_using_events_expecting_the_validation_routine_to_get_all_of_the_given_data(
-        single_flow_pipe_with_input_output_validations_routines):
+def test_pipe_one_flow():
+    data = [
+        "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
+    ]
 
-    pipe, input_routine, validation_routine = single_flow_pipe_with_input_output_validations_routines
-    pipe.notify_event(START_EVENT.event_name)
+    buffer = "A"
 
-    try:
-        input_routine.does_data_sent.wait()
-        time.sleep(5)
-        pipe.join(to_kill=True)
-    except TimeoutError:
-        assert not validation_routine.is_data_equals_to_expected_data_flag.is_set(), validation_routine.get_error()
-        assert False, "The pipe didn't join but no error was recognized"
-    else:
-        assert not validation_routine.is_data_equals_to_expected_data_flag.is_set(), validation_routine.get_error()
+    src = SourceGeneratingRoutine(data)
+    mid = MiddleBufferingRoutine(buffer, 10, "mid1", True)
+    dst = DestinationSavingRoutine()
+
+    pipe = Pipe()
+    pipe.create_flow("F1", True, src, mid, dst)
+    pipe.build()
+
+    pipe.notify_event(START_EVENT_NAME)
+
+    time.sleep(3)
+
+    pipe.join(True)
+
+    expected_full_results = [
+        "1A", "2A", "3A", "4A", "5A", "6A", "7A", "8A", "9A", "10A"
+    ]
+
+    assert all((val in expected_full_results) for val in list(dst.values))
 
 
 @pytest.mark.timeout(15)
-def test_pipe_start_multiple_flows_using_events_expecting_the_validation_routine_to_get_all_of_the_given_data(
-        multiple_flows_pipe_with_input_output_validations_routines):
+def test_pipe_multiple_flows():
+    data = [
+        "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
+    ]
 
-    pipe, input_routine, validation_routine = multiple_flows_pipe_with_input_output_validations_routines
-    pipe.notify_event(START_EVENT.event_name)
+    buffer = "A"
 
-    try:
-        input_routine.does_data_sent.wait()
-        time.sleep(5)
-        pipe.join(to_kill=True)
-    except TimeoutError:
-        assert not validation_routine.is_data_equals_to_expected_data_flag.is_set(), validation_routine.get_error()
-        assert False, "The pipe didn't join but no error was recognized"
-    else:
-        assert not validation_routine.is_data_equals_to_expected_data_flag.is_set(), validation_routine.get_error()
+    src = SourceGeneratingRoutine(data)
+    mid = MiddleBufferingRoutine(buffer, 10, "mid1", True)
+    dst = DestinationSavingRoutine()
+
+    pipe = Pipe()
+    pipe.create_flow("F1", False, src)
+    pipe.create_flow("F2", False, mid)
+    pipe.create_flow("F3", False, dst)
+
+    pipe.link(Wire(source=src, destinations=(mid,)))
+    pipe.link(Wire(source=mid, destinations=(dst,)))
+
+    pipe.build()
+
+    pipe.notify_event(START_EVENT_NAME)
+
+    time.sleep(3)
+
+    pipe.join(True)
+
+    expected_full_results = [
+        "1A", "2A", "3A", "4A", "5A", "6A", "7A", "8A", "9A", "10A"
+    ]
+
+    assert all((val in expected_full_results) for val in list(dst.values))
+
+
+def test_pipe_notify_custom_event_to_one_routine():
+
+    src = SourceGeneratingRoutine([], "src")
+    mid = MiddleBufferingRoutine("", 10, "mid", True)
+    dst = DestinationSavingRoutine()
+
+    pipe = Pipe()
+    pipe.create_flow("F1", True, src, mid, dst)
+    pipe.build()
+
+    pipe.notify_event("CUSTOM_EVENT", specific_routine="src")
+    time.sleep(1)
+
+    pipe.join(True)
+
+    assert src.custom_event_notifies.is_set()
+    assert not mid.custom_event_notifies.is_set()
+
+
+def test_pipe_notify_custom_event_all_routines():
+
+    src = SourceGeneratingRoutine([], "src")
+    mid = MiddleBufferingRoutine("", 10, "mid", True)
+    dst = DestinationSavingRoutine()
+
+    pipe = Pipe()
+    pipe.create_flow("F1", True, src, mid, dst)
+    pipe.build()
+
+    pipe.notify_event("CUSTOM_EVENT")
+    time.sleep(1)
+
+    pipe.join(True)
+
+    assert src.custom_event_notifies.is_set()
+    assert mid.custom_event_notifies.is_set()
+
