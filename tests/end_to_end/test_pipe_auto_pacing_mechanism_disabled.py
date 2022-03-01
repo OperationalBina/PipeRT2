@@ -35,6 +35,7 @@ def test_pipe_one_flow():
         "1A", "2A", "3A", "4A", "5A", "6A", "7A", "8A", "9A", "10A"
     ]
 
+    assert len(list(dst.values)) > 0
     assert all((val in expected_full_results) for val in list(dst.values))
 
 
@@ -70,6 +71,7 @@ def test_pipe_multiple_flows():
         "1A", "2A", "3A", "4A", "5A", "6A", "7A", "8A", "9A", "10A"
     ]
 
+    assert len(list(dst.values)) > 0
     assert all((val in expected_full_results) for val in list(dst.values))
 
 
