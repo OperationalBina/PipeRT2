@@ -8,19 +8,19 @@ from pipert2.utils.annotations import class_functions_dictionary
 class MiddleBufferingRoutine(FPSRoutine):
     events = class_functions_dictionary()
 
-    def __init__(self, buffer, limit, name, is_running):
+    def __init__(self, buffer, limit, name, sleeping_time=0):
         super().__init__(name)
         self.custom_event_notifies = mp.Event()
         self.middle_event_notifies = mp.Event()
         self.buffer = buffer
         self.limit = limit
         self.index = 0
-        self.is_running = is_running
+        self.sleeping_time = sleeping_time
         self.event_param = mp.Value('i', 0)
 
     def main_logic(self, data: Data = None) -> Data:
-        if not self.is_running:
-            time.sleep(3)
+        if self.sleeping_time > 0:
+            time.sleep(self.sleeping_time)
 
         data.additional_data["val"] += self.buffer
         self.index += 1
