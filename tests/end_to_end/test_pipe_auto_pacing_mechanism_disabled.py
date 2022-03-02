@@ -175,3 +175,39 @@ def test_notify_event_from_pipe_with_parameter_expect_all_routines_to_get_the_gi
 
     assert dst.custom_event_notifies.is_set()
     assert dst.event_param.value == PARAM
+
+
+@pytest.mark.timeout(15)
+def test_pipe_one_flow_multiple_middle_routines():
+    data = [
+        "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
+    ]
+
+    src = SourceGeneratingRoutine(data)
+    mid1 = MiddleBufferingRoutine("A", 10, "mid1", True)
+    mid2 = MiddleBufferingRoutine("B", 2, "mid2", True)
+    dst = DestinationSavingRoutine()
+
+    pipe = Pipe()
+    pipe.create_flow("F1", False, src, mid1, mid2, dst)
+    pipe.link(Wire(source=src, destinations=(mid1, mid2)))
+    pipe.link(Wire(source=mid1, destinations=(dst,)))
+    pipe.link(Wire(source=mid2, destinations=(dst,)))
+
+    pipe.build()
+
+    pipe.notify_event(START_EVENT_NAME)
+
+    time.sleep(3)
+
+    pipe.join(True)
+
+    expected_full_results = [
+        "1A", "2A", "3A", "4A", "5A", "6A", "7A", "8A", "9A", "10A",
+        "1B", "2B", "3B", "4B", "5B", "6B", "7B", "8B", "9B", "10B",
+    ]
+
+    print(list(dst.values))
+
+    assert len(list(dst.values)) > 0
+    assert all((val in expected_full_results) for val in list(dst.values))

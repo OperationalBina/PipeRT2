@@ -22,12 +22,10 @@ class MiddleBufferingRoutine(FPSRoutine):
         if not self.is_running:
             time.sleep(3)
 
-        print(f"Buffer {self.buffer}")
         data.additional_data["val"] += self.buffer
         self.index += 1
 
         if self.index == self.limit:
-            print("Notify stop")
             self.notify_event(STOP_EVENT_NAME, specific_routine=self.name)
 
         time.sleep(random.randint(1, 10) / 10)

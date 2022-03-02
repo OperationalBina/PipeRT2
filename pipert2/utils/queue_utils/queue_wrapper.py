@@ -1,8 +1,9 @@
+import copy
 from threading import Thread
 from multiprocessing import Queue as mpQueue
 from pipert2.core.base.message import Message
-from pipert2.utils.queue_utils.publish_queue import force_push_to_queue
 from queue import Queue as thQueue, Full, Empty
+from pipert2.utils.queue_utils.publish_queue import force_push_to_queue
 
 
 class QueueWrapper:
@@ -47,7 +48,7 @@ class QueueWrapper:
         except Empty:
             raise Empty
 
-        return message
+        return copy.deepcopy(message)
 
     def get_queue(self, process_safe: bool):
         """Get a queue according to necessity.
