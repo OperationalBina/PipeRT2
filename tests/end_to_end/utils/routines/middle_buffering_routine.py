@@ -11,10 +11,12 @@ class MiddleBufferingRoutine(FPSRoutine):
     def __init__(self, buffer, limit, name, is_running):
         super().__init__(name)
         self.custom_event_notifies = mp.Event()
+        self.middle_event_notifies = mp.Event()
         self.buffer = buffer
         self.limit = limit
         self.index = 0
         self.is_running = is_running
+        self.event_param = mp.Value('i', 0)
 
     def main_logic(self, data: Data = None) -> Data:
         if not self.is_running:
@@ -34,3 +36,12 @@ class MiddleBufferingRoutine(FPSRoutine):
     @events("CUSTOM_EVENT")
     def custom_event(self):
         self.custom_event_notifies.set()
+
+    @events("MIDDLE_EVENT")
+    def middle_event(self):
+        self.middle_event_notifies.set()
+
+    @events("CUSTOM_EVENT_PARAM")
+    def custom_event_with_param(self, param):
+        self.custom_event_notifies.set()
+        self.event_param.value = param
