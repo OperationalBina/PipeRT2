@@ -17,10 +17,11 @@ class MiddleBufferingRoutine(FPSRoutine):
         self.is_running = is_running
 
     def main_logic(self, data: Data = None) -> Data:
+        print(f"Buffer {self.buffer}, Get: {data}")
+
         if not self.is_running:
             time.sleep(3)
 
-        print(f"Buffer {self.buffer}")
         data.additional_data["val"] += self.buffer
         self.index += 1
 

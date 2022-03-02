@@ -1,4 +1,5 @@
 import time
+import copy
 from queue import Full, Empty, Queue
 from pipert2.core.base.message import Message
 
@@ -57,7 +58,7 @@ class PublishQueue(object):
         """
 
         for q in self._queues:
-            _push_to_queue(q, message, block, timeout)
+            _push_to_queue(q, copy.deepcopy(message), block, timeout)
 
         if len(self._mp_queues) > 0:
             transmitted_value = self.transmit(message.payload.data)

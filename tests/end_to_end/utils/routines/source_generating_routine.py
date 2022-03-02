@@ -1,4 +1,6 @@
 import multiprocessing as mp
+import time
+
 from pipert2 import FPSRoutine, Data
 from pipert2.utils.annotations import class_functions_dictionary
 
@@ -22,6 +24,8 @@ class SourceGeneratingRoutine(FPSRoutine):
             }
 
             self.indexing += 1
+
+            time.sleep(0.1)
 
             return d
 
