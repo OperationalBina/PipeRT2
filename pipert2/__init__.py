@@ -1,4 +1,4 @@
-__version__ = "2.3.0"
+__version__ = "2.4.0"
 
 try:
     from dataclasses import dataclass, field, fields
@@ -10,7 +10,7 @@ except ImportError:
 from .core import Pipe, Wire, Data
 
 # Interfaces for user implementations
-from .core import SourceRoutine, MiddleRoutine, DestinationRoutine, Network, MessageHandler, DataTransmitter
+from .core import FPSRoutine, Network, MessageHandler, DataTransmitter
 
 # Given implementations
 from .core import QueueNetwork, QueueHandler, SharedMemoryTransmitter, BasicTransmitter

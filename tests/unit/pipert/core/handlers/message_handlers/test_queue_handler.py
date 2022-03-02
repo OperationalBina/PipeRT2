@@ -57,9 +57,9 @@ def test_put(blocking_queue_handler, non_blocking_queue_handler, output_queue):
 
 def test_get(blocking_queue_handler, non_blocking_queue_handler, input_queue):
     message = StrMessage("Test Message", "dummy")
-    input_queue.put(Message.encode(message))
+    input_queue.put(message)
     assert blocking_queue_handler.get() == message
-    input_queue.put(Message.encode(message))
+    input_queue.put(message)
     assert non_blocking_queue_handler.get() == message
     assert blocking_queue_handler.get() is None
     assert non_blocking_queue_handler.get() is None
@@ -96,9 +96,9 @@ def test_safe_push(blocking_queue_handler, output_queue):
 def test_record_entry(blocking_queue_handler, non_blocking_queue_handler, input_queue):
     blocking_message = StrMessage("Blocking Message", "blocking")
     non_blocking_message = StrMessage("Non Blocking Message", "non blocking")
-    input_queue.put(Message.encode(blocking_message))
+    input_queue.put(blocking_message)
     assert blocking_queue_handler.get().history["dummy"]
-    input_queue.put(Message.encode(non_blocking_message))
+    input_queue.put(non_blocking_message)
     assert non_blocking_queue_handler.get().history["dummy"]
 
 
@@ -116,54 +116,48 @@ def test_get_no_receive_method(blocking_queue_handler, non_blocking_queue_handle
     message = StrMessage("Test Message", "dummy")
     blocking_queue_handler.receive = None
     non_blocking_queue_handler.receive = None
-    input_queue.put(Message.encode(message))
+    input_queue.put(message)
     assert blocking_queue_handler.get() == message
-    input_queue.put(Message.encode(message))
+    input_queue.put(message)
     assert non_blocking_queue_handler.get() == message
     assert blocking_queue_handler.get() is None
     assert non_blocking_queue_handler.get() is None
 
 
 def test_send_data_true_put(non_blocking_queue_handler, mocker: MockerFixture):
-    with mocker.patch("pipert2.core.handlers.message_handler.numpy_frame_to_base64", return_value="base64"):
-        message = StrMessage("Test Message", "dummy")
+    message = StrMessage("Test Message", "dummy")
 
-        data = FrameData()
-        data.additional_data = {}
+    data = FrameData()
+    data.additional_data = {}
 
-        message.payload.data = data
+    message.payload.data = data
 
-        logger: Logger = Mock()
+    logger: Logger = Mock()
 
-        non_blocking_queue_handler.send_data = True
-        non_blocking_queue_handler.logger = logger
+    non_blocking_queue_handler.send_data = True
+    non_blocking_queue_handler.logger = logger
 
-        non_blocking_queue_handler.put(message)
-        logger.info.assert_called_once_with(f"output: ", data={
-            'image_base64': "base64"
-        })
+    non_blocking_queue_handler.put(message)
+    logger.log_frame.assert_called_once()
 
 
 def test_send_data_true_get(non_blocking_queue_handler, input_queue, mocker: MockerFixture):
-    with mocker.patch("pipert2.core.handlers.message_handler.numpy_frame_to_base64", return_value="base64"):
-        message = StrMessage("Test Message", "dummy")
+    message = StrMessage("Test Message", "dummy")
 
-        data = FrameData()
-        data.additional_data = {}
+    data = FrameData()
+    data.additional_data = {}
 
-        message.payload.data = data
+    message.payload.data = data
 
-        logger: Logger = Mock()
+    logger: Logger = Mock()
 
-        non_blocking_queue_handler.send_data = True
-        non_blocking_queue_handler.logger = logger
+    non_blocking_queue_handler.send_data = True
+    non_blocking_queue_handler.logger = logger
 
-        input_queue.put(message)
-        non_blocking_queue_handler.get()
+    input_queue.put(message)
+    non_blocking_queue_handler.get()
 
-        logger.info.assert_called_once_with(f"input: ", data={
-                'image_base64': "base64"
-            })
+    logger.log_frame.assert_called_once()
 
 
 def test_send_data_false_put(non_blocking_queue_handler):
@@ -187,6 +181,34 @@ def test_send_data_false_get(non_blocking_queue_handler, input_queue):
     input_queue.put(message)
     non_blocking_queue_handler.get()
     assert not logger.info.called
+
+
+def test_link(blocking_queue_handler, mocker: MockerFixture):
+    blocking_queue_handler.output_queue = mocker.MagicMock()
+    destination_queue = mocker.MagicMock()
+
+    blocking_queue_handler.link("des1", destination_queue)
+
+    blocking_queue_handler.output_queue.register.assert_called_with("des1", destination_queue)
+
+
+def test_unlink(blocking_queue_handler, mocker: MockerFixture):
+    blocking_queue_handler.output_queue = mocker.MagicMock()
+    blocking_queue_handler.unlink("des1")
+
+    blocking_queue_handler.output_queue.unregister.assert_called_with("des1")
+
+
+def get_receiver_process_safe(blocking_queue_handler, mocker: MockerFixture):
+    blocking_queue_handler.input_queue = mocker.MagicMock()
+    blocking_queue_handler.get_receiver(process_safe=True)
+    blocking_queue_handler.input_queue.get_queue.assert_calleD_with(True)
+
+
+def get_receiver_not_process_safe(blocking_queue_handler, mocker: MockerFixture):
+    blocking_queue_handler.input_queue = mocker.MagicMock()
+    blocking_queue_handler.get_receiver(process_safe=False)
+    blocking_queue_handler.input_queue.get_queue.assert_calleD_with(False)
 
 
 class StrMessage(Message):

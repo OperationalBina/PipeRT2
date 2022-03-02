@@ -26,8 +26,12 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 - [Using The Cockpit](#using-the-cockpit)
 - [Running via RPC CLI](#running-via-rpc-cli)
 - [Running via API](#running-via-api)
+- [Synchroniser](#synchroniser)
+- [Constant FPS](#constant-fps)
+- [Unlink Routines](#unlink-routines)
 - [FAQ](#faq)
 - [Contributing](#contributing)
+
 
 # Requirements
 
@@ -37,14 +41,8 @@ With a simple implementation of pipe's components a full dataflow can be dispatc
 
 **Routine** - The smallest component in the pipe.
 
-Each routine has to implement a `main_logic` function that contains the business logic of the routine.
+* Each routine has to implement a `main_logic` function that contains the business logic of the routine.
 
-There are three types of routines - 
-
-- **SourceRoutine** - The first routine in a pipe. Used for generating new data and streaming it 
-through the pipeline. 
-- **MiddleRoutine** - Consumes data from other routines in the pipeline. Perform desired operations on any given data and send the results into the next routine. 
-- **DestinationRoutine** - The last routine of the pipe. Used for storing the results from all data manipulation. 
 
 **Flow** - Contains multiple routines with the same context.
 
@@ -65,13 +63,13 @@ Run `pip3 install PipeRT` for installing the official PipeRT2 stable version.
 
 For example, we're going to create a pipe which contains simple flows with very simple routines.
 
-The First step is to create a 'SourceRoutine', which will be responsible for generating data inside our pipeline. 
+The First step is to create a 'FPSRoutine', which will be responsible for generating data inside our pipeline. 
     We create the source class that generates data:
 
 ```Python
-from pipert2 import SourceRoutine
+from pipert2 import FPSRoutine
 
-class GenerateData(SourceRoutine):
+class GenerateData(FPSRoutine):
 
     def main_logic(self) -> dict:
         return {
@@ -79,12 +77,12 @@ class GenerateData(SourceRoutine):
         }
 ```
 
-Then we create the destination routine to store (in our case print) the pipeline's result:
+Then we create the destination routine (which is also FPSRoutine) to store (in our case print) the pipeline's result:
 
 ```Python
-from pipert2 import DestinationRoutine
+from pipert2 import FPSRoutine
 
-class PrintResult(DestinationRoutine):
+class PrintResult(FPSRoutine):
 
     def main_logic(self, data: dict) -> None:
         print(data["value"])
@@ -133,45 +131,61 @@ For triggering an event for a specific flow or routine we add a dictionary of th
     ```Python
   example_pipe.notify_event(START_EVENT_NAME, {"example_flow": [generate_data_routine.name, print_result_routine.name]})  
   ```
+  
+### Custom Data Types
+
+Instead of using the `Data` class to pass arguments throughout the pipe's routines, you can create custom class that will inherit from `Data` 
+with your own parameters. 
+
+For example: 
+
+```Python
+class Example(Data):
+    def __init__(self):
+        self.custom_param = "custom param"
+
+class SrcRoutine(FPSRoutine):
+    def main_logic(self) -> Example:
+        return Example()
+
+class MidRoutine(FPSRoutine):
+    def main_logic(self, example: Example) -> Example:
+        print(example.custom_param) // output -> "custom param"
+        example.custom_param = "change"
+        
+        return example
+
+class DstRoutine(FPSRoutine):
+    def main_logic(self, example):
+        print(example.custom_param) // output -> "change"
+```
+
+
 
 # Advanced
 ## The Routine
 When inhereting the base routine class, there are 3 main functions to extend upon.
 
-The first:
-### main_logic
-The `main_logic` function acts as the core of the routine. Each routine *has* to implement this method in order for it to work.  
-The `main_logic` function occurs each time new data is being received from another routine. A routine that generates data will have its `main_logic` executed whenever possible.  
-The `main_logic` function can serve a few porpouses according to the routines need:
+###The first:
+#### main_logic
+1. The `main_logic` function acts as the core of the routine. Each routine *has* to implement this method in order for it to work.  
+2. The `main_logic` function occurs each time new data is being received from another routine. A routine that generates data will have its `main_logic` executed whenever possible.  
+3. The `main_logic` function can serve a few purposes according to the routines need:
+   1. It can receive data from another routine which is linked to current routine
+   2. It can generate new data and send it to another routine
+   3. It can get data and return nothing (f.e - saving to file/send to remote API/etc..)
 ```Python
-# The first type of main logic for a generator type routine
-def main_logic(self) -> Data:
-    # This main logic will return a new `Data` object without any input required.
-    # Usually this type of routine will be placed as a starting routine for the pipe/flow.
-
-    # This main logic must return data as its return clause.
-
-# The second type of main logic is for a 'computational' routine.
-def main_logic(self, data: Data) -> Data:
-    # This main logic will get input from a previous routine within the pipe, and send out new data.
-    # This type of routine will most likely be the core of your pipe, doing manipulations on your data or whatever you desire it to do!
-
-    # This main logic must return data as its return clause.
-
-# The third type of main logic is for a final routine.
-def main_logic(self, data: Data) -> None:
-    # This main logic will get input from a previous routine within the pipe, and do whatever you define it to do.
-    # This type of routine will usually be the finalizing process of your pipe, doing things such as: saving to a file, showing a resulting image, and so on.
+def main_logic(self, data: Data = None) -> Optional[Data]:    
 ```
 
-The second:
-### setup
+###The second:
+#### setup
 The `setup` function of a routine happens right before the routine starts working.  
 The `setup` function should be used to set a starting state for your routine.  
 For example: opening a file, setting up a socket for a stream, resetting attributes of the routine, etc...  
 
-The third:
-### cleanup
+###The third:
+#### cleanup
 The `cleanup` function acts as the counterpart to the `setup`.  
 The `cleanup` function should be used to clean any resources left used by the routine.  
 For example: releasing a file reader, closing a socket, etc...  
@@ -190,7 +204,7 @@ example_pipe.notify_event(<Event_name>, {<Flow_name1>: [], <Flow_name2>: []...})
 example_pipe.notify_event(<Event_name>, {<Flow_name1>: [<routine_name1>, <routine_name2>...]})
     
 # Same applies for routine except 
-class SomeRoutine(Routine):
+class SomeRoutine(FPSRoutine):
     ...
     def SomeFunc(self):
         # In order to notify event within the routine
@@ -212,7 +226,7 @@ When writing your routines, you can implement your own events to issue custom be
 
 Here is an example routine that has two custom events:
 ```Python
-class SomeRoutine(Routine):
+class SomeRoutine(FPSRoutine):
     def __init__(self, name):
         super().__init__(name)
         self.cap = None
@@ -225,7 +239,7 @@ class SomeRoutine(Routine):
 To call the new events `notify_event` is used just like any other event:
 ```Python
 from pipert2 import Pipe
-from pipert2.utils.consts.event_names import START_EVENT_NAME, KILL_EVENT_NAME
+from pipert2.utils.consts.event_names import START_EVENT_NAME
 
 # Creating the pipe.
 example_pipe = Pipe()
@@ -245,6 +259,16 @@ example_pipe.notify_event(START_EVENT_NAME)
 ```
 
 # Using The Cockpit
+## Installation
+To install the Cockpit pipeline integration along with its dependencies, use the following command:    
+```Pip
+pip install PipeRT[cockpit]
+```  
+OR (if the command above doesn't work):  
+```Pip
+pip install 'PipeRT[cockpit]'
+```  
+## Usage
 (Before you get started, make sure you have an instance of the cockpit up and running. For more information visit the [PipeRT-Cockpit repository](https://github.com/OperationalBina/PipeRT-Cockpit))  
 In order for the pipe to be able to communicate with the cockpit a few things must be done.  
 First create a `.env` file with the following contents:
@@ -254,7 +278,7 @@ SOCKET_LOGGER_URL="<cockpit url here (usually http://localhost:3000 if on the sa
 After that your pipes default logger with the socket logger like so:
 ```Python
 from pipert2 import Pipe
-from pipert2.utils.logging_module_modifiers import get_socket_logger
+from pipert2.utils.socketio_logger.socket_logger import get_socket_logger
 
 # logger level indicates what logs will be sent, if logging.INFO is provided info logs and above will be sent and so on.
 example_pipe = Pipe(logger=get_socket_logger("<desired base name here>", <logger level>))
@@ -263,8 +287,17 @@ And that's it!
 After that your pipe will send its logs to the cockpit!
 
 # Running via RPC CLI
-
-Firstly, you need to install the zerorpc python package via `pip3 install zerorpc`
+## Installation
+To install the pipeline RPC Server along with its dependencies, use the following command:    
+```Pip
+pip install PipeRT[rpc]
+```  
+OR (if the command above doesn't work):  
+```Pip
+pip install 'PipeRT[rpc]'
+```  
+## Usage
+Firstly, in order to use this capability, you need to install the optional package via `pip install PipeRT[rpc]`  
 
 The next step is running the RPC Server:
 ```Python
@@ -288,7 +321,16 @@ Arguments to pipe events are passed in a JSON format:
  
 
 # Running via API
-
+## Installation
+To install the pipeline REST api along with its dependencies, use the following command:    
+```Pip
+pip install PipeRT[api]
+```  
+OR (if the command above doesn't work):  
+```Pip
+pip install 'PipeRT[api]'
+```  
+## Usage
 After creating a pipeline, you need to call run_api_wrapper with your host and port:
 ```Python
 pipe = Pipe()
@@ -323,6 +365,49 @@ In order to execute pipe events you need to execute `GET` http calls for `your_h
   } 
 }
 ```
+
+# Synchroniser
+
+In the pipe there is a synchronising mechanism which is used to synchronise the routine's FPS.
+This mechanism forces routines to rest, if their FPS is significantly higher than that of the bottlenecks routines.
+It saves resources, and should not affect the number of the processed routines. 
+
+The best example of a case where the synchronising mechanism would be useful, is when there are fast routines
+followed by routines with lower FPS.
+
+To activate this mechanism, create the pipe should with `auto_pacing_mechanism` parameter as true, for example: 
+```Python
+pipe = Pipe(auto_pacing_mechanism=True)
+```
+
+# Constant FPS
+
+How to set it? 
+When initializing a routine, call the `set_const_fps` function with the required FPS.
+
+```Python
+class Example(DestinationRoutine):
+    def __init__(self, required_fps):
+        self.set_const_fps(required_fps)
+```
+
+# Unlink Routines
+
+To disconnect one routine from another, and stop the output of its results to that other specific routine,  
+you should use the `unlink` event. 
+
+To unlink them use:
+
+- Python code - `pipe.notify_event(UNLINK, specific_routine="<source_routine_name>", unlink_routine_name="<destination_routine_name>")`
+- API - Send http POST request to `<your_host>:<your_port>/routines/<source_routine_name>/events/unlink/execute` with the parameters: 
+```JSON
+{
+  "extra_args": {
+    "unlink_routine_name": <destination_routine_name>
+  } 
+}
+```
+
 # FAQ 
     
     Q: What will happen when nothing is returned from the main logic?

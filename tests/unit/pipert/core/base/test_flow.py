@@ -3,7 +3,7 @@ from unittest.mock import call
 from pytest_mock import MockerFixture
 from pipert2.core.base.flow import Flow
 from pipert2.utils.method_data import Method
-from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME
+from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, CLEANUP
 from tests.unit.pipert.core.utils.events_utils import START_EVENT, EVENT1, KILL_EVENT, STOP_EVENT
 
 
@@ -79,8 +79,8 @@ def test_run(mocker, dummy_flow_with_two_routines: Flow):
 
     dummy_flow_with_two_routines.run()
 
-    assert routine.execute_event.call_count == 3
-    assert routine.execute_event.call_args_list == [call(START_EVENT), call(EVENT1), call(STOP_EVENT)]
+    assert routine.execute_event.call_count == 4
+    assert routine.execute_event.call_args_list == [call(START_EVENT), call(EVENT1), call(STOP_EVENT), call(Method(CLEANUP))]
 
     start_event_callback_mock.assert_called_once()
     stop_event_callback_mock.assert_called_once()

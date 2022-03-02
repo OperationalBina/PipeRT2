@@ -37,8 +37,6 @@ class Payload:
         """
 
         if self.encoded:
-            # self._data = decoder.decode(self._data)  # TODO - Add data encoding logic
-
             self.encoded = False
 
     def encode(self) -> None:

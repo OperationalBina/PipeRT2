@@ -1,6 +1,9 @@
+import copy
 from threading import Thread
 from multiprocessing import Queue as mpQueue
+from pipert2.core.base.message import Message
 from queue import Queue as thQueue, Full, Empty
+from pipert2.utils.queue_utils.publish_queue import force_push_to_queue
 
 
 class QueueWrapper:
@@ -10,6 +13,7 @@ class QueueWrapper:
     queues.
 
     Attributes:
+        receive: A function that indicates how to receive data over processes.
         mp_queue: A multiprocessing queue. Will be initiated once necessary.
         out_queue: Either a multiprocessing or a multithreading queue according to which queues exist.
         multiprocess_thread: A thread listening to the multiprocessing queue if it exists.
@@ -17,6 +21,7 @@ class QueueWrapper:
     """
 
     def __init__(self, max_queue_size=1):
+        self.receive = None
         self.mp_queue: mpQueue = None
         self.max_queue_size = max_queue_size
         self.out_queue = thQueue(maxsize=max_queue_size)
@@ -43,7 +48,7 @@ class QueueWrapper:
         except Empty:
             raise Empty
 
-        return message
+        return copy.deepcopy(message)
 
     def get_queue(self, process_safe: bool):
         """Get a queue according to necessity.
@@ -84,7 +89,15 @@ class QueueWrapper:
 
         for item in iter(self.mp_queue.get, None):
             try:
-                self.out_queue.put(item, block=True, timeout=1)
+                message = Message.decode(item)
+
+                # If a receive function exists, it means that the data came from a different process,
+                # and it needs to be parsed.
+                if callable(self.receive):
+                    received_data = self.receive(message.payload.data)
+                    message.update_data(received_data)
+
+                force_push_to_queue(self.out_queue, message)
             except Full:
                 pass
 

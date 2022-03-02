@@ -1,2 +1,7 @@
 from .basic_transmitter import BasicTransmitter
-from .shared_memory_transmitter import SharedMemoryTransmitter
+try:
+    import posix_ipc
+except ImportError:
+    SharedMemoryTransmitter = None
+else:
+    from .shared_memory_transmitter import SharedMemoryTransmitter

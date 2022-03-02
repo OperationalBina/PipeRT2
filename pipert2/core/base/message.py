@@ -97,7 +97,7 @@ class Message:
 
         try:
             pickled_message = pickle.dumps(msg)
-        except TypeError:  # TODO - Maybe add logs to exception
+        except TypeError:
             pickled_message = msg
 
         return pickled_message

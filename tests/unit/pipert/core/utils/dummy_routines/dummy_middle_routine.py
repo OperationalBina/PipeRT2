@@ -1,10 +1,10 @@
-from pipert2.core.base.routines import MiddleRoutine
+from pipert2.core.base.routines import FPSRoutine
 from pipert2.utils.method_data import Method
 
 DUMMY_ROUTINE_EVENT = Method("Change")
 
 
-class DummyMiddleRoutine(MiddleRoutine):
+class DummyMiddleRoutine(FPSRoutine):
 
     def __init__(self, counter=0, **kwargs):
         super().__init__(**kwargs)
@@ -25,12 +25,12 @@ class DummyMiddleRoutine(MiddleRoutine):
     def cleanup(self) -> None:
         pass
 
-    @MiddleRoutine.events(DUMMY_ROUTINE_EVENT.event_name)
+    @FPSRoutine.events(DUMMY_ROUTINE_EVENT.event_name)
     def change_logic(self):
         self.inc = not self.inc
 
 
-class DummyMiddleRoutineException(MiddleRoutine):
+class DummyMiddleRoutineException(FPSRoutine):
 
     def __init__(self, counter=0, **kwargs):
         super().__init__(**kwargs)
@@ -46,7 +46,7 @@ class DummyMiddleRoutineException(MiddleRoutine):
     def cleanup(self) -> None:
         pass
 
-    @MiddleRoutine.events(DUMMY_ROUTINE_EVENT.event_name)
+    @FPSRoutine.events(DUMMY_ROUTINE_EVENT.event_name)
     def change_logic(self):
         self.inc = not self.inc
 

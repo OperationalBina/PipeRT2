@@ -1,5 +1,6 @@
 import time
 from abc import ABCMeta
+from statistics import median
 from pipert2.core.base.routine import Routine
 from pipert2.utils.batch_notifier import BatchNotifier
 from pipert2.utils.annotations import class_functions_dictionary
@@ -9,7 +10,6 @@ from pipert2.utils.consts.synchronise_routines import FPS_MULTIPLIER, ROUTINE_NO
 
 
 class FPSRoutine(Routine, metaclass=ABCMeta):
-
     events = class_functions_dictionary()
 
     def __init__(self, name: str = None):
@@ -34,9 +34,11 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
 
         super(FPSRoutine, self).initialize(message_handler, event_notifier)
 
-        self.notifier = BatchNotifier(ROUTINE_NOTIFY_DURATIONS_INTERVAL,
-                                      NOTIFY_ROUTINE_DURATIONS_NAME,
-                                      event_notifier, self.name, DURATIONS_MAX_SIZE)
+        self.notifier = BatchNotifier(
+            ROUTINE_NOTIFY_DURATIONS_INTERVAL,
+            self._notify_routine_fps,
+            DURATIONS_MAX_SIZE
+        )
 
     def set_const_fps(self, fps):
         """Set const fps for routine.
@@ -60,6 +62,18 @@ class FPSRoutine(Routine, metaclass=ABCMeta):
         if self.last_duration is not None:
             self._delay_routine(self.last_duration)
             self.last_duration = None
+
+    def _notify_routine_fps(self, data):
+        """Notify the routine fps to the logger and to the synchroniser.
+
+        Args:
+            data: The routine fps.
+
+        """
+
+        if data is not None and len(data) > 0:
+            self._logger.plog(f"fps: {1 / median(data)}")
+            self.event_notifier(event_name=NOTIFY_ROUTINE_DURATIONS_NAME, source_name=self.name, data=data)
 
     def _delay_routine(self, last_duration):
         """Delay the routine by required fps.

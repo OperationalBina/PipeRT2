@@ -1,20 +1,19 @@
 import time
 import threading
 from typing import Dict
-from logging import Logger
 import multiprocessing as mp
 from statistics import median
+
 from pipert2.utils.dummy_object import Dummy
 from pipert2.utils.base_event_executor import BaseEventExecutor
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.core.base.routines.source_routine import SourceRoutine
+from pipert2.utils.routine_type_identifier import infer_routines_types
 from pipert2.core.base.synchronise_routines.synchroniser_node import SynchroniserNode
 from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTINE_DURATIONS_NAME, NULL_FPS, \
-    SYNCHRONISER_UPDATE_INTERVAL, STOP_EVENT_NAME
+    SYNCHRONISER_UPDATE_INTERVAL, STOP_EVENT_NAME, GENERATOR_ROUTINE
 
 
-class RoutinesSynchroniser(BaseEventExecutor):
-
+class RoutinesSynchronizer(BaseEventExecutor):
     events = class_functions_dictionary()
 
     def __init__(self, event_board: any, notify_callback: callable):
@@ -45,34 +44,36 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         """
 
-        synchronise_graph = {}
-        synchroniser_nodes = {}
+        synchronize_graph = {}
+        synchronizer_nodes = {}
+
+        routines_with_type = infer_routines_types(self.wires.values())
 
         for wire in self.wires.values():
             for wire_destination_routine in wire.destinations:
-                if wire_destination_routine.name not in synchroniser_nodes:
-                    synchroniser_nodes[wire_destination_routine.name] = SynchroniserNode(
+                if wire_destination_routine.name not in synchronizer_nodes:
+                    synchronizer_nodes[wire_destination_routine.name] = SynchroniserNode(
                         wire_destination_routine.name,
                         wire_destination_routine.flow_name
                     )
 
-            destinations_synchroniser_nodes = [synchroniser_nodes[wire_destination_routine.name]
+            destinations_synchronizer_nodes = [synchronizer_nodes[wire_destination_routine.name]
                                                for wire_destination_routine
                                                in wire.destinations]
 
-            if wire.source.name in synchroniser_nodes:
-                synchroniser_nodes[wire.source.name].nodes = destinations_synchroniser_nodes
+            if wire.source.name in synchronizer_nodes:
+                synchronizer_nodes[wire.source.name].nodes = destinations_synchronizer_nodes
             else:
                 source_node = SynchroniserNode(
                     wire.source.name,
                     wire.source.flow_name,
-                    destinations_synchroniser_nodes
+                    destinations_synchronizer_nodes
                 )
 
-                if isinstance(wire.source, SourceRoutine):
-                    synchronise_graph[source_node.name] = source_node
+                if wire.source in routines_with_type[GENERATOR_ROUTINE]:
+                    synchronize_graph[source_node.name] = source_node
 
-        return synchronise_graph
+        return synchronize_graph
 
     def get_routine_fps(self, routine_name):
         """Get the median fps by routine name.
@@ -100,7 +101,8 @@ class RoutinesSynchroniser(BaseEventExecutor):
 
         while not self._stop_event.is_set():
             # Run each function of the algorithm for all roots, and then continue to the next functions.
-            self._execute_function_for_sources(SynchroniserNode.update_original_fps_by_real_time.__name__, self.get_routine_fps)
+            self._execute_function_for_sources(SynchroniserNode.update_original_fps_by_real_time.__name__,
+                                               self.get_routine_fps)
             self._execute_function_for_sources(SynchroniserNode.update_fps_by_nodes.__name__)
             self._execute_function_for_sources(SynchroniserNode.update_fps_by_fathers.__name__)
             self._execute_function_for_sources(SynchroniserNode.notify_fps.__name__, self.notify_callback)

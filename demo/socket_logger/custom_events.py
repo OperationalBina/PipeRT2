@@ -1,13 +1,14 @@
+from pipert2.core.base.routines import FPSRoutine
 from pipert2.core.wrappers.api_wrapper import APIWrapper
 from pipert2.utils.annotations import class_functions_dictionary
-from pipert2 import SourceRoutine, Data, DestinationRoutine, Pipe
-from pipert2.utils.logging_module_modifiers import get_socket_logger
+from pipert2 import Data, Pipe
+from pipert2.utils.socketio_logger.socket_logger import get_socket_logger
 
 
-class Src(SourceRoutine):
+class Src(FPSRoutine):
     events = class_functions_dictionary()
 
-    def main_logic(self) -> Data:
+    def main_logic(self, data) -> Data:
         return Data()
 
     @events("Hello")
@@ -19,7 +20,7 @@ class Src(SourceRoutine):
         self._logger.info(f"Param in {self.name}: {param}")
 
 
-class Dst(DestinationRoutine):
+class Dst(FPSRoutine):
     events = class_functions_dictionary()
 
     def main_logic(self, data: Data) -> None:

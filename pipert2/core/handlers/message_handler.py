@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from pipert2.utils.dummy_object import Dummy
 from pipert2.core.base.message import Message
 from pipert2.core.base.data.frame_data import FrameData
-from pipert2.utils.socketio_logger.frame_utils import numpy_frame_to_base64
 
 
 class MessageHandler(ABC):
@@ -61,7 +60,7 @@ class MessageHandler(ABC):
         """
 
         if self.send_data and isinstance(message.payload.data, FrameData):
-            self.log_frame("output", message)
+            self.logger.log_frame("output", message)
 
         if callable(self.transmit):
             transmitted_data = self.transmit(message.payload.data)
@@ -83,7 +82,7 @@ class MessageHandler(ABC):
             message = Message.decode(message)
 
             if self.send_data and isinstance(message.payload.data, FrameData):
-                self.log_frame("input", message)
+                self.logger.log_frame("input", message)
 
             if callable(self.receive):
                 received_data = self.receive(message.payload.data)
@@ -93,7 +92,56 @@ class MessageHandler(ABC):
 
         return message
 
-    def log_frame(self, input_output_type, message):
-        self.logger.info(f"{input_output_type}: ", data={
-            'image_base64': numpy_frame_to_base64(message.payload.data.get_frame())
-        })
+    @abstractmethod
+    def link(self, name, destination):
+        """Link the message handler to another destination.
+
+        Args:
+            name: The name of the destination.
+            destination: The destination object.
+
+        """
+
+        pass
+
+    @abstractmethod
+    def unlink(self, name):
+        """Unlink the message handler from another destination.
+
+        Args:
+            name: The name of the destination.
+
+        """
+        pass
+
+    @abstractmethod
+    def get_receiver(self, process_safe):
+        """Get the receiver of the message handler.
+
+        Args:
+            process_safe: Whether the receiver should be process safe or not.
+
+        Returns:
+            Receiver object.
+        """
+        pass
+
+    def set_receive(self, receive):
+        """Set the receive function of the message handler.
+
+        Args:
+            receive: The receive function.
+
+        """
+
+        self.receive = receive
+
+    def set_transmit(self, transmit):
+        """Set the transmit function of the message handler.
+
+        Args:
+            transmit: The transmit function.
+
+        """
+
+        self.transmit = transmit
