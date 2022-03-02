@@ -10,7 +10,7 @@ TEST_TIME = 2
 
 
 @pytest.mark.timeout(15)
-def test_pipe_one_flow():
+def test_pipe_one_flow_expect_containing_generated_data():
     data = [
         "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
     ]
@@ -40,7 +40,7 @@ def test_pipe_one_flow():
 
 
 @pytest.mark.timeout(15)
-def test_pipe_multiple_flows():
+def test_pipe_multiple_flows_expect_containing_generated_data():
     data = [
         "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
     ]
@@ -111,6 +111,70 @@ def test_pipe_notify_custom_event_all_routines():
 
     assert src.custom_event_notifies.is_set()
     assert mid.custom_event_notifies.is_set()
+
+
+def test_pipe_notify_event_inside_a_routine_expect_event_to_notified():
+    src = SourceGeneratingRoutine([], "src")
+    mid = MiddleBufferingRoutine("", 10, "mid", True)
+    dst = DestinationSavingRoutine()
+
+    pipe = Pipe()
+    pipe.create_flow("F1", True, src, mid, dst)
+    pipe.build()
+
+    pipe.notify_event("CUSTOM_EVENT_NOTIFY")
+    time.sleep(1)
+
+    pipe.join(True)
+
+    assert src.custom_event_notifies.is_set()
+    assert mid.middle_event_notifies.is_set()
+
+
+def test_pipe_notify_event_with_argument_expect_setting_the_given_parameter():
+    src = SourceGeneratingRoutine([], "src")
+    mid = MiddleBufferingRoutine("", 10, "mid", True)
+    dst = DestinationSavingRoutine()
+
+    PARAM = 5
+
+    pipe = Pipe()
+    pipe.create_flow("F1", True, src, mid, dst)
+    pipe.build()
+
+    pipe.notify_event("CUSTOM_EVENT_PARAM", specific_routine="src", param=PARAM)
+    time.sleep(1)
+
+    pipe.join(True)
+
+    assert src.custom_event_notifies.is_set()
+    assert src.event_param.value == PARAM
+
+
+def test_notify_event_from_pipe_with_parameter_expect_all_routines_to_get_the_given_parameter():
+    src = SourceGeneratingRoutine([], "src")
+    mid = MiddleBufferingRoutine("", 10, "mid", True)
+    dst = DestinationSavingRoutine()
+
+    PARAM = 5
+
+    pipe = Pipe()
+    pipe.create_flow("F1", True, src, mid, dst)
+    pipe.build()
+
+    pipe.notify_event("CUSTOM_EVENT_PARAM", param=PARAM)
+    time.sleep(1)
+
+    pipe.join(True)
+
+    assert src.custom_event_notifies.is_set()
+    assert src.event_param.value == PARAM
+
+    assert mid.custom_event_notifies.is_set()
+    assert mid.event_param.value == PARAM
+
+    assert dst.custom_event_notifies.is_set()
+    assert dst.event_param.value == PARAM
 
 
 @pytest.mark.timeout(15)
