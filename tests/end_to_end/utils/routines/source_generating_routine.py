@@ -1,6 +1,5 @@
-import multiprocessing as mp
 import time
-
+import multiprocessing as mp
 from pipert2 import FPSRoutine, Data
 from pipert2.utils.annotations import class_functions_dictionary
 
@@ -20,13 +19,11 @@ class SourceGeneratingRoutine(FPSRoutine):
     def main_logic(self, data: Data = None) -> Data:
         if self.indexing < len(self.data_to_iterate):
             d = Data()
-
             d.additional_data = {
                 "val": self.data_to_iterate[self.indexing]
             }
 
             self.indexing += 1
-
             time.sleep(0.1)
 
             return d

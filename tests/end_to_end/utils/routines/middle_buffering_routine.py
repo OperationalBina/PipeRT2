@@ -19,8 +19,6 @@ class MiddleBufferingRoutine(FPSRoutine):
         self.event_param = mp.Value('i', 0)
 
     def main_logic(self, data: Data = None) -> Data:
-        print(f"Buffer {self.buffer}, Get: {data}")
-
         if not self.is_running:
             time.sleep(3)
 
@@ -28,7 +26,6 @@ class MiddleBufferingRoutine(FPSRoutine):
         self.index += 1
 
         if self.index == self.limit:
-            print("Notify stop")
             self.notify_event(STOP_EVENT_NAME, specific_routine=self.name)
 
         time.sleep(random.randint(1, 10) / 10)
