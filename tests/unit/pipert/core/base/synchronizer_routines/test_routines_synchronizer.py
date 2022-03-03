@@ -3,9 +3,9 @@ import pytest
 import multiprocessing as mp
 from pytest_mock import MockerFixture
 from pipert2 import Wire
-from pipert2.utils import NULL_FPS
-from pipert2.core import FPSRoutine
-from pipert2.core import RoutinesSynchronizer
+from pipert2.core.base.routines.fps_routine import FPSRoutine
+from pipert2.utils.consts.synchronise_routines import NULL_FPS
+from pipert2.core.base.synchronise_routines.routines_synchroniser import RoutinesSynchronizer
 
 
 @pytest.fixture

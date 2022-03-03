@@ -3,10 +3,11 @@ from mock import MagicMock
 from functools import partial
 from collections import deque
 from pytest_mock import MockerFixture
-from pipert2.core import FPSRoutine
-from pipert2.core import get_runner_for_type
-from pipert2.utils import Dummy, INNER_ROUTINE
+from pipert2.utils.dummy_object import Dummy
+from pipert2.utils.consts.routine_types import INNER_ROUTINE
+from pipert2.core.base.routines.fps_routine import FPSRoutine
 from tests.unit.pipert.core.utils.functions_test_utils import timeout_wrapper
+from pipert2.core.base.routines.extended_run_factory import get_runner_for_type
 from tests.unit.pipert.core.utils.dummy_routines.dummy_middle_routine import DummyMiddleRoutine, DUMMY_ROUTINE_EVENT, \
     DummyMiddleRoutineException
 

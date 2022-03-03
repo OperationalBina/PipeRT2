@@ -1,8 +1,8 @@
 import pytest
 from pipert2 import Wire
 from pytest_mock import MockerFixture
-from pipert2.core import flow_validator
-from pipert2.utils import FloatingRoutine, UniqueRoutineName
+from pipert2.core.base.validators.flow_validator import flow_validator
+from pipert2.utils.exceptions import FloatingRoutine, UniqueRoutineName
 
 
 def test_validate_flow(mocker: MockerFixture):
