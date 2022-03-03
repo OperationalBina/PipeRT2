@@ -51,3 +51,19 @@ def test_basic_transmit_receive(dummy_basic_data_transmitter):
     data = {"data": b"AAA" * 5000, "short_data": b"AAA"}
     return_data = transmit_func(data)
     assert data == receive_func(return_data)
+
+
+def test_transmitter_with_greater_int_then_threshold_should_save_int_representation_of_value(
+        dummy_shared_memory_transmitter):
+
+    threshold = dummy_shared_memory_transmitter.data_size_threshold
+    transmit_func = dummy_shared_memory_transmitter.transmit()
+    expected_number = threshold * 2
+
+    data = Data()
+    data.additional_data = {"number": expected_number}
+
+    transmitted_data = transmit_func(data)
+
+    assert isinstance(transmitted_data.additional_data["number"], int)
+    assert expected_number == transmitted_data.additional_data["number"]

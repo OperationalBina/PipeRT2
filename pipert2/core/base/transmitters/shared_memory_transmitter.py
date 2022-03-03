@@ -127,7 +127,10 @@ def save_value_in_shared_memory(value, threshold_for_saving_in_shared_memory):
     """
 
     try:
-        new_val = bytes(value)
+        if isinstance(value, int):
+            new_val = value.to_bytes(value.bit_length(), 'big')
+        else:
+            new_val = bytes(value)
     except TypeError:
         value_address_metadata = value
     else:
