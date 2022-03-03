@@ -1,7 +1,7 @@
 import time
 from abc import ABCMeta
 from statistics import median
-from pipert2.core.base.routine import Routine
+from pipert2.core import Routine
 from pipert2.utils.batch_notifier import BatchNotifier
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.consts import NOTIFY_ROUTINE_DURATIONS_NAME, UPDATE_FPS_NAME, START_EVENT_NAME, STOP_EVENT_NAME

@@ -1,6 +1,6 @@
-from typing import Dict, List
-from pipert2.core.base.wire import Wire
-from pipert2.core.base.flow import Flow
+from typing import Dict
+from pipert2.core import Wire
+from pipert2.core import Flow
 from pipert2.utils.exceptions import FloatingRoutine, UniqueRoutineName
 
 

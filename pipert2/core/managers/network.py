@@ -1,9 +1,9 @@
 from typing import Tuple
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from pipert2.core.base.routine import Routine
-from pipert2.core.base.data_transmitter import DataTransmitter
-from pipert2.core.handlers.message_handler import MessageHandler
+from pipert2.core import Routine
+from pipert2.core import DataTransmitter
+from pipert2.core import MessageHandler
 
 
 class Network(ABC):

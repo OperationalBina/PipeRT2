@@ -1,6 +1,6 @@
 import numpy as np
 from abc import abstractmethod
-from pipert2.core.base.data.data import Data
+from pipert2.core import Data
 
 
 class FrameData(Data):

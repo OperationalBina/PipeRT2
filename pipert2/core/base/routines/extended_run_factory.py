@@ -1,6 +1,6 @@
 from typing import Callable
 from functools import partial
-from pipert2.core.base.message import Message
+from pipert2.core import Message
 from pipert2.utils.consts import GENERATOR_ROUTINE, INNER_ROUTINE, FINAL_ROUTINE
 
 
