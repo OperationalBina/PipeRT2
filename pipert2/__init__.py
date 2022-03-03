@@ -3,7 +3,7 @@ __version__ = "2.4.0"
 try:
     from dataclasses import dataclass, field, fields
 except ImportError:
-    from .utils.data_class.dataclasses import dataclass, field, fields
+    from .utils import dataclass, field, fields
 
 
 # User interaction classes

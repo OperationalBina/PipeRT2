@@ -1,7 +1,7 @@
 from typing import Dict
 from pipert2.core import Wire
 from pipert2.core import Flow
-from pipert2.utils.exceptions import FloatingRoutine, UniqueRoutineName
+from pipert2.utils import FloatingRoutine, UniqueRoutineName
 
 
 def validate_flow(flows: Dict[str, Flow], wires: Dict[tuple, Wire]):

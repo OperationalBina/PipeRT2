@@ -3,13 +3,12 @@ import threading
 from typing import Dict
 import multiprocessing as mp
 from statistics import median
-
-from pipert2.utils.dummy_object import Dummy
-from pipert2.utils.base_event_executor import BaseEventExecutor
-from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.utils.routine_type_identifier import infer_routines_types
+from pipert2.utils import Dummy
 from pipert2.core import SynchroniserNode
-from pipert2.utils.consts import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTINE_DURATIONS_NAME, NULL_FPS, \
+from pipert2.utils import BaseEventExecutor
+from pipert2.utils import infer_routines_types
+from pipert2.utils import class_functions_dictionary
+from pipert2.utils import START_EVENT_NAME, KILL_EVENT_NAME, NOTIFY_ROUTINE_DURATIONS_NAME, NULL_FPS, \
     SYNCHRONISER_UPDATE_INTERVAL, STOP_EVENT_NAME, GENERATOR_ROUTINE
 
 

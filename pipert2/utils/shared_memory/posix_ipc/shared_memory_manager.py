@@ -1,7 +1,6 @@
 try:
-    from pipert2.utils.shared_memory.general.shared_memory_manager import AbsSharedMemoryManager
-    from pipert2.utils.shared_memory.posix_ipc.shared_memory_generator import SharedMemoryGenerator, \
-        get_shared_memory_object
+    from pipert2.utils import AbsSharedMemoryManager
+    from .shared_memory_generator import SharedMemoryGenerator, get_shared_memory_object
 except ImportError:
     SharedMemoryGenerator = None
 

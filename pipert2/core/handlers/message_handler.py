@@ -1,7 +1,7 @@
 from logging import Logger
 from typing import Optional
 from abc import ABC, abstractmethod
-from pipert2.utils.dummy_object import Dummy
+from pipert2.utils import Dummy
 from pipert2.core import Message
 from pipert2.core import FrameData
 

@@ -1,7 +1,6 @@
 import pytest
-
-from pipert2.utils.consts import START_EVENT_NAME
-from pipert2.utils.method_data import Method
+from pipert2.utils import Method
+from pipert2.utils import START_EVENT_NAME
 
 
 @pytest.fixture()

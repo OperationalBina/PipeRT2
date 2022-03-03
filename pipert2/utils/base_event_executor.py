@@ -1,10 +1,10 @@
 from multiprocessing import Process
-from pipert2.utils.method_data import Method
-from pipert2.utils.dummy_object import Dummy
-from pipert2.utils.interfaces import EventExecutorInterface
-from pipert2.utils.annotations import class_functions_dictionary
-from pipert2.core.managers.event_board import EventBoard, EventHandler
-from pipert2.utils.consts import KILL_EVENT_NAME, STOP_EVENT_NAME, CLEANUP
+from pipert2.utils import Dummy
+from pipert2.utils import Method
+from pipert2.utils import EventExecutorInterface
+from pipert2.core import EventBoard, EventHandler
+from pipert2.utils import class_functions_dictionary
+from pipert2.utils import KILL_EVENT_NAME, STOP_EVENT_NAME, CLEANUP
 
 
 class BaseEventExecutor(EventExecutorInterface):

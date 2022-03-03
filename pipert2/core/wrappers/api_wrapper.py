@@ -11,7 +11,7 @@ except ImportError:
 if flask:
     from pipert2.core import Pipe
     from multiprocessing import Process
-    from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
+    from pipert2.utils import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 
 
     class APIWrapper:

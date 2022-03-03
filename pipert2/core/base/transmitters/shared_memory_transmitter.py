@@ -2,7 +2,7 @@ import numpy as np
 from pipert2 import fields
 from pipert2.core import Data
 from pipert2.core import DataTransmitter
-from pipert2.utils.shared_memory import SharedMemoryManager
+from pipert2.utils import SharedMemoryManager
 
 
 class SharedMemoryTransmitter(DataTransmitter):

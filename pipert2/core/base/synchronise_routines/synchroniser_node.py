@@ -1,5 +1,5 @@
 from typing import List
-from pipert2.utils.consts import UPDATE_FPS_NAME, NULL_FPS
+from pipert2.utils import UPDATE_FPS_NAME, NULL_FPS
 
 
 class SynchroniserNode:

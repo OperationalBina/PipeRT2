@@ -2,11 +2,10 @@ import os
 import cv2
 import time
 import numpy as np
-from pipert2 import Data, Pipe
-from pipert2.core.base.data import FrameData
-from pipert2.core.base.routines import FPSRoutine
+from pipert2.core import FrameData
+from pipert2 import FPSRoutine, Data, Pipe
+from pipert2.utils import get_socket_logger
 from pipert2.core.wrappers.api_wrapper import APIWrapper
-from pipert2.utils.socketio_logger.socket_logger import get_socket_logger
 
 
 class Frame(FrameData):

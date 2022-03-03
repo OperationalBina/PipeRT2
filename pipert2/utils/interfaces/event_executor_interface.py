@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from pipert2.utils.method_data import Method
+from pipert2.utils import Method
 
 
 class EventExecutorInterface(ABC):  # TODO - Maybe add a logger abstract class for each class with logger.

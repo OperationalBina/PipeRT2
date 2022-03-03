@@ -1,14 +1,14 @@
 try:
-    from pipert2.utils.socketio_logger.socket_handler import SocketHandler
+    from .socket_handler import SocketHandler
 except ImportError:
     SocketHandler = None
 
 if SocketHandler:
     import os
     import logging
-    from pipert2.utils.consts.emit_socket_names import LOG_NAME
-    from pipert2.utils.socketio_logger.frame_utils import numpy_frame_to_base64
-    from pipert2.utils.socketio_logger.socket_formatter import SocketFormatter
+    from pipert2.utils import LOG_NAME
+    from pipert2.utils import SocketFormatter
+    from pipert2.utils import numpy_frame_to_base64
 
 
     class SocketLogger(logging.Logger):

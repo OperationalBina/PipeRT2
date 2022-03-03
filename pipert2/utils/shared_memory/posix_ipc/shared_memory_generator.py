@@ -10,8 +10,8 @@ if posix_ipc:
     import os
     import mmap
     from typing import Optional
-    from pipert2.utils.shared_memory.posix_ipc.shared_memory import SharedMemory
-    from pipert2.utils.shared_memory.general.memory_id_iterator import MemoryIdIterator
+    from .shared_memory import SharedMemory
+    from pipert2.utils import MemoryIdIterator
 
 
     def get_shared_memory_object(name: str) -> Optional[SharedMemory]:

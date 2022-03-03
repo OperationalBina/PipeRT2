@@ -1,7 +1,7 @@
 import sys
 import pytest
 import logging
-from pipert2.utils.logging_module_modifiers import add_pipe_log_level, \
+from pipert2.utils import add_pipe_log_level, \
     PIPE_INFRASTRUCTURE_LOG_LEVEL_NAME, PIPE_INFRASTRUCTURE_LOG_LEVEL
 
 

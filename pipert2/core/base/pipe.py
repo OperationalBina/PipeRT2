@@ -5,17 +5,17 @@ from pipert2.core import Wire
 from pipert2.core import Flow
 from pipert2.core import Routine
 from pipert2.core import Network
-from pipert2.core import RoutinesSynchronizer
-from pipert2.core import validate_flow
 from pipert2.core import EventBoard
 from pipert2.core import QueueNetwork
+from pipert2.core import validate_flow
 from pipert2.core import DataTransmitter
 from pipert2.core import BasicTransmitter
 from pipert2.core import get_runner_for_type
-from pipert2.utils.routine_type_identifier import infer_routines_types
-from pipert2.utils.consts.emit_socket_names import CREATION_LOG_NAME, LOG_NAME
-from pipert2.utils.logging_module_modifiers import add_pipe_log_level, get_default_print_logger
-from pipert2.utils.consts.event_names import KILL_EVENT_NAME, INTERNAL_EVENT_NAMES, STOP_EVENT_NAME, START_EVENT_NAME
+from pipert2.core import RoutinesSynchronizer
+from pipert2.utils import infer_routines_types
+from pipert2.utils import CREATION_LOG_NAME, LOG_NAME
+from pipert2.utils import add_pipe_log_level, get_default_print_logger
+from pipert2.utils import KILL_EVENT_NAME, INTERNAL_EVENT_NAMES, STOP_EVENT_NAME, START_EVENT_NAME
 
 add_pipe_log_level()
 
