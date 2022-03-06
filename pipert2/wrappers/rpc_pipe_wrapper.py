@@ -1,8 +1,8 @@
 try:
     from zerorpc import Server
 except ImportError:
-    print(f"Oops! seems like zerorpc isn't installed!\nIf you want to use the capabilities of the rpc_wrapper run "
-          f"'pip install PipeRT[rpc]'")
+    print(f"\033[93mWARNING: seems like zerorpc isn't installed!\nIf you want to use the capabilities of the "
+          f"rpc_wrapper run pip install PipeRT[rpc]")
     Server = None
 
 if Server:

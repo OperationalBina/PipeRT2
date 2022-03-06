@@ -3,8 +3,8 @@ try:
     from socketio.exceptions import SocketIOError
 except ImportError:
     print(
-        "Seems like socketio isn't installed...\nIn order to use the cockpit and its features run pip install PipeRT["
-        "cockpit]")
+        "\033[93mWARNING: Seems like socketio isn't installed...\nIn order to use the cockpit and its features run pip "
+        "install PipeRT[cockpit]")
     socketio = None
 
 if socketio:

@@ -2,8 +2,8 @@ try:
     import cv2
 except ImportError:
     print(
-        "Seems like opencv isn't installed...\nIn order to use the cockpit and its features run pip install PipeRT["
-        "cockpit]")
+        "\033[93mWARNING: Seems like opencv isn't installed...\nIn order to use the cockpit and its features run pip "
+        "install PipeRT[cockpit]")
     cv2 = None
 
 import base64

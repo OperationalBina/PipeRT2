@@ -2,8 +2,8 @@ try:
     import posix_ipc
 except ImportError:
     print(
-        "Seems like posix-ipc isn't installed...\nFor shared memory support in python ver < 3.8 run pip install "
-        "PipeRT[shared_memory]")
+        "\033[93mWARNING: Seems like posix-ipc isn't installed...\nFor shared memory support in python ver < 3.8 run "
+        "pip install PipeRT[shared_memory]")
     posix_ipc = None
 
 if posix_ipc:
