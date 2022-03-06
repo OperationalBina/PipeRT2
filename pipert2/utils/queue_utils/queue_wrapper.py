@@ -1,8 +1,8 @@
 import copy
 from threading import Thread
-from pipert2.core import Message
+from pipert2.core.base.message import Message
 from multiprocessing import Queue as mpQueue
-from pipert2.utils import force_push_to_queue
+from pipert2.utils.queue_utils.publish_queue import force_push_to_queue
 from queue import Queue as thQueue, Full, Empty
 
 

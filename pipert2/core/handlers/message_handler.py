@@ -1,9 +1,9 @@
 from logging import Logger
 from typing import Optional
 from abc import ABC, abstractmethod
-from pipert2.utils import Dummy
-from pipert2.core import Message
-from pipert2.core import FrameData
+from pipert2.utils.dummy_object import Dummy
+from pipert2.core.base.message import Message
+from pipert2.core.base.data.frame_data import FrameData
 
 
 class MessageHandler(ABC):

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from pipert2.core import Data
+from pipert2.core.base.data.data import Data
 
 
 class DataTransmitter(ABC):

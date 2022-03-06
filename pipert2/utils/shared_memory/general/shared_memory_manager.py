@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from pipert2.utils import SingletonABCMeta
+from pipert2.utils.singleton_abs import SingletonABCMeta
 
 
 class AbsSharedMemoryManager(metaclass=SingletonABCMeta):

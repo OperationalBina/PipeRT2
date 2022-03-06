@@ -1,5 +1,5 @@
 import time
-from pipert2.core import FPSRoutine
+from pipert2.core.base.routines.fps_routine import FPSRoutine
 from pipert2 import Pipe, BasicTransmitter, Data, START_EVENT_NAME
 
 

@@ -1,7 +1,7 @@
 from typing import Callable
 from functools import partial
-from pipert2.core import Message
-from pipert2.utils import GENERATOR_ROUTINE, INNER_ROUTINE, FINAL_ROUTINE
+from pipert2.core.base.message import Message
+from pipert2.utils.consts.routine_types import GENERATOR_ROUTINE, INNER_ROUTINE, FINAL_ROUTINE
 
 
 def get_runner_for_type(routine_type: str) -> Callable:

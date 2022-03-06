@@ -1,9 +1,10 @@
 from queue import Full, Empty
-from pipert2.core import Message
-from pipert2.core import FrameData
-from pipert2.core import MessageHandler
-from pipert2.utils import QueueNotInitialized
-from pipert2.utils import PublishQueue, QueueWrapper
+from pipert2.core.base.message import Message
+from pipert2.core.base.data.frame_data import FrameData
+from pipert2.core.handlers.message_handler import MessageHandler
+from pipert2.utils.exceptions.queue_not_initialized import QueueNotInitialized
+from pipert2.utils.queue_utils.publish_queue import PublishQueue
+from pipert2.utils.queue_utils.queue_wrapper import QueueWrapper
 
 
 class QueueHandler(MessageHandler):

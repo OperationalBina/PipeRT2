@@ -1,7 +1,7 @@
 import time
 import random
 import multiprocessing as mp
-from pipert2.utils import class_functions_dictionary
+from pipert2.utils.annotations import class_functions_dictionary
 from pipert2 import FPSRoutine, Data, STOP_EVENT_NAME
 
 

@@ -1,6 +1,6 @@
 import multiprocessing as mp
 from pipert2 import FPSRoutine, Data
-from pipert2.utils import class_functions_dictionary
+from pipert2.utils.annotations import class_functions_dictionary
 
 
 class DestinationSavingRoutine(FPSRoutine):

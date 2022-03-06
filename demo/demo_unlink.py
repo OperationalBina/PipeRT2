@@ -1,8 +1,8 @@
 import os
 import time
 import numpy as np
-from pipert2.utils import UNLINK
-from pipert2.core import FrameData
+from pipert2.utils.consts.event_names import UNLINK
+from pipert2.core.base.data.frame_data import FrameData
 from pipert2 import FPSRoutine, Data, Pipe, START_EVENT_NAME, STOP_EVENT_NAME, \
     Wire
 

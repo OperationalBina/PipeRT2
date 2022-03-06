@@ -9,9 +9,9 @@ except ImportError:
     flask = None
 
 if flask:
-    from pipert2.core import Pipe
+    from pipert2.core.base.pipe import Pipe
     from multiprocessing import Process
-    from pipert2.utils import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
+    from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 
 
     class APIWrapper:

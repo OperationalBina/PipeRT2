@@ -1,11 +1,11 @@
 from threading import Thread
 from functools import partial
 from typing import Callable, Set
-from pipert2.utils import Method
+from pipert2.utils.method_data import Method
 from collections import defaultdict
-from pipert2.core import EventHandler
+from pipert2.core.handlers.event_handler import EventHandler
 from multiprocessing import Pipe, SimpleQueue
-from pipert2.utils import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME
+from pipert2.utils.consts.event_names import KILL_EVENT_NAME, STOP_EVENT_NAME, START_EVENT_NAME
 
 DEFAULT_EVENT_HANDLER_EVENTS = [START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME]
 

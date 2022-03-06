@@ -1,8 +1,8 @@
 import time
 import pickle
 import collections
-from pipert2.core import Data
-from pipert2.core import Payload
+from pipert2.core.base.data.data import Data
+from pipert2.core.base.payload import Payload
 
 
 class Message:
