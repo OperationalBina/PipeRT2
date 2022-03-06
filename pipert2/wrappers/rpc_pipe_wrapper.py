@@ -7,7 +7,7 @@ except ImportError:
 
 if Server:
     from pipert2 import Pipe
-    from pipert2.core.wrappers.utils import parse_arguments
+    from pipert2.wrappers.utils import parse_arguments
     from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME
 
 

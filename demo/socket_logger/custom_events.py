@@ -1,6 +1,6 @@
 from pipert2 import FPSRoutine
 from pipert2 import Data, Pipe
-from pipert2.core.wrappers.api_wrapper import APIWrapper
+from pipert2.wrappers.api_wrapper import APIWrapper
 from pipert2.utils.annotations import class_functions_dictionary
 from pipert2.utils.socketio_logger.socket_logger import get_socket_logger
 
