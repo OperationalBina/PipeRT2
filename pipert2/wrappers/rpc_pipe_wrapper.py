@@ -1,7 +1,8 @@
 try:
     from zerorpc import Server
 except ImportError:
-    print(f"\033[93mWARNING: seems like zerorpc isn't installed!\nIf you want to use the capabilities of the "
+    from pipert2.utils.consts.console_colors import WARNING
+    print(f"{WARNING}WARNING: seems like zerorpc isn't installed!\nIf you want to use the capabilities of the "
           f"rpc_wrapper run pip install PipeRT[rpc]")
     Server = None
 

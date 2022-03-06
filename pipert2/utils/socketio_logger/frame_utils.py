@@ -1,9 +1,10 @@
 try:
     import cv2
 except ImportError:
+    from pipert2.utils.consts.console_colors import WARNING
     print(
-        "\033[93mWARNING: Seems like opencv isn't installed...\nIn order to use the cockpit and its features run pip "
-        "install PipeRT[cockpit]")
+        f"{WARNING}WARNING: Seems like opencv isn't installed...\nIn order to use the cockpit and its features run pip "
+        f"install PipeRT[cockpit]")
     cv2 = None
 
 import base64

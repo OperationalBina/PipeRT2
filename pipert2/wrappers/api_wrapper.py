@@ -4,8 +4,9 @@ try:
     from flask import Response
     from flask_cors import CORS
 except ImportError:
-    print(f"\033[93mWARNING: seems like flask isn't installed!\nIf you want to use the capabilities of the api_wrapper "
-          f"run pip install PipeRT[api]")
+    from pipert2.utils.consts.console_colors import WARNING
+    print(f"{WARNING}WARNING: seems like flask isn't installed!\nIf you want to use the capabilities of the api_wrapper"
+          f" run pip install PipeRT[api]")
     flask = None
 
 if flask:

@@ -1,6 +1,6 @@
 import time
-from pipert2.core.base.message import Message
 from queue import Full, Empty, Queue
+from pipert2.core.base.message import Message
 
 
 class PublishQueue(object):

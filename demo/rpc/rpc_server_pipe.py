@@ -1,7 +1,7 @@
 import time
-from pipert2.core.base.routines.fps_routine import FPSRoutine
 from pipert2 import Pipe, BasicTransmitter, Data
 from pipert2.wrappers.rpc_pipe_wrapper import RPCPipeWrapper
+from pipert2.core.base.routines.fps_routine import FPSRoutine
 
 
 class DummyCount(FPSRoutine):

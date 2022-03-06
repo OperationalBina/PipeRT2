@@ -2,9 +2,10 @@ try:
     import socketio
     from socketio.exceptions import SocketIOError
 except ImportError:
+    from pipert2.utils.consts.console_colors import WARNING
     print(
-        "\033[93mWARNING: Seems like socketio isn't installed...\nIn order to use the cockpit and its features run pip "
-        "install PipeRT[cockpit]")
+        f"{WARNING}WARNING: Seems like socketio isn't installed...\nIn order to use the cockpit and its features run "
+        f"pip install PipeRT[cockpit]")
     socketio = None
 
 if socketio:

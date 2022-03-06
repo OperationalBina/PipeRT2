@@ -1,9 +1,10 @@
 try:
     import posix_ipc
 except ImportError:
+    from pipert2.utils.consts.console_colors import WARNING
     print(
-        "\033[93mWARNING: Seems like posix-ipc isn't installed...\nFor shared memory support in python ver < 3.8 run "
-        "pip install PipeRT[shared_memory]")
+        f"{WARNING}WARNING: Seems like posix-ipc isn't installed...\nFor shared memory support in python ver < 3.8 run "
+        f"pip install PipeRT[shared_memory]")
     posix_ipc = None
 
 if posix_ipc:
