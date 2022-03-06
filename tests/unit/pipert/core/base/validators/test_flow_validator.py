@@ -1,8 +1,9 @@
 import pytest
 from pipert2 import Wire
 from pytest_mock import MockerFixture
-from pipert2.core.base.validators.flow_validator import flow_validator
 from pipert2.utils.exceptions import FloatingRoutine, UniqueRoutineName
+from pipert2.core.base.validators.flow_validator import validate_flow, validate_flows_routines_are_linked, \
+    validate_routines_unique_names
 
 
 def test_validate_flow(mocker: MockerFixture):
@@ -29,7 +30,7 @@ def test_validate_flow(mocker: MockerFixture):
         dummy_flow2.name: dummy_flow2
     }
 
-    flow_validator.validate_flow(flows=flows, wires=dummy_wires)
+    validate_flow(flows=flows, wires=dummy_wires)
 
 
 def test_validate_flows_routines_are_linked_with_valid_flow(mocker: MockerFixture):
@@ -66,7 +67,7 @@ def test_validate_flows_routines_are_linked_with_valid_flow(mocker: MockerFixtur
         ("flow_2", "r3"): Wire(source=dummy_routine3, destinations=(dummy_routine4, dummy_routine5)),
     }
 
-    flow_validator.validate_flows_routines_are_linked(flows, wires)
+    validate_flows_routines_are_linked(flows, wires)
 
 
 def test_validate_routines_unique_names(mocker: MockerFixture):
@@ -92,7 +93,7 @@ def test_validate_routines_unique_names(mocker: MockerFixture):
 
     flows = {"flow1": dummy_flow1, "flow2": dummy_flow2}
 
-    flow_validator.validate_routines_unique_names(flows)
+    validate_routines_unique_names(flows)
 
 
 def test_validate_routines_unique_names_existing_names(mocker: MockerFixture):
@@ -119,7 +120,7 @@ def test_validate_routines_unique_names_existing_names(mocker: MockerFixture):
     flows = {"flow1": dummy_flow1, "flow2": dummy_flow2}
 
     with pytest.raises(UniqueRoutineName) as error:
-        flow_validator.validate_routines_unique_names(flows)
+        validate_routines_unique_names(flows)
 
     assert "r1" in str(error)
 
@@ -159,6 +160,6 @@ def test_validate_flows_routines_are_linked_floating_routine_build_raises_error(
     }
 
     with pytest.raises(FloatingRoutine) as error:
-        flow_validator.validate_flows_routines_are_linked(flows=flows, wires=wires)
+        validate_flows_routines_are_linked(flows=flows, wires=wires)
 
     assert "r5" in str(error)
