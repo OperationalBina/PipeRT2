@@ -40,18 +40,18 @@ class SharedMemoryTransmitter(DataTransmitter):
 
             """
 
-            for field in fields(data.__class__):
-                if field.type == dict:
+            for field in data.__dict__.keys():
+                if isinstance(data.__getattribute__(field), dict):
                     modified_dict = {}
 
-                    for key, value in getattr(data, field.name).items():
+                    for key, value in getattr(data, field).items():
                         modified_dict[key] = save_value_in_shared_memory(value, self.data_size_threshold)
 
-                    setattr(data, field.name, modified_dict)
+                    setattr(data, field, modified_dict)
 
                 else:
-                    value = getattr(data, field.name)
-                    setattr(data, field.name, save_value_in_shared_memory(value, self.data_size_threshold))
+                    value = getattr(data, field)
+                    setattr(data, field, save_value_in_shared_memory(value, self.data_size_threshold))
 
             return data
 
@@ -76,21 +76,21 @@ class SharedMemoryTransmitter(DataTransmitter):
 
             """
 
-            for field in fields(data.__class__):
-                if field.type == dict and "address" not in getattr(data, field.name):  # Check for dict values
-                    for outer_key, outer_value in getattr(data, field.name).items():
+            for field in data.__dict__.keys():
+                if isinstance(getattr(data, field), dict) and "address" not in getattr(data, field):
+                    for outer_key, outer_value in getattr(data, field).items():
                         if type(outer_value) == dict:
 
                             value_from_shared_memory = get_data_in_shared_memory(outer_value)
 
                             if value_from_shared_memory is not None:
-                                getattr(data, field.name)[outer_key] = value_from_shared_memory
+                                getattr(data, field)[outer_key] = value_from_shared_memory
 
-                elif field.type == dict:  # The field is saved in shared memory
-                    value_from_shared_memory = get_data_in_shared_memory(getattr(data, field.name))
+                elif isinstance(getattr(data, field), dict):  # The field is saved in shared memory
+                    value_from_shared_memory = get_data_in_shared_memory(getattr(data, field))
 
                     if value_from_shared_memory is not None:
-                        setattr(data, field.name, value_from_shared_memory)
+                        setattr(data, field, value_from_shared_memory)
 
             return data
 
