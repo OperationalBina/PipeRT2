@@ -38,8 +38,8 @@ def test_link_shared_memory_transmitter_to_destination_routines_message_handlers
     expected_value = Data()
     expected_value.additional_data = {"test": input_sentence_in_bytes}
 
-    assert first_destination_routine.message_handler.input_queue.receive(requested_data) == expected_value
-    assert second_destination_routine.message_handler.input_queue.receive(requested_data) == expected_value
+    assert first_destination_routine.message_handler.input_queue.receive(requested_data).additional_data == expected_value.additional_data
+    assert second_destination_routine.message_handler.input_queue.receive(requested_data).additional_data == expected_value.additional_data
 
 
 def test_link_shared_memory_transmitter_to_source_routine_message_handlers(mocker: MockerFixture):
