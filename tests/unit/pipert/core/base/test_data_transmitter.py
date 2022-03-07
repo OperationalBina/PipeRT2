@@ -1,11 +1,14 @@
 import sys
 import pytest
 import numpy as np
-from pipert2.core.base.data import Data
+from pipert2.core.base.data import Data, FrameData
 from pipert2.core.base.transmitters import BasicTransmitter
 
 
-class CustomData(Data):
+class CustomData(FrameData):
+    def get_frame(self) -> np.array:
+        pass
+
     def __init__(self, param, additional_data=None):
         super().__init__(additional_data)
         self.param = param
@@ -75,10 +78,10 @@ def test_transmitter_with_greater_int_then_threshold_should_save_int_representat
     assert expected_number == transmitted_data.additional_data["number"]
 
 
-def test_transmit_in_shared_memory_transmitter_with_custom_object_save_all_properties_properly(dummy_shared_memory_transmitter):
-    custom_data = CustomData([1, 2, 3], additional_data={
-        "name": "test"
-    })
+def test_transmit_in_shared_memory_transmitter_with_custom_object_save_all_properties_properly_without_crashing(
+        dummy_shared_memory_transmitter):
+
+    custom_data = CustomData([1, 2, 3])
 
     result = dummy_shared_memory_transmitter.transmit()(custom_data)
 
