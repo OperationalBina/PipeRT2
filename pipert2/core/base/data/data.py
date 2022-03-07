@@ -1,21 +1,19 @@
-from pipert2 import dataclass, field
-
-
-@dataclass
 class Data:
-    """ase class for transportation of data within the pipeline.
+    """Base class for transportation of data within the pipeline.
     User can implement Data classes for customizing types.
 
     Example usage:
     >>> import numpy as np
-    >>> @dataclass
-    ... class FrameData(Data):
-    ...     frame: np.ndarray
-    ...     source: str
-
-    >>> frame = np.zeros((4,5))
-    >>> data = FrameData(frame=frame, source="Doctest")
+    >>> class DataTransferObject(Data):
+    >>>     def __init__(self, name, data, additional_data):
+    >>>         super().__init__(additional_data=additional_data)
+    >>>         self.name = name
+    >>>         self.data = data
 
     """
 
-    additional_data: dict = field(default_factory=dict, init=False)
+    def __init__(self, additional_data=None):
+        if additional_data is None:
+            additional_data = {}
+
+        self.additional_data = additional_data

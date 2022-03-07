@@ -9,6 +9,7 @@ from pipert2.core.base.routines import FPSRoutine
 
 class Frame(FrameData):
     def __init__(self, frame, frame_number):
+        super().__init__()
         self.frame = frame
         self.frame_number = frame_number
 
