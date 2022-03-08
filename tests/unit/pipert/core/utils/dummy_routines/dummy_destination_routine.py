@@ -1,4 +1,4 @@
-from pipert2.core.base.routines import FPSRoutine
+from pipert2 import FPSRoutine
 from tests.unit.pipert.core.utils.dummy_routines.dummy_middle_routine import DUMMY_ROUTINE_EVENT
 
 

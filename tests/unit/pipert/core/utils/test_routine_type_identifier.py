@@ -1,9 +1,8 @@
 from unittest.mock import Mock
-
 from pipert2 import Wire
-from pipert2.core.base.routines import FPSRoutine
-from pipert2.utils.consts import GENERATOR_ROUTINE, INNER_ROUTINE, FINAL_ROUTINE
+from pipert2.core.base.routines.fps_routine import FPSRoutine
 from pipert2.utils.routine_type_identifier import infer_routines_types
+from pipert2.utils.consts.routine_types import GENERATOR_ROUTINE, INNER_ROUTINE, FINAL_ROUTINE
 
 
 def test_infer_routines_types_1_gen_2_inner_1_final():

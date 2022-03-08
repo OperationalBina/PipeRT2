@@ -1,6 +1,6 @@
 from typing import Callable
 
-from pipert2.core.base.routines import FPSRoutine
+from pipert2.core.base.routines.fps_routine import FPSRoutine
 
 
 class FunctionalMiddleRoutine(FPSRoutine):

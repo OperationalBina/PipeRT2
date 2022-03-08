@@ -1,8 +1,7 @@
 import mock
 import pytest
 from pytest_mock import MockerFixture
-from werkzeug.datastructures import MultiDict
-from pipert2.core.wrappers.api_wrapper import APIWrapper
+from pipert2.wrappers.api_wrapper import APIWrapper
 from pipert2 import START_EVENT_NAME, STOP_EVENT_NAME, KILL_EVENT_NAME, Pipe
 
 

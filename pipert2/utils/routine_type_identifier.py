@@ -1,7 +1,7 @@
 from typing import Dict, List, Set
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.routine import Routine
-from pipert2.utils.consts import GENERATOR_ROUTINE, INNER_ROUTINE, FINAL_ROUTINE
+from pipert2.utils.consts.routine_types import GENERATOR_ROUTINE, INNER_ROUTINE, FINAL_ROUTINE
 
 
 def infer_routines_types(wires: List[Wire]) -> Dict[str, Set[Routine]]:

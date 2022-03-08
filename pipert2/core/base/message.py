@@ -1,7 +1,7 @@
 import time
 import pickle
 import collections
-from pipert2.core.base.data import Data
+from pipert2.core.base.data.data import Data
 from pipert2.core.base.payload import Payload
 
 

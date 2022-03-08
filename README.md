@@ -93,7 +93,7 @@ Now we create new pipe that contains a flow made by those two routines:
 ```Python
 
 from pipert2 import Pipe, QueueNetwork
-from pipert2.utils.consts.event_names import START_EVENT_NAME, KILL_EVENT_NAME
+from pipert2.utils import START_EVENT_NAME, KILL_EVENT_NAME
 
 # Creating the pipe.
 example_pipe = Pipe()
@@ -239,7 +239,7 @@ class SomeRoutine(FPSRoutine):
 To call the new events `notify_event` is used just like any other event:
 ```Python
 from pipert2 import Pipe
-from pipert2.utils.consts.event_names import START_EVENT_NAME
+from pipert2.utils import START_EVENT_NAME
 
 # Creating the pipe.
 example_pipe = Pipe()
@@ -278,7 +278,7 @@ SOCKET_LOGGER_URL="<cockpit url here (usually http://localhost:3000 if on the sa
 After that your pipes default logger with the socket logger like so:
 ```Python
 from pipert2 import Pipe
-from pipert2.utils.socketio_logger.socket_logger import get_socket_logger
+from pipert2.utils import get_socket_logger
 
 # logger level indicates what logs will be sent, if logging.INFO is provided info logs and above will be sent and so on.
 example_pipe = Pipe(logger=get_socket_logger("<desired base name here>", <logger level>))

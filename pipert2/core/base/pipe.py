@@ -1,14 +1,13 @@
 from typing import Dict
 from logging import Logger
 from collections import defaultdict
-
 from pipert2.core.base.wire import Wire
 from pipert2.core.base.flow import Flow
 from pipert2.core.base.routine import Routine
 from pipert2.core.managers.network import Network
-from pipert2.core.base.validators import flow_validator
 from pipert2.core.managers.event_board import EventBoard
 from pipert2.core.base.data_transmitter import DataTransmitter
+from pipert2.core.base.validators.flow_validator import validate_flow
 from pipert2.core.managers.networks.queue_network import QueueNetwork
 from pipert2.utils.routine_type_identifier import infer_routines_types
 from pipert2.core.base.transmitters.basic_transmitter import BasicTransmitter
@@ -185,7 +184,7 @@ class Pipe:
 
         """
 
-        flow_validator.validate_flow(self.flows, self.wires)
+        validate_flow(self.flows, self.wires)
 
     def get_pipe_structure(self):
         """Calculate the structure of the pipe including the routines and the events.

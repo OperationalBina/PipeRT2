@@ -1,9 +1,9 @@
 import numpy as np
 from pytest_mock import MockerFixture
+from pipert2.core.base.data.data import Data
 from pipert2 import SharedMemoryTransmitter
-from pipert2 import QueueNetwork, QueueHandler
-from pipert2.core.base.data import Data
 from pipert2.utils.shared_memory import SharedMemoryManager
+from pipert2 import QueueNetwork, QueueHandler
 
 
 class NameData(Data):

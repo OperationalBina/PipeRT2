@@ -1,7 +1,7 @@
 import os
 import pytest
 import signal
-from pipert2.core import Flow
+from pipert2.core.base.flow import Flow
 from pytest_mock import MockerFixture
 from pipert2 import Pipe, Wire
 from pipert2.core.base.routines import FPSRoutine

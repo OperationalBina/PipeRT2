@@ -1,5 +1,5 @@
-from pipert2.core.base.routines import FPSRoutine
 from pipert2.utils.method_data import Method
+from pipert2.core.base.routines.fps_routine import FPSRoutine
 
 DUMMY_ROUTINE_EVENT = Method("Change")
 
