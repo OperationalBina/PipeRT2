@@ -18,7 +18,6 @@ coverage:
     changes: false
 
 ignore:
-  - "demo/"
   - "tests/"
   - "docs/"
   - "pipert2/utils/data_class/"
@@ -26,6 +25,7 @@ ignore:
   - "pipert2/utils/logging_module_modifiers.py"
   - "pipert2/utils/socketio_logger/"
   - "pipert2/core/handlers/message_handler.py"
+  - "**/__init__.py"
 
 flags:
   # filter the folder(s) you wish to measure by that flag
