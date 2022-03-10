@@ -1,15 +1,15 @@
 import threading
+from typing import Callable
 import multiprocessing as mp
 from functools import partial
 from collections import defaultdict
-from typing import Callable
 from abc import ABCMeta, abstractmethod
-from pipert2.core.base.data.data import Data
+from logging import Logger, LoggerAdapter
 from pipert2.utils.method_data import Method
 from pipert2.utils.dummy_object import Dummy
-from logging import Logger, LoggerAdapter
-from pipert2.core.handlers.message_handler import MessageHandler
+from pipert2.core.base.data.data import Data
 from pipert2.utils.annotations import class_functions_dictionary
+from pipert2.core.handlers.message_handler import MessageHandler
 from pipert2.utils.interfaces.event_executor_interface import EventExecutorInterface
 from pipert2.utils.consts.event_names import LOG_DATA, START_EVENT_NAME, STOP_EVENT_NAME, UNLINK
 

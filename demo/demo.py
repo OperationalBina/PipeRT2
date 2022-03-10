@@ -1,14 +1,15 @@
 import os
 import time
 import numpy as np
-from pipert2.core.base.data import FrameData
+from pipert2.core.base.data.frame_data import FrameData
+from pipert2.core.base.routines.fps_routine import FPSRoutine
 from pipert2 import Data, Pipe, START_EVENT_NAME, STOP_EVENT_NAME, \
     Wire
-from pipert2.core.base.routines import FPSRoutine
 
 
 class Frame(FrameData):
     def __init__(self, frame, frame_number):
+        super().__init__()
         self.frame = frame
         self.frame_number = frame_number
 

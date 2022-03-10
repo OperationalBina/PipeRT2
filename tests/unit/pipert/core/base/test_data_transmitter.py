@@ -1,8 +1,17 @@
 import sys
 import pytest
 import numpy as np
-from pipert2.core.base.data import Data
+from pipert2.core.base.data import Data, FrameData
 from pipert2.core.base.transmitters import BasicTransmitter
+
+
+class CustomData(FrameData):
+    def get_frame(self) -> np.array:
+        pass
+
+    def __init__(self, param, additional_data=None):
+        super().__init__(additional_data)
+        self.param = param
 
 
 @pytest.fixture
@@ -51,3 +60,29 @@ def test_basic_transmit_receive(dummy_basic_data_transmitter):
     data = {"data": b"AAA" * 5000, "short_data": b"AAA"}
     return_data = transmit_func(data)
     assert data == receive_func(return_data)
+
+
+def test_transmitter_with_greater_int_then_threshold_should_save_int_representation_of_value(
+        dummy_shared_memory_transmitter):
+
+    threshold = dummy_shared_memory_transmitter.data_size_threshold
+    transmit_func = dummy_shared_memory_transmitter.transmit()
+    expected_number = threshold * 2
+
+    data = Data()
+    data.additional_data = {"number": expected_number}
+
+    transmitted_data = transmit_func(data)
+
+    assert isinstance(transmitted_data.additional_data["number"], int)
+    assert expected_number == transmitted_data.additional_data["number"]
+
+
+def test_transmit_in_shared_memory_transmitter_with_custom_object_save_all_properties_properly_without_crashing(
+        dummy_shared_memory_transmitter):
+
+    custom_data = CustomData([1, 2, 3])
+
+    result = dummy_shared_memory_transmitter.transmit()(custom_data)
+
+    assert result == custom_data

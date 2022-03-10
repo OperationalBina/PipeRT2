@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
-from pipert2.core.base.message import Message
 from pipert2.utils.dummy_object import Dummy
+from pipert2.core.base.message import Message
 
 
 MESSAGE_DATA = {"Feeling": "Good", "It's": "u", "Not no": "yes"}

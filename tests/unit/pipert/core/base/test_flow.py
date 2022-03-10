@@ -3,7 +3,7 @@ from unittest.mock import call
 from pytest_mock import MockerFixture
 from pipert2.core.base.flow import Flow
 from pipert2.utils.method_data import Method
-from pipert2.utils.consts import START_EVENT_NAME, STOP_EVENT_NAME, CLEANUP
+from pipert2.utils.consts.event_names import START_EVENT_NAME, STOP_EVENT_NAME, CLEANUP
 from tests.unit.pipert.core.utils.events_utils import START_EVENT, EVENT1, KILL_EVENT, STOP_EVENT
 
 

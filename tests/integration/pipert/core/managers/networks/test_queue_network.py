@@ -1,9 +1,15 @@
 import numpy as np
 from pytest_mock import MockerFixture
+from pipert2.core.base.data.data import Data
 from pipert2 import SharedMemoryTransmitter
-from pipert2 import QueueNetwork, QueueHandler
-from pipert2.core.base.data import Data
 from pipert2.utils.shared_memory import SharedMemoryManager
+from pipert2 import QueueNetwork, QueueHandler
+
+
+class NameData(Data):
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
 
 
 def test_link_shared_memory_transmitter_to_destination_routines_message_handlers(mocker: MockerFixture):
@@ -27,7 +33,7 @@ def test_link_shared_memory_transmitter_to_destination_routines_message_handlers
 
     address = SharedMemoryManager().write_to_mem(input_sentence_in_bytes)
 
-    requested_data = Data()
+    requested_data = NameData("test")
     requested_data.additional_data = {
         "test": {
             "address": address,
@@ -35,11 +41,11 @@ def test_link_shared_memory_transmitter_to_destination_routines_message_handlers
         }
     }
 
-    expected_value = Data()
+    expected_value = NameData("test")
     expected_value.additional_data = {"test": input_sentence_in_bytes}
 
-    assert first_destination_routine.message_handler.input_queue.receive(requested_data) == expected_value
-    assert second_destination_routine.message_handler.input_queue.receive(requested_data) == expected_value
+    assert first_destination_routine.message_handler.input_queue.receive(requested_data).additional_data == expected_value.additional_data
+    assert second_destination_routine.message_handler.input_queue.receive(requested_data).additional_data == expected_value.additional_data
 
 
 def test_link_shared_memory_transmitter_to_source_routine_message_handlers(mocker: MockerFixture):

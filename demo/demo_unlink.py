@@ -1,10 +1,10 @@
 import os
 import time
 import numpy as np
-from pipert2.core.base.data import FrameData
-from pipert2 import SourceRoutine, Data, MiddleRoutine, DestinationRoutine, Pipe, START_EVENT_NAME, STOP_EVENT_NAME, \
+from pipert2.utils.consts.event_names import UNLINK
+from pipert2.core.base.data.frame_data import FrameData
+from pipert2 import FPSRoutine, Data, Pipe, START_EVENT_NAME, STOP_EVENT_NAME, \
     Wire
-from pipert2.utils.consts import UNLINK
 
 
 class Frame(FrameData):
@@ -16,7 +16,7 @@ class Frame(FrameData):
         return self.frame
 
 
-class Src(SourceRoutine):
+class Src(FPSRoutine):
 
     def __init__(self, name):
         super().__init__(name)
@@ -24,7 +24,7 @@ class Src(SourceRoutine):
         self.count = 1
         self.frame = np.zeros((500, 700, 3))
 
-    def main_logic(self) -> FrameData:
+    def main_logic(self, data: Data = None) -> FrameData:
         self._logger.info("Sending frame")
         frame = Frame(self.frame, self.count)
         self.count += 1
@@ -34,14 +34,14 @@ class Src(SourceRoutine):
         return frame
 
 
-class Mid(MiddleRoutine):
-    def main_logic(self, data: Frame) -> Frame:
+class Mid(FPSRoutine):
+    def main_logic(self, data: Frame = None) -> Frame:
         self._logger.info(f"Get to {self.name}")
         return data
 
 
-class Dst(DestinationRoutine):
-    def main_logic(self, data: Data) -> None:
+class Dst(FPSRoutine):
+    def main_logic(self, data: Data = None):
         self._logger.info("Get to destination")
 
 
