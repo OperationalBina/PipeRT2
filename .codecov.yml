@@ -18,7 +18,6 @@ coverage:
     changes: false
 
 ignore:
-  - "demo/"
   - "tests/"
   - "docs/"
   - "pipert2/utils/data_class/"
