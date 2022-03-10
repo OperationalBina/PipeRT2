@@ -71,7 +71,7 @@ from pipert2 import FPSRoutine
 
 class GenerateData(FPSRoutine):
 
-    def main_logic(self) -> dict:
+    def main_logic(self, data) -> dict:
         return {
             "value": "example"
         }
