@@ -16,7 +16,7 @@ def get_runner_for_type(routine_type: str) -> Callable:
 
 def _generator_extended_run(self):
     try:
-        main_logic_callable = partial(self.main_logic)
+        main_logic_callable = partial(self.main_logic, None)
         output_data = self._run_main_logic_with_durations_updating(
             main_logic_callable)
 
